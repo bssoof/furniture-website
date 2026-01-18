@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دار الأثاث الفاخر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-top">
+            <div class="nav-top-content">
+                <div>
+                    <i class="fas fa-phone-alt"></i> +966 50 123 4567
+                    <span style="margin: 0 15px;">|</span>
+                    <i class="fas fa-envelope"></i> info@darfurniture.com
+                </div>
+                <div>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="nav-main">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-couch"></i></div>
+                <div class="logo-text">دار <span>الأثاث</span></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">الرئيسية</a></li>
+                <li><a href="#categories">التصنيفات</a></li>
+                <li><a href="#products">المنتجات</a></li>
+                <li><a href="#offer">العروض</a></li>
+                <li><a href="#contact">اتصل بنا</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="nav-btn"><i class="fas fa-search"></i></button>
+                <button class="nav-btn"><i class="fas fa-heart"></i></button>
+                <button class="nav-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <button class="nav-btn"><i class="fas fa-user"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>صمم منزلك <span>بأناقة لا مثيل لها</span></h1>
+                <p>اكتشف مجموعتنا الفاخرة من الأثاث العصري والكلاسيكي. جودة استثنائية وتصاميم تناسب جميع الأذواق مع ضمان شامل وتوصيل مجاني.</p>
+                <div class="hero-btns">
+                    <a href="#products" class="btn-primary">
+                        <i class="fas fa-shopping-bag"></i>
+                        تسوق الآن
+                    </a>
+                    <a href="#categories" class="btn-secondary">شاهد المجموعات</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">15K+</div>
+                        <div class="stat-label">عميل سعيد</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">منتج فريد</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">فرع</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800" alt="أثاث فاخر">
+                <div class="floating-card discount">
+                    <i class="fas fa-percent"></i>
+                    <div>
+                        <div class="text">خصم 40%</div>
+                        <div class="subtext">على المجموعة الجديدة</div>
+                    </div>
+                </div>
+                <div class="floating-card rating">
+                    <i class="fas fa-star"></i>
+                    <div>
+                        <div class="text">4.9/5</div>
+                        <div class="subtext">تقييم العملاء</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-truck"></i></div>
+                <h3>توصيل مجاني</h3>
+                <p>توصيل مجاني لجميع الطلبات فوق 500 ريال</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>ضمان الجودة</h3>
+                <p>ضمان شامل لمدة 5 سنوات على جميع المنتجات</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-undo"></i></div>
+                <h3>إرجاع سهل</h3>
+                <p>سياسة إرجاع مرنة خلال 30 يوم</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                <h3>دعم 24/7</h3>
+                <p>فريق دعم متاح على مدار الساعة</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories" id="categories">
+        <div class="section-header">
+            <h2>تصفح التصنيفات</h2>
+            <p>اكتشف مجموعتنا المتنوعة من الأثاث لكل غرفة في منزلك</p>
+            <div class="line"></div>
+        </div>
+        <div class="categories-grid">
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرم المعيشة">
+                <div class="category-overlay">
+                    <div class="arrow"><i class="fas fa-arrow-left"></i></div>
+                    <h3>غرف المعيشة</h3>
+                    <p>120 منتج</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600" alt="غرف النوم">
+                <div class="category-overlay">
+                    <div class="arrow"><i class="fas fa-arrow-left"></i></div>
+                    <h3>غرف النوم</h3>
+                    <p>85 منتج</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرم الطعام">
+                <div class="category-overlay">
+                    <div class="arrow"><i class="fas fa-arrow-left"></i></div>
+                    <h3>غرف الطعام</h3>
+                    <p>65 منتج</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600" alt="المكاتب">
+                <div class="category-overlay">
+                    <div class="arrow"><i class="fas fa-arrow-left"></i></div>
+                    <h3>المكاتب</h3>
+                    <p>45 منتج</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="products" id="products">
+        <div class="products-header">
+            <div class="section-header" style="text-align: right; margin: 0;">
+                <h2>منتجاتنا المميزة</h2>
+                <p>اختيارات مميزة بأعلى جودة وأفضل الأسعار</p>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active">الكل</button>
+                <button class="filter-tab">الأكثر مبيعاً</button>
+                <button class="filter-tab">جديد</button>
+                <button class="filter-tab">عروض</button>
+            </div>
+        </div>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500" alt="كنبة فاخرة">
+                    <span class="product-badge badge-sale">-30%</span>
+                    <div class="product-actions">
+                        <button class="action-btn"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">غرف المعيشة</div>
+                    <h3 class="product-name">كنبة مودرن فاخرة</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(128 تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">2,799 ر.س</span>
+                        <span class="old-price">3,999 ر.س</span>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('كنبة مودرن فاخرة', 2799)">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500" alt="طاولة طعام">
+                    <span class="product-badge badge-new">جديد</span>
+                    <div class="product-actions">
+                        <button class="action-btn"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">غرف الطعام</div>
+                    <h3 class="product-name">طاولة طعام خشب فاخر</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>(95 تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">1,899 ر.س</span>
+                        <span class="old-price">2,299 ر.س</span>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('طاولة طعام خشب فاخر', 1899)">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500" alt="كرسي جلد">
+                    <span class="product-badge badge-sale">-20%</span>
+                    <div class="product-actions">
+                        <button class="action-btn"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">مقاعد</div>
+                    <h3 class="product-name">كرسي جلد إيطالي</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>(64 تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">1,199 ر.س</span>
+                        <span class="old-price">1,499 ر.س</span>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('كرسي جلد إيطالي', 1199)">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500" alt="سرير">
+                    <div class="product-actions">
+                        <button class="action-btn"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">غرف النوم</div>
+                    <h3 class="product-name">سرير فاخر بتصميم عصري</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(156 تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">3,999 ر.س</span>
+                        <span class="old-price">4,999 ر.س</span>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('سرير فاخر بتصميم عصري', 3999)">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Offer -->
+    <section class="special-offer" id="offer">
+        <div class="offer-content">
+            <div class="offer-text">
+                <h2>عرض خاص <span>محدود الوقت</span></h2>
+                <p>احصل على خصم يصل إلى 50% على مجموعة مختارة من الأثاث الفاخر. هذا العرض متاح لفترة محدودة فقط!</p>
+                <div class="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">05</div>
+                        <div class="countdown-label">أيام</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">12</div>
+                        <div class="countdown-label">ساعات</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">34</div>
+                        <div class="countdown-label">دقائق</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">56</div>
+                        <div class="countdown-label">ثواني</div>
+                    </div>
+                </div>
+                <a href="#products" class="btn-primary">اغتنم العرض الآن</a>
+            </div>
+            <div class="offer-image">
+                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600" alt="عرض خاص">
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header">
+            <h2>آراء عملائنا</h2>
+            <p>شاهد ما يقوله عملاؤنا الراضون عن خدماتنا</p>
+            <div class="line"></div>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">جودة ممتازة وخدمة لا تُضاهى! أثاث بيتي كله من دار الأثاث وأنا راضي جداً عن الاختيار.</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60" class="author-avatar" alt="محمد">
+                    <div class="author-info">
+                        <h4>محمد أحمد</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">توصيل سريع وآمن جداً. المنتجات تطابق الصور بنسبة 100%. متجر موثوق وأنصح به بقوة!</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60" class="author-avatar" alt="فاطمة">
+                    <div class="author-info">
+                        <h4>فاطمة محمود</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">أفضل سعر في السوق مع أفضل جودة! فريق الدعم رد على استفساراتي بسرعة واحترافية.</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60" class="author-avatar" alt="علي">
+                    <div class="author-info">
+                        <h4>علي خالد</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="newsletter-content">
+            <h2>اشترك في نشرتنا البريدية</h2>
+            <p>احصل على أحدث العروض والمنتجات الجديدة مباشرة في بريدك الإلكتروني</p>
+            <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+                <input type="email" placeholder="أدخل بريدك الإلكتروني" required>
+                <button type="submit">اشترك الآن</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-couch"></i></div>
+                    <div class="logo-text">دار <span>الأثاث</span></div>
+                </div>
+                <p>متجر الأثاث الفاخر الأول في المملكة. نقدم أفضل تشكيلة من الأثاث العصري والكلاسيكي بأسعار منافسة وجودة عالية.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>المتجر</h4>
+                <ul>
+                    <li><a href="#">الرئيسية</a></li>
+                    <li><a href="#">المنتجات</a></li>
+                    <li><a href="#">العروض</a></li>
+                    <li><a href="#">المجموعات</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>خدمات</h4>
+                <ul>
+                    <li><a href="#">سياسة الإرجاع</a></li>
+                    <li><a href="#">الشحن والتوصيل</a></li>
+                    <li><a href="#">الضمان</a></li>
+                    <li><a href="#">التثبيت</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>المساعدة</h4>
+                <ul>
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">اتصل بنا</a></li>
+                    <li><a href="#">الشروط والأحكام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>تواصل معنا</h4>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <p style="margin: 0;">+966 50 123 4567</p>
+                        <p style="margin: 0; font-size: 13px;">من 9 صباحاً إلى 11 مساءً</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <p style="margin: 0;">info@darfurniture.com</p>
+                        <p style="margin: 0; font-size: 13px;">رد خلال 24 ساعة</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <p style="margin: 0;">الرياض - المملكة العربية السعودية</p>
+                        <p style="margin: 0; font-size: 13px;">50 فرع في الدول الخليجية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 دار الأثاث الفاخر. جميع الحقوق محفوظة.</p>
+            <div class="payment-methods">
+                <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa">
+                <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MasterCard">
+                <img src="https://img.icons8.com/color/48/000000/apple-pay.png" alt="Apple Pay">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3>سلة التسوق</h3>
+            <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>الإجمالي:</span>
+                <span id="cartTotal">0 ر.س</span>
+            </div>
+            <button class="checkout-btn">الدفع الآن</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
