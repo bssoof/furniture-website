@@ -39,13 +39,17 @@
                 <li><a href="#contact">اتصل بنا</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="nav-btn"><i class="fas fa-search"></i></button>
-                <button class="nav-btn"><i class="fas fa-heart"></i></button>
+                <button class="nav-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
+                <button class="nav-btn" onclick="toggleWishlist()"><i class="fas fa-heart"></i><span class="wishlist-count" id="wishlistCount">0</span></button>
                 <button class="nav-btn" onclick="toggleCart()">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </button>
-                <button class="nav-btn"><i class="fas fa-user"></i></button>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </nav>
@@ -509,9 +513,39 @@
                 <span>الإجمالي:</span>
                 <span id="cartTotal">0 ر.س</span>
             </div>
-            <button class="checkout-btn">الدفع الآن</button>
+            <button class="checkout-btn" onclick="checkout()">الدفع الآن</button>
         </div>
     </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <button class="close-search" onclick="toggleSearch()"><i class="fas fa-times"></i></button>
+            <h2>ابحث عن منتجاتك</h2>
+            <div class="search-input-wrapper">
+                <input type="text" id="searchInput" placeholder="اكتب اسم المنتج..." onkeyup="searchProducts(event)">
+                <button onclick="performSearch()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Wishlist Sidebar -->
+    <div class="wishlist-overlay" id="wishlistOverlay" onclick="toggleWishlist()"></div>
+    <div class="wishlist-sidebar" id="wishlistSidebar">
+        <div class="cart-header">
+            <h3>المفضلة <i class="fas fa-heart"></i></h3>
+            <button class="close-cart" onclick="toggleWishlist()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="wishlistItems">
+            <p style="text-align: center; color: #999; padding: 40px 20px;">المفضلة فارغة</p>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script src="js/script.js"></script>
 </body>
