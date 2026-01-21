@@ -303,6 +303,53 @@ function validatePhone(phone) {
     return /^[\d\s\-+()]{9,}$/.test(phone);
 }
 
+// ========== Product Sorting ==========
+function sortProducts(sortValue) {
+    const productsGrid = document.querySelector('.products-grid');
+    if (!productsGrid) return;
+    
+    const products = Array.from(productsGrid.querySelectorAll('.product-card'));
+    
+    products.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price) || 0;
+        const priceB = parseFloat(b.dataset.price) || 0;
+        const nameA = a.dataset.name || '';
+        const nameB = b.dataset.name || '';
+        
+        switch(sortValue) {
+            case 'price-low':
+                return priceA - priceB;
+            case 'price-high':
+                return priceB - priceA;
+            case 'name':
+                return nameA.localeCompare(nameB, 'ar');
+            case 'default':
+            default:
+                return 0;
+        }
+    });
+    
+    // Re-append sorted products with animation
+    products.forEach((product, index) => {
+        product.style.animation = 'none';
+        product.offsetHeight; // Trigger reflow
+        product.style.animation = `fadeInUp 0.4s ease ${index * 0.05}s both`;
+        productsGrid.appendChild(product);
+    });
+    
+    showToast('تم ترتيب المنتجات', 'info');
+}
+
+// Initialize sort dropdown
+function initProductSorting() {
+    const sortDropdown = document.getElementById('sortProducts');
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', (e) => {
+            sortProducts(e.target.value);
+        });
+    }
+}
+
 function showFieldError(input, message) {
     clearFieldError(input);
     input.classList.add('error');
@@ -914,7 +961,123 @@ function checkout() {
         showNotification('السلة فارغة!', 'error');
         return;
     }
-    showNotification('جاري تحويلك لصفحة الدفع...', 'success');
+    
+    // Show checkout modal
+    const modal = document.getElementById('checkoutModal');
+    const overlay = document.getElementById('checkoutOverlay');
+    
+    if (modal && overlay) {
+        // Update checkout summary
+        updateCheckoutSummary();
+        overlay.classList.add('active');
+        modal.classList.add('active');
+        setBodyScrollLocked(true);
+    } else {
+        // Fallback if modal doesn't exist
+        showNotification('🎉 شكراً لك! سيتم التواصل معك قريباً لتأكيد الطلب.', 'success');
+        // Clear cart
+        cart = [];
+        appliedCoupon = null;
+        persistCart();
+        updateCartCount();
+        updateCartDisplay();
+        toggleCart();
+    }
+}
+
+function updateCheckoutSummary() {
+    const itemsContainer = document.getElementById('checkoutItems');
+    const subtotalEl = document.getElementById('checkoutSubtotal');
+    const discountEl = document.getElementById('checkoutDiscount');
+    const totalEl = document.getElementById('checkoutTotal');
+    
+    if (!itemsContainer) return;
+    
+    // Calculate values
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let discount = 0;
+    
+    if (appliedCoupon) {
+        discount = appliedCoupon.type === 'percent' 
+            ? subtotal * (appliedCoupon.discount / 100) 
+            : appliedCoupon.discount;
+    }
+    
+    const total = subtotal - discount;
+    
+    // Update items
+    itemsContainer.innerHTML = cart.map(item => `
+        <div class="checkout-item">
+            <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+            <div class="checkout-item-info">
+                <div class="checkout-item-name">${item.name}</div>
+                <div class="checkout-item-qty">الكمية: ${item.quantity}</div>
+            </div>
+            <div class="checkout-item-price">${formatPrice(item.price * item.quantity)}</div>
+        </div>
+    `).join('');
+    
+    // Update totals
+    if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
+    if (discountEl) {
+        discountEl.textContent = discount > 0 ? '-' + formatPrice(discount) : formatPrice(0);
+    }
+    if (totalEl) totalEl.textContent = formatPrice(total);
+}
+
+function closeCheckout() {
+    const modal = document.getElementById('checkoutModal');
+    const overlay = document.getElementById('checkoutOverlay');
+    if (modal) modal.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    setBodyScrollLocked(false);
+}
+
+function submitOrder(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const name = form.querySelector('#checkoutName').value.trim();
+    const phone = form.querySelector('#checkoutPhone').value.trim();
+    const address = form.querySelector('#checkoutAddress').value.trim();
+    
+    if (!name || !phone || !address) {
+        showNotification('الرجاء تعبئة جميع الحقول', 'error');
+        return;
+    }
+    
+    if (!validatePhone(phone)) {
+        showNotification('رقم الهاتف غير صالح', 'error');
+        return;
+    }
+    
+    // Show loading
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب...';
+    
+    // Simulate order submission
+    setTimeout(() => {
+        showNotification('🎉 تم استلام طلبك بنجاح! سنتواصل معك قريباً.', 'success');
+        
+        // Clear cart
+        cart = [];
+        appliedCoupon = null;
+        persistCart();
+        updateCartCount();
+        updateCartDisplay();
+        
+        // Close modals
+        closeCheckout();
+        toggleCart();
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> تأكيد الطلب';
+        
+        // Reset form
+        form.reset();
+    }, 1500);
 }
 
 // ========== وظائف المفضلة ==========
@@ -1253,6 +1416,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // تهيئة Lightbox للصور
     initImageLightbox();
+    
+    // تهيئة ترتيب المنتجات
+    initProductSorting();
     
     // تشغيل العد التنازلي
     startCountdown();

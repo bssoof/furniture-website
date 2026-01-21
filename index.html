@@ -202,14 +202,24 @@
                 <h2>منتجاتنا المميزة</h2>
                 <p>اختيارات مميزة بأعلى جودة وأفضل الأسعار</p>
             </div>
-            <div class="filter-tabs">
-                <button class="filter-tab active">الكل</button>
-                <button class="filter-tab">الأكثر مبيعاً</button>
-                <button class="filter-tab">جديد</button>
-                <button class="filter-tab">عروض</button>
+            <div class="products-controls">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">الكل</button>
+                    <button class="filter-tab" data-filter="bestseller">الأكثر مبيعاً</button>
+                    <button class="filter-tab" data-filter="new">جديد</button>
+                    <button class="filter-tab" data-filter="sale">عروض</button>
+                </div>
+                <div class="sort-dropdown">
+                    <select id="sortProducts" onchange="sortProducts()" aria-label="ترتيب المنتجات">
+                        <option value="default">الترتيب الافتراضي</option>
+                        <option value="price-low">السعر: من الأقل للأعلى</option>
+                        <option value="price-high">السعر: من الأعلى للأقل</option>
+                        <option value="name">الاسم: أ-ي</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="products-grid">
+        <div class="products-grid" id="productsGrid">
             <div class="product-card" data-name="كنبة مودرن فاخرة" data-price="2799" data-old-price="3999" data-category="غرف المعيشة" data-badge="-30%" data-image="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500" alt="كنبة فاخرة" loading="lazy">
@@ -664,6 +674,61 @@
             <i class="fas fa-chevron-left"></i>
         </button>
         <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-overlay" id="checkoutOverlay" onclick="closeCheckout()" aria-hidden="true"></div>
+    <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إتمام الطلب" aria-modal="true">
+        <div class="checkout-header">
+            <h3><i class="fas fa-shopping-bag"></i> إتمام الطلب</h3>
+            <button class="close-checkout" onclick="closeCheckout()" aria-label="إغلاق">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="checkout-body">
+            <div class="checkout-section">
+                <h4>ملخص الطلب</h4>
+                <div class="checkout-items" id="checkoutItems"></div>
+                <div class="checkout-totals">
+                    <div class="checkout-row">
+                        <span>المجموع الفرعي:</span>
+                        <span id="checkoutSubtotal">0 ر.س</span>
+                    </div>
+                    <div class="checkout-row discount">
+                        <span>الخصم:</span>
+                        <span id="checkoutDiscount">0 ر.س</span>
+                    </div>
+                    <div class="checkout-row total">
+                        <span>الإجمالي:</span>
+                        <span id="checkoutTotal">0 ر.س</span>
+                    </div>
+                </div>
+            </div>
+            <div class="checkout-section">
+                <h4>معلومات التوصيل</h4>
+                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                    <div class="form-group">
+                        <label for="checkoutName"><i class="fas fa-user"></i> الاسم الكامل</label>
+                        <input type="text" id="checkoutName" required placeholder="أدخل اسمك الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutPhone"><i class="fas fa-phone"></i> رقم الهاتف</label>
+                        <input type="tel" id="checkoutPhone" required placeholder="05xxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutAddress"><i class="fas fa-map-marker-alt"></i> عنوان التوصيل</label>
+                        <textarea id="checkoutAddress" required rows="3" placeholder="المدينة - الحي - الشارع - رقم المبنى"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutNotes"><i class="fas fa-sticky-note"></i> ملاحظات (اختياري)</label>
+                        <textarea id="checkoutNotes" rows="2" placeholder="أي ملاحظات إضافية للطلب"></textarea>
+                    </div>
+                    <button type="submit" class="submit-order-btn">
+                        <i class="fas fa-check"></i> تأكيد الطلب
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="js/script.js"></script>
