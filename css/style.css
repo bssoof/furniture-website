@@ -235,6 +235,28 @@ body.no-scroll {
     color: rgba(255,255,255,0.8);
 }
 
+.nav-contact-info, 
+.nav-social-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-social-links {
+    gap: 15px;
+}
+
+.nav-social-links a {
+    color: var(--secondary);
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-social-links a:hover {
+    color: white;
+}
+
 .nav-top a {
     color: var(--secondary);
     text-decoration: none;
