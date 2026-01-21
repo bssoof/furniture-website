@@ -350,17 +350,16 @@ body.no-scroll {
     font-weight: bold;
 }
 
-/* Hero Section with Parallax */
+/* Hero Section */
 .hero {
     margin-top: 110px;
     min-height: 90vh;
-    background: linear-gradient(135deg, rgba(44,24,16,0.9) 0%, rgba(93,46,12,0.85) 100%),
-                url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920') center/cover fixed;
-    background-attachment: fixed;
+    background: linear-gradient(135deg, rgba(44,24,16,0.95) 0%, rgba(93,46,12,0.9) 100%),
+                url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920') center/cover no-repeat;
     display: flex;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .hero::before {
