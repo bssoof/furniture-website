@@ -1656,10 +1656,8 @@ body.no-scroll {
 }
 
 @media (max-width: 768px) {
-    .nav-top-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+    .nav-top {
+        display: none;
     }
     
     .nav-main {
