@@ -242,7 +242,8 @@ body.no-scroll {
 }
 
 .nav-social-links {
-    display: flex; /* Ensure horizontal layout */
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center;
     gap: 15px;
 }
@@ -250,16 +251,16 @@ body.no-scroll {
 .nav-social-links a {
     color: var(--secondary);
     transition: color 0.3s;
-    display: inline-flex; /* Changed from flex to inline-flex */
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 30px; /* Force width */
-    height: 30px; /* Force height */
     text-decoration: none;
+    width: auto !important;
+    height: auto !important;
 }
 
 .nav-social-links a i {
-    font-size: 14px; /* Ensure icon size */
+    font-size: 16px;
 }
 
 .nav-social-links a:hover {
