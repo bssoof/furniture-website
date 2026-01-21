@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+    
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">تخطي إلى المحتوى الرئيسي</a>
     
@@ -90,15 +93,15 @@
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <div class="stat-number">15K+</div>
+                        <div class="stat-number" data-count="15000">0</div>
                         <div class="stat-label">عميل سعيد</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">500+</div>
+                        <div class="stat-number" data-count="500">0</div>
                         <div class="stat-label">منتج فريد</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">50+</div>
+                        <div class="stat-number" data-count="50">0</div>
                         <div class="stat-label">فرع</div>
                     </div>
                 </div>
@@ -207,14 +210,14 @@
             </div>
         </div>
         <div class="products-grid">
-            <div class="product-card">
+            <div class="product-card" data-name="كنبة مودرن فاخرة" data-price="2799" data-old-price="3999" data-category="غرف المعيشة" data-badge="-30%" data-image="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500" alt="كنبة فاخرة" loading="lazy">
                     <span class="product-badge badge-sale">-30%</span>
                     <div class="product-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
                     </div>
                 </div>
                 <div class="product-info">
@@ -232,21 +235,21 @@
                         <span class="current-price">2,799 ر.س</span>
                         <span class="old-price">3,999 ر.س</span>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('كنبة مودرن فاخرة', 2799)">
+                    <button class="add-to-cart" onclick="addToCart('كنبة مودرن فاخرة', 2799, 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500')">
                         <i class="fas fa-cart-plus"></i>
                         أضف للسلة
                     </button>
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-name="طاولة طعام خشب فاخر" data-price="1899" data-old-price="2299" data-category="غرف الطعام" data-badge="جديد" data-image="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500" alt="طاولة طعام" loading="lazy">
                     <span class="product-badge badge-new">جديد</span>
                     <div class="product-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
                     </div>
                 </div>
                 <div class="product-info">
@@ -264,21 +267,21 @@
                         <span class="current-price">1,899 ر.س</span>
                         <span class="old-price">2,299 ر.س</span>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('طاولة طعام خشب فاخر', 1899)">
+                    <button class="add-to-cart" onclick="addToCart('طاولة طعام خشب فاخر', 1899, 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500')">
                         <i class="fas fa-cart-plus"></i>
                         أضف للسلة
                     </button>
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-name="كرسي جلد إيطالي" data-price="1199" data-old-price="1499" data-category="مقاعد" data-badge="-20%" data-image="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500" alt="كرسي جلد" loading="lazy">
                     <span class="product-badge badge-sale">-20%</span>
                     <div class="product-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
                     </div>
                 </div>
                 <div class="product-info">
@@ -295,20 +298,20 @@
                         <span class="current-price">1,199 ر.س</span>
                         <span class="old-price">1,499 ر.س</span>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('كرسي جلد إيطالي', 1199)">
+                    <button class="add-to-cart" onclick="addToCart('كرسي جلد إيطالي', 1199, 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500')">
                         <i class="fas fa-cart-plus"></i>
                         أضف للسلة
                     </button>
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-name="سرير فاخر بتصميم عصري" data-price="3999" data-old-price="4999" data-category="غرف النوم" data-image="https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500" alt="سرير" loading="lazy">
                     <div class="product-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn"><i class="fas fa-sync"></i></button>
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
                     </div>
                 </div>
                 <div class="product-info">
@@ -326,7 +329,7 @@
                         <span class="current-price">3,999 ر.س</span>
                         <span class="old-price">4,999 ر.س</span>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('سرير فاخر بتصميم عصري', 3999)">
+                    <button class="add-to-cart" onclick="addToCart('سرير فاخر بتصميم عصري', 3999, 'https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500')">
                         <i class="fas fa-cart-plus"></i>
                         أضف للسلة
                     </button>
@@ -532,13 +535,75 @@
             <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
         </div>
         <div class="cart-footer">
-            <div class="cart-total">
-                <span>الإجمالي:</span>
-                <span id="cartTotal" aria-live="polite">0 ر.س</span>
+            <!-- Coupon Code -->
+            <div class="coupon-section">
+                <input type="text" id="couponInput" placeholder="كود الخصم" aria-label="أدخل كود الخصم">
+                <button onclick="applyCoupon()" class="coupon-btn">تطبيق</button>
             </div>
-            <button class="checkout-btn" onclick="checkout()">الدفع الآن</button>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>المجموع:</span>
+                    <span id="cartSubtotal">0 ر.س</span>
+                </div>
+                <div class="summary-row discount-row" id="discountRow" style="display: none;">
+                    <span>الخصم:</span>
+                    <span id="discountAmount">-0 ر.س</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>الإجمالي:</span>
+                    <span id="cartTotal" aria-live="polite">0 ر.س</span>
+                </div>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">
+                <i class="fas fa-lock"></i>
+                الدفع الآن
+            </button>
         </div>
     </aside>
+
+    <!-- Quick View Modal -->
+    <div class="quick-view-overlay" id="quickViewOverlay" onclick="closeQuickView()" aria-hidden="true"></div>
+    <div class="quick-view-modal" id="quickViewModal" role="dialog" aria-label="معاينة المنتج" aria-modal="true">
+        <button class="close-quick-view" onclick="closeQuickView()" aria-label="إغلاق">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <div class="quick-view-content">
+            <div class="quick-view-image">
+                <img id="quickViewImage" src="" alt="">
+                <div class="quick-view-badge" id="quickViewBadge"></div>
+            </div>
+            <div class="quick-view-info">
+                <span class="quick-view-category" id="quickViewCategory"></span>
+                <h2 id="quickViewName"></h2>
+                <div class="quick-view-rating" id="quickViewRating"></div>
+                <div class="quick-view-price">
+                    <span class="current-price" id="quickViewPrice"></span>
+                    <span class="old-price" id="quickViewOldPrice"></span>
+                </div>
+                <p class="quick-view-desc" id="quickViewDesc">منتج فاخر بجودة عالية وتصميم عصري يناسب جميع الأذواق. مصنوع من أفضل الخامات مع ضمان شامل.</p>
+                <div class="quick-view-quantity">
+                    <label>الكمية:</label>
+                    <div class="qty-selector">
+                        <button onclick="changeQuickViewQty(-1)">-</button>
+                        <input type="number" id="quickViewQty" value="1" min="1" max="10">
+                        <button onclick="changeQuickViewQty(1)">+</button>
+                    </div>
+                </div>
+                <div class="quick-view-actions">
+                    <button class="qv-add-cart" onclick="addFromQuickView()">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                    <button class="qv-wishlist" onclick="addToWishlistFromQuickView()">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="qv-share" onclick="shareProduct()">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Search Overlay -->
     <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="البحث" aria-modal="true">

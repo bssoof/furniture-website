@@ -21,6 +21,300 @@ let cart = safeParse(STORAGE_KEYS.cart);
 let wishlist = safeParse(STORAGE_KEYS.wishlist);
 let cartTotal = 0;
 
+// ========== Scroll Progress Bar ==========
+function initScrollProgress() {
+    const progressBar = document.getElementById('scrollProgress');
+    if (!progressBar) return;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        progressBar.style.width = scrollPercent + '%';
+    }, { passive: true });
+}
+
+// ========== Enhanced Toast Notifications ==========
+function createToastContainer() {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        container.setAttribute('role', 'alert');
+        container.setAttribute('aria-live', 'polite');
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+function showToast(message, type = 'success', title = null) {
+    const container = createToastContainer();
+    
+    const icons = {
+        success: 'fa-check',
+        error: 'fa-times',
+        warning: 'fa-exclamation',
+        info: 'fa-info'
+    };
+    
+    const titles = {
+        success: 'تم بنجاح',
+        error: 'خطأ',
+        warning: 'تنبيه',
+        info: 'معلومة'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icons[type]}" aria-hidden="true"></i></div>
+        <div class="toast-content">
+            <div class="toast-title">${title || titles[type]}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()" aria-label="إغلاق">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <div class="toast-progress" style="color: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'}"></div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Announce to screen readers
+    announceToScreenReader(message);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+// ========== Animated Counters ==========
+function animateCounter(element) {
+    const target = parseInt(element.dataset.count);
+    const duration = 2000;
+    const start = 0;
+    const startTime = performance.now();
+    
+    element.classList.add('counting');
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (target - start) * easeOut);
+        
+        // Format large numbers
+        if (current >= 1000) {
+            element.textContent = (current / 1000).toFixed(current >= 10000 ? 0 : 1) + 'K';
+        } else {
+            element.textContent = current;
+        }
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            element.classList.remove('counting');
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+function initAnimatedCounters() {
+    const counters = document.querySelectorAll('.stat-number[data-count]');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.dataset.animated) {
+                entry.target.dataset.animated = 'true';
+                animateCounter(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    counters.forEach(counter => observer.observe(counter));
+}
+
+// ========== Quick View ==========
+let currentQuickViewProduct = null;
+
+function openQuickView(name, price, image, category = 'أثاث', oldPrice = null, badge = null, rating = 4.5) {
+    const overlay = document.getElementById('quickViewOverlay');
+    const modal = document.getElementById('quickViewModal');
+    
+    // Set product data
+    document.getElementById('quickViewImage').src = image;
+    document.getElementById('quickViewImage').alt = name;
+    document.getElementById('quickViewName').textContent = name;
+    document.getElementById('quickViewPrice').textContent = formatPrice(price);
+    document.getElementById('quickViewCategory').textContent = category;
+    document.getElementById('quickViewQty').value = 1;
+    
+    // Old price
+    const oldPriceEl = document.getElementById('quickViewOldPrice');
+    if (oldPrice) {
+        oldPriceEl.textContent = formatPrice(oldPrice);
+        oldPriceEl.style.display = 'inline';
+    } else {
+        oldPriceEl.style.display = 'none';
+    }
+    
+    // Badge
+    const badgeEl = document.getElementById('quickViewBadge');
+    if (badge) {
+        badgeEl.textContent = badge;
+        badgeEl.className = 'quick-view-badge ' + (badge.includes('%') ? 'sale' : 'new');
+        badgeEl.style.display = 'block';
+    } else {
+        badgeEl.style.display = 'none';
+    }
+    
+    // Rating
+    const ratingEl = document.getElementById('quickViewRating');
+    const fullStars = Math.floor(rating);
+    const hasHalf = rating % 1 >= 0.5;
+    let starsHtml = '';
+    for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+    if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+    for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+    starsHtml += `<span>(${Math.floor(Math.random() * 200 + 50)} تقييم)</span>`;
+    ratingEl.innerHTML = starsHtml;
+    
+    currentQuickViewProduct = { name, price, image, category };
+    
+    // Show modal
+    overlay.classList.add('active');
+    modal.classList.add('active');
+    setBodyScrollLocked(true);
+    
+    announceToScreenReader('تم فتح معاينة المنتج: ' + name);
+}
+
+function closeQuickView() {
+    document.getElementById('quickViewOverlay').classList.remove('active');
+    document.getElementById('quickViewModal').classList.remove('active');
+    setBodyScrollLocked(false);
+    currentQuickViewProduct = null;
+}
+
+function changeQuickViewQty(delta) {
+    const input = document.getElementById('quickViewQty');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 10) val = 10;
+    input.value = val;
+}
+
+function addFromQuickView() {
+    if (!currentQuickViewProduct) return;
+    const qty = parseInt(document.getElementById('quickViewQty').value);
+    
+    for (let i = 0; i < qty; i++) {
+        addToCart(currentQuickViewProduct.name, currentQuickViewProduct.price, currentQuickViewProduct.image);
+    }
+    
+    closeQuickView();
+}
+
+function addToWishlistFromQuickView() {
+    if (!currentQuickViewProduct) return;
+    
+    const existingIndex = wishlist.findIndex(item => item.name === currentQuickViewProduct.name);
+    if (existingIndex > -1) {
+        showToast('المنتج موجود بالفعل في المفضلة', 'warning');
+    } else {
+        wishlist.push({
+            name: currentQuickViewProduct.name,
+            price: currentQuickViewProduct.price,
+            image: currentQuickViewProduct.image
+        });
+        persistWishlist();
+        updateWishlistCount();
+        showToast('تم إضافة المنتج للمفضلة', 'success');
+    }
+}
+
+function shareProduct() {
+    if (!currentQuickViewProduct) return;
+    
+    const shareData = {
+        title: currentQuickViewProduct.name,
+        text: `شاهد هذا المنتج: ${currentQuickViewProduct.name} - ${formatPrice(currentQuickViewProduct.price)}`,
+        url: window.location.href
+    };
+    
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(shareData.url).then(() => {
+            showToast('تم نسخ الرابط!', 'success');
+        });
+    }
+}
+
+// ========== Coupon System ==========
+const COUPONS = {
+    'WELCOME10': { discount: 10, type: 'percent', minOrder: 0 },
+    'SAVE20': { discount: 20, type: 'percent', minOrder: 500 },
+    'FLAT50': { discount: 50, type: 'fixed', minOrder: 200 },
+    'VIP25': { discount: 25, type: 'percent', minOrder: 1000 }
+};
+
+let appliedCoupon = null;
+
+function applyCoupon() {
+    const input = document.getElementById('couponInput');
+    const code = input.value.trim().toUpperCase();
+    
+    if (!code) {
+        showToast('الرجاء إدخال كود الخصم', 'warning');
+        return;
+    }
+    
+    if (appliedCoupon) {
+        showToast('يوجد كوبون مطبق بالفعل', 'warning');
+        return;
+    }
+    
+    const coupon = COUPONS[code];
+    
+    if (!coupon) {
+        showToast('كود الخصم غير صالح', 'error');
+        input.value = '';
+        return;
+    }
+    
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    if (subtotal < coupon.minOrder) {
+        showToast(`الحد الأدنى للطلب ${formatPrice(coupon.minOrder)}`, 'warning');
+        return;
+    }
+    
+    appliedCoupon = { code, ...coupon };
+    input.value = code;
+    input.disabled = true;
+    
+    updateCartTotal();
+    showToast(`تم تطبيق كود الخصم: ${coupon.type === 'percent' ? coupon.discount + '%' : formatPrice(coupon.discount)}`, 'success', '🎉 مبروك!');
+}
+
+function removeCoupon() {
+    appliedCoupon = null;
+    const input = document.getElementById('couponInput');
+    if (input) {
+        input.value = '';
+        input.disabled = false;
+    }
+    updateCartTotal();
+}
+
 // ========== Dark Mode ==========
 function getPreferredTheme() {
     const saved = localStorage.getItem(STORAGE_KEYS.theme);
@@ -331,8 +625,33 @@ function decreaseQty(index) {
 
 // تحديث إجمالي السلة
 function updateCartTotal() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Update subtotal
+    const subtotalEl = document.getElementById('cartSubtotal');
+    if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
+    
+    // Calculate discount
+    let discount = 0;
+    const discountRow = document.getElementById('discountRow');
+    const discountAmountEl = document.getElementById('discountAmount');
+    
+    if (appliedCoupon && subtotal > 0) {
+        if (appliedCoupon.type === 'percent') {
+            discount = subtotal * (appliedCoupon.discount / 100);
+        } else {
+            discount = appliedCoupon.discount;
+        }
+        
+        if (discountRow) discountRow.style.display = 'flex';
+        if (discountAmountEl) discountAmountEl.textContent = '-' + formatPrice(discount);
+    } else {
+        if (discountRow) discountRow.style.display = 'none';
+    }
+    
+    // Final total
+    cartTotal = subtotal - discount;
     const totalEl = document.getElementById('cartTotal');
-    cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     if (totalEl) totalEl.textContent = formatPrice(cartTotal);
 }
 
@@ -508,29 +827,9 @@ function toggleMobileMenu() {
     setBodyScrollLocked(navLinks.classList.contains('active'));
 }
 
-// عرض تنبيه
+// عرض تنبيه (استخدام Toast الجديد)
 function showNotification(message, type = 'success') {
-    // إزالة التنبيهات السابقة
-    document.querySelectorAll('.notification').forEach(n => n.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.setAttribute('role', 'alert');
-    notification.setAttribute('aria-live', 'assertive');
-    notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}" aria-hidden="true"></i>
-        <span>${message}</span>
-    `;
-    document.body.appendChild(notification);
-    
-    // Announce to screen readers
-    announceToScreenReader(message);
-    
-    setTimeout(() => notification.classList.add('show'), 10);
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    showToast(message, type);
 }
 
 // الاشتراك في النشرة البريدية
@@ -584,6 +883,65 @@ function attachProductButtons() {
             addToCart(name, price, img);
         });
     });
+    
+    // أزرار Quick View
+    document.querySelectorAll('.quick-view-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = btn.closest('.product-card');
+            if (!card) return;
+            
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
+            const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
+            const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
+            const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
+            const category = card.dataset.category || card.querySelector('.product-category')?.textContent || 'أثاث';
+            const badge = card.dataset.badge || null;
+            
+            openQuickView(name, price, image, category, oldPrice, badge);
+        });
+    });
+    
+    // أزرار المفضلة
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = btn.closest('.product-card');
+            if (!card) return;
+            
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
+            const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
+            const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
+            
+            addToWishlist(name, price, btn, image);
+        });
+    });
+    
+    // أزرار المشاركة
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = btn.closest('.product-card');
+            if (!card) return;
+            
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
+            const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
+            
+            const shareData = {
+                title: name,
+                text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
+                url: window.location.href
+            };
+            
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareData.url).then(() => {
+                    showToast('تم نسخ الرابط!', 'success');
+                });
+            }
+        });
+    });
 }
 
 function hydrateHeartsFromWishlist() {
@@ -626,7 +984,13 @@ document.addEventListener('DOMContentLoaded', function() {
     hydrateHeartsFromWishlist();
     
     // تهيئة تحميل الصور
-    initImageLoading();;
+    initImageLoading();
+    
+    // تهيئة شريط التقدم
+    initScrollProgress();
+    
+    // تهيئة العدادات المتحركة
+    initAnimatedCounters();
     
     // تشغيل العد التنازلي
     startCountdown();
