@@ -338,6 +338,18 @@
         </div>
     </section>
 
+    <!-- Recently Viewed Products -->
+    <section class="recently-viewed" id="recentlyViewed" style="display: none;">
+        <div class="section-header">
+            <h2>شاهدتها مؤخراً</h2>
+            <p>المنتجات التي قمت بمعاينتها</p>
+            <div class="line"></div>
+        </div>
+        <div class="recently-viewed-grid" id="recentlyViewedGrid">
+            <!-- Products will be added dynamically -->
+        </div>
+    </section>
+
     <!-- Special Offer -->
     <section class="special-offer" id="offer">
         <div class="offer-content">
@@ -634,6 +646,25 @@
     <button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="العودة إلى أعلى الصفحة">
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
+
+    <!-- Image Lightbox -->
+    <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()" aria-hidden="true"></div>
+    <div class="lightbox" id="lightbox" role="dialog" aria-label="عرض الصورة" aria-modal="true">
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="إغلاق">
+            <i class="fas fa-times"></i>
+        </button>
+        <button class="lightbox-nav lightbox-prev" onclick="lightboxPrev()" aria-label="السابق">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="lightbox-content">
+            <img id="lightboxImage" src="" alt="">
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+        <button class="lightbox-nav lightbox-next" onclick="lightboxNext()" aria-label="التالي">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
 
     <script src="js/script.js"></script>
 </body>

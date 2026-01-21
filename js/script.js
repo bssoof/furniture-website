@@ -140,6 +140,255 @@ function initAnimatedCounters() {
     counters.forEach(counter => observer.observe(counter));
 }
 
+// ========== Recently Viewed ==========
+const RECENTLY_VIEWED_KEY = 'recentlyViewed';
+const MAX_RECENTLY_VIEWED = 8;
+
+function getRecentlyViewed() {
+    try {
+        return JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function addToRecentlyViewed(product) {
+    let items = getRecentlyViewed();
+    
+    // Remove if already exists
+    items = items.filter(item => item.name !== product.name);
+    
+    // Add to beginning
+    items.unshift(product);
+    
+    // Keep only max items
+    items = items.slice(0, MAX_RECENTLY_VIEWED);
+    
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(items));
+    renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+    const section = document.getElementById('recentlyViewed');
+    const grid = document.getElementById('recentlyViewedGrid');
+    const items = getRecentlyViewed();
+    
+    if (!section || !grid) return;
+    
+    if (items.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    grid.innerHTML = items.map(item => `
+        <div class="recently-viewed-item" onclick="openQuickView('${item.name}', ${item.price}, '${item.image}', '${item.category}', ${item.oldPrice || 'null'}, null)">
+            <img src="${item.image}" alt="${item.name}" loading="lazy">
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${formatPrice(item.price)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ========== Image Lightbox ==========
+let lightboxImages = [];
+let lightboxCurrentIndex = 0;
+
+function openLightbox(imageSrc, caption = '', images = null, currentIndex = 0) {
+    const overlay = document.getElementById('lightboxOverlay');
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImage');
+    const captionEl = document.getElementById('lightboxCaption');
+    const counter = document.getElementById('lightboxCounter');
+    
+    if (!overlay || !lightbox) return;
+    
+    if (images && images.length > 0) {
+        lightboxImages = images;
+        lightboxCurrentIndex = currentIndex;
+    } else {
+        lightboxImages = [{ src: imageSrc, caption: caption }];
+        lightboxCurrentIndex = 0;
+    }
+    
+    updateLightboxImage();
+    
+    overlay.classList.add('active');
+    lightbox.classList.add('active');
+    setBodyScrollLocked(true);
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', lightboxKeyHandler);
+}
+
+function updateLightboxImage() {
+    const img = document.getElementById('lightboxImage');
+    const captionEl = document.getElementById('lightboxCaption');
+    const counter = document.getElementById('lightboxCounter');
+    
+    const current = lightboxImages[lightboxCurrentIndex];
+    img.src = current.src;
+    captionEl.textContent = current.caption || '';
+    
+    if (lightboxImages.length > 1) {
+        counter.textContent = `${lightboxCurrentIndex + 1} / ${lightboxImages.length}`;
+        counter.style.display = 'block';
+    } else {
+        counter.style.display = 'none';
+    }
+}
+
+function closeLightbox() {
+    const overlay = document.getElementById('lightboxOverlay');
+    const lightbox = document.getElementById('lightbox');
+    
+    overlay?.classList.remove('active');
+    lightbox?.classList.remove('active');
+    setBodyScrollLocked(false);
+    
+    document.removeEventListener('keydown', lightboxKeyHandler);
+}
+
+function lightboxNext() {
+    if (lightboxImages.length <= 1) return;
+    lightboxCurrentIndex = (lightboxCurrentIndex + 1) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function lightboxPrev() {
+    if (lightboxImages.length <= 1) return;
+    lightboxCurrentIndex = (lightboxCurrentIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function lightboxKeyHandler(e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxNext();
+    if (e.key === 'ArrowRight') lightboxPrev();
+}
+
+function initImageLightbox() {
+    // Make product images clickable to open lightbox
+    document.querySelectorAll('.product-card .product-image img').forEach((img, index) => {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', () => {
+            const allImages = Array.from(document.querySelectorAll('.product-card .product-image img')).map(i => ({
+                src: i.src.replace('w=500', 'w=1200'),
+                caption: i.alt
+            }));
+            openLightbox(img.src.replace('w=500', 'w=1200'), img.alt, allImages, index);
+        });
+    });
+}
+
+// ========== Button Loading States ==========
+function setButtonLoading(button, loading = true) {
+    if (loading) {
+        button.classList.add('btn-loading');
+        button.disabled = true;
+    } else {
+        button.classList.remove('btn-loading');
+        button.disabled = false;
+    }
+}
+
+// ========== Form Validation ==========
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+    return /^[\d\s\-+()]{9,}$/.test(phone);
+}
+
+function showFieldError(input, message) {
+    clearFieldError(input);
+    input.classList.add('error');
+    input.classList.remove('success');
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'form-error';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    input.parentNode.appendChild(errorDiv);
+}
+
+function clearFieldError(input) {
+    input.classList.remove('error');
+    const error = input.parentNode.querySelector('.form-error');
+    if (error) error.remove();
+}
+
+function showFieldSuccess(input) {
+    clearFieldError(input);
+    input.classList.add('success');
+}
+
+function validateField(input) {
+    const value = input.value.trim();
+    const type = input.type;
+    const required = input.required;
+    
+    if (required && !value) {
+        showFieldError(input, 'هذا الحقل مطلوب');
+        return false;
+    }
+    
+    if (type === 'email' && value && !validateEmail(value)) {
+        showFieldError(input, 'البريد الإلكتروني غير صالح');
+        return false;
+    }
+    
+    if (type === 'tel' && value && !validatePhone(value)) {
+        showFieldError(input, 'رقم الهاتف غير صالح');
+        return false;
+    }
+    
+    if (value) {
+        showFieldSuccess(input);
+    } else {
+        clearFieldError(input);
+    }
+    return true;
+}
+
+// ========== Floating Cart Button ==========
+function initFloatingCartButton() {
+    // Create FAB container
+    let fabContainer = document.querySelector('.fab-container');
+    if (!fabContainer) {
+        fabContainer = document.createElement('div');
+        fabContainer.className = 'fab-container';
+        fabContainer.innerHTML = `
+            <button class="fab fab-cart" onclick="toggleCart()" aria-label="سلة التسوق">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="fab-badge" id="fabCartBadge">0</span>
+            </button>
+        `;
+        document.body.appendChild(fabContainer);
+    }
+    
+    const fabCart = document.querySelector('.fab-cart');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 600) {
+            fabCart?.classList.add('visible');
+        } else {
+            fabCart?.classList.remove('visible');
+        }
+    }, { passive: true });
+}
+
+function updateFabCartBadge() {
+    const badge = document.getElementById('fabCartBadge');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (badge) {
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+}
+
 // ========== Quick View ==========
 let currentQuickViewProduct = null;
 
@@ -185,7 +434,10 @@ function openQuickView(name, price, image, category = 'أثاث', oldPrice = nul
     starsHtml += `<span>(${Math.floor(Math.random() * 200 + 50)} تقييم)</span>`;
     ratingEl.innerHTML = starsHtml;
     
-    currentQuickViewProduct = { name, price, image, category };
+    currentQuickViewProduct = { name, price, image, category, oldPrice };
+    
+    // Add to recently viewed
+    addToRecentlyViewed(currentQuickViewProduct);
     
     // Show modal
     overlay.classList.add('active');
@@ -514,6 +766,7 @@ function hideSkeleton() {
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cartCount').textContent = totalItems;
+    updateFabCartBadge();
     updateCartTotal();
 }
 
@@ -991,6 +1244,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // تهيئة العدادات المتحركة
     initAnimatedCounters();
+    
+    // تهيئة زر السلة العائم
+    initFloatingCartButton();
+    
+    // عرض المنتجات المشاهدة مؤخراً
+    renderRecentlyViewed();
+    
+    // تهيئة Lightbox للصور
+    initImageLightbox();
     
     // تشغيل العد التنازلي
     startCountdown();
