@@ -8,7 +8,6 @@
     <meta name="author" content="دار الأثاث">
     <meta name="theme-color" content="#8B4513">
     
-    <!-- Open Graph -->
     <meta property="og:title" content="دار الأثاث الفاخر">
     <meta property="og:description" content="اكتشف مجموعتنا الفاخرة من الأثاث العصري والكلاسيكي">
     <meta property="og:image" content="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200">
@@ -20,13 +19,10 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
     
-    <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">تخطي إلى المحتوى الرئيسي</a>
     
-    <!-- Navigation -->
     <nav class="navbar" role="navigation" aria-label="القائمة الرئيسية">
         <div class="nav-top">
             <div class="nav-top-content">
@@ -75,10 +71,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main id="main-content">
     
-    <!-- Hero Section -->
     <section class="hero" id="home" aria-labelledby="hero-title">
         <div class="hero-content">
             <div class="hero-text">
@@ -126,7 +120,6 @@
         </div>
     </section>
 
-    <!-- Features -->
     <section class="features">
         <div class="features-grid">
             <div class="feature-card">
@@ -152,7 +145,6 @@
         </div>
     </section>
 
-    <!-- Categories -->
     <section class="categories" id="categories">
         <div class="section-header">
             <h2>تصفح التصنيفات</h2>
@@ -161,7 +153,7 @@
         </div>
         <div class="categories-grid">
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرم المعيشة" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرف المعيشة" loading="lazy">
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف المعيشة</h3>
@@ -177,7 +169,7 @@
                 </div>
             </div>
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرم الطعام" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرف الطعام" loading="lazy">
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف الطعام</h3>
@@ -195,19 +187,18 @@
         </div>
     </section>
 
-    <!-- Products -->
     <section class="products" id="products">
         <div class="products-header">
             <div class="section-header" style="text-align: right; margin: 0;">
-                <h2>قائمةنا المميزة</h2>
-                <p>أطباق شهية محضرة بكل حب</p>
+                <h2>قائمتنا المميزة</h2>
+                <p>تشكيلة مختارة من أرقى قطع الأثاث</p>
             </div>
             <div class="products-controls">
                 <div class="filter-tabs">
                     <button class="filter-tab active" data-filter="all">الكل</button>
-                    <button class="filter-tab" data-filter="بيتزا">بيتزا</button>
-                    <button class="filter-tab" data-filter="باستا">باستا</button>
-                    <button class="filter-tab" data-filter="سلطات">سلطات</button>
+                    <button class="filter-tab" data-filter="غرف المعيشة">غرف المعيشة</button>
+                    <button class="filter-tab" data-filter="غرف النوم">غرف النوم</button>
+                    <button class="filter-tab" data-filter="غرف الطعام">غرف الطعام</button>
                 </div>
                 <div class="sort-dropdown">
                     <select id="sortProducts" onchange="sortProducts()" aria-label="ترتيب المنتجات">
@@ -283,7 +274,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-name="كرسي جلد إيطالي" data-price="1199" data-old-price="1499" data-category="مقاعد" data-badge="-20%" data-image="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500">
+            <div class="product-card" data-name="كرسي جلد إيطالي" data-price="1199" data-old-price="1499" data-category="غرف المعيشة" data-badge="-20%" data-image="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500">
                 <div class="product-image">
                     <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500" alt="كرسي جلد" loading="lazy">
                     <span class="product-badge badge-sale">-20%</span>
@@ -294,7 +285,7 @@
                     </div>
                 </div>
                 <div class="product-info">
-                    <div class="product-category">مقاعد</div>
+                    <div class="product-category">غرف المعيشة</div>
                     <h3 class="product-name">كرسي جلد إيطالي</h3>
                     <div class="product-rating">
                         <i class="fas fa-star"></i>
@@ -347,7 +338,6 @@
         </div>
     </section>
 
-    <!-- Recently Viewed Products -->
     <section class="recently-viewed" id="recentlyViewed" style="display: none;">
         <div class="section-header">
             <h2>شاهدتها مؤخراً</h2>
@@ -355,11 +345,9 @@
             <div class="line"></div>
         </div>
         <div class="recently-viewed-grid" id="recentlyViewedGrid">
-            <!-- Products will be added dynamically -->
-        </div>
+            </div>
     </section>
 
-    <!-- Special Offer -->
     <section class="special-offer" id="offer">
         <div class="offer-content">
             <div class="offer-text">
@@ -391,7 +379,6 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
     <section class="testimonials">
         <div class="section-header">
             <h2>آراء عملائنا</h2>
@@ -453,7 +440,6 @@
         </div>
     </section>
 
-    <!-- Newsletter -->
     <section class="newsletter">
         <div class="newsletter-content">
             <h2>اشترك في نشرتنا البريدية</h2>
@@ -465,7 +451,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
@@ -543,10 +528,7 @@
         </div>
     </footer>
     
-    </main><!-- End main content -->
-
-    <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" aria-hidden="true"></div>
+    </main><div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" aria-hidden="true"></div>
     <aside class="cart-sidebar" role="dialog" aria-label="سلة التسوق" aria-modal="true">
         <div class="cart-header">
             <h3>سلة التسوق</h3>
@@ -556,7 +538,6 @@
             <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
         </div>
         <div class="cart-footer">
-            <!-- Coupon Code -->
             <div class="coupon-section">
                 <input type="text" id="couponInput" placeholder="كود الخصم" aria-label="أدخل كود الخصم">
                 <button onclick="applyCoupon()" class="coupon-btn">تطبيق</button>
@@ -582,7 +563,6 @@
         </div>
     </aside>
 
-    <!-- Quick View Modal -->
     <div class="quick-view-overlay" id="quickViewOverlay" onclick="closeQuickView()" aria-hidden="true"></div>
     <div class="quick-view-modal" id="quickViewModal" role="dialog" aria-label="معاينة المنتج" aria-modal="true">
         <button class="close-quick-view" onclick="closeQuickView()" aria-label="إغلاق">
@@ -626,7 +606,6 @@
         </div>
     </div>
 
-    <!-- Search Overlay -->
     <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="البحث" aria-modal="true">
         <div class="search-container">
             <button class="close-search" onclick="toggleSearch()" aria-label="إغلاق البحث"><i class="fas fa-times" aria-hidden="true"></i></button>
@@ -639,7 +618,6 @@
         </div>
     </div>
 
-    <!-- Wishlist Sidebar -->
     <div class="wishlist-overlay" id="wishlistOverlay" onclick="toggleWishlist()" aria-hidden="true"></div>
     <aside class="wishlist-sidebar" id="wishlistSidebar" role="dialog" aria-label="المفضلة" aria-modal="true">
         <div class="cart-header">
@@ -651,12 +629,10 @@
         </div>
     </aside>
 
-    <!-- Back to Top -->
     <button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="العودة إلى أعلى الصفحة">
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <!-- Image Lightbox -->
     <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()" aria-hidden="true"></div>
     <div class="lightbox" id="lightbox" role="dialog" aria-label="عرض الصورة" aria-modal="true">
         <button class="lightbox-close" onclick="closeLightbox()" aria-label="إغلاق">
@@ -675,7 +651,6 @@
         <div class="lightbox-counter" id="lightboxCounter"></div>
     </div>
 
-    <!-- Checkout Modal -->
     <div class="checkout-overlay" id="checkoutOverlay" onclick="closeCheckout()" aria-hidden="true"></div>
     <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إتمام الطلب" aria-modal="true">
         <div class="checkout-header">
