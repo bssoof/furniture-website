@@ -199,15 +199,17 @@
     <section class="products" id="products">
         <div class="products-header">
             <div class="section-header" style="text-align: right; margin: 0;">
-                <h2>قائمةنا المميزة</h2>
-                <p>أطباق شهية محضرة بكل حب</p>
+                <h2>مجموعتنا الحصرية</h2>
+                <p>تشكيلة مميزة من أرقى قطع الأثاث</p>
             </div>
             <div class="products-controls">
                 <div class="filter-tabs">
                     <button class="filter-tab active" data-filter="all">الكل</button>
-                    <button class="filter-tab" data-filter="بيتزا">بيتزا</button>
-                    <button class="filter-tab" data-filter="باستا">باستا</button>
-                    <button class="filter-tab" data-filter="سلطات">سلطات</button>
+                    <button class="filter-tab" data-filter="غرف المعيشة">غرف المعيشة</button>
+                    <button class="filter-tab" data-filter="غرف النوم">غرف النوم</button>
+                    <button class="filter-tab" data-filter="غرف الطعام">غرف الطعام</button>
+                    <button class="filter-tab" data-filter="المكاتب">المكاتب</button>
+                    <button class="filter-tab" data-filter="مقاعد">مقاعد</button>
                 </div>
                 <div class="sort-dropdown">
                     <select id="sortProducts" onchange="sortProducts()" aria-label="ترتيب المنتجات">
@@ -219,131 +221,7 @@
             </div>
         </div>
         <div class="products-grid" id="productsGrid">
-            <div class="product-card" data-name="كنبة مودرن فاخرة" data-price="2799" data-old-price="3999" data-category="غرف المعيشة" data-badge="-30%" data-image="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500" alt="كنبة فاخرة" loading="lazy">
-                    <span class="product-badge badge-sale">-30%</span>
-                    <div class="product-actions">
-                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-category">غرف المعيشة</div>
-                    <h3 class="product-name">كنبة مودرن فاخرة</h3>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span>(128 تقييم)</span>
-                    </div>
-                    <div class="product-price">
-                        <span class="current-price">2,799 ر.س</span>
-                        <span class="old-price">3,999 ر.س</span>
-                    </div>
-                    <button class="add-to-cart" onclick="addToCart('كنبة مودرن فاخرة', 2799, 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500')">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                </div>
-            </div>
-
-            <div class="product-card" data-name="طاولة طعام خشب فاخر" data-price="1899" data-old-price="2299" data-category="غرف الطعام" data-badge="جديد" data-image="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500" alt="طاولة طعام" loading="lazy">
-                    <span class="product-badge badge-new">جديد</span>
-                    <div class="product-actions">
-                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-category">غرف الطعام</div>
-                    <h3 class="product-name">طاولة طعام خشب فاخر</h3>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span>(95 تقييم)</span>
-                    </div>
-                    <div class="product-price">
-                        <span class="current-price">1,899 ر.س</span>
-                        <span class="old-price">2,299 ر.س</span>
-                    </div>
-                    <button class="add-to-cart" onclick="addToCart('طاولة طعام خشب فاخر', 1899, 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500')">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                </div>
-            </div>
-
-            <div class="product-card" data-name="كرسي جلد إيطالي" data-price="1199" data-old-price="1499" data-category="مقاعد" data-badge="-20%" data-image="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500" alt="كرسي جلد" loading="lazy">
-                    <span class="product-badge badge-sale">-20%</span>
-                    <div class="product-actions">
-                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-category">مقاعد</div>
-                    <h3 class="product-name">كرسي جلد إيطالي</h3>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span>(64 تقييم)</span>
-                    </div>
-                    <div class="product-price">
-                        <span class="current-price">1,199 ر.س</span>
-                        <span class="old-price">1,499 ر.س</span>
-                    </div>
-                    <button class="add-to-cart" onclick="addToCart('كرسي جلد إيطالي', 1199, 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500')">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                </div>
-            </div>
-
-            <div class="product-card" data-name="سرير فاخر بتصميم عصري" data-price="3999" data-old-price="4999" data-category="غرف النوم" data-image="https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500" alt="سرير" loading="lazy">
-                    <div class="product-actions">
-                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-category">غرف النوم</div>
-                    <h3 class="product-name">سرير فاخر بتصميم عصري</h3>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span>(156 تقييم)</span>
-                    </div>
-                    <div class="product-price">
-                        <span class="current-price">3,999 ر.س</span>
-                        <span class="old-price">4,999 ر.س</span>
-                    </div>
-                    <button class="add-to-cart" onclick="addToCart('سرير فاخر بتصميم عصري', 3999, 'https://images.unsplash.com/photo-1505693313881-080f91b4b5b6?w=500')">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                </div>
-            </div>
+            <!-- المنتجات ستظهر هنا تلقائياً -->
         </div>
     </section>
 
