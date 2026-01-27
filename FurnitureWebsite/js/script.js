@@ -7,6 +7,72 @@ const STORAGE_KEYS = {
     theme: 'theme'
 };
 
+// قائمة المنتجات
+const products = [
+    {
+        id: 1,
+        name: 'كنبة مودرن فاخرة',
+        price: 2799,
+        oldPrice: 3999,
+        category: 'غرف المعيشة',
+        badge: '-30%',
+        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500',
+        rating: 4.5,
+        reviews: 128
+    },
+    {
+        id: 2,
+        name: 'طاولة طعام خشب فاخر',
+        price: 1899,
+        oldPrice: 2299,
+        category: 'غرف الطعام',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1616362348473-c767bf9eb473?w=500',
+        rating: 5,
+        reviews: 95
+    },
+    {
+        id: 3,
+        name: 'كرسي جلد إيطالي',
+        price: 1199,
+        oldPrice: 1499,
+        category: 'مقاعد',
+        badge: '-20%',
+        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500',
+        rating: 4,
+        reviews: 64
+    },
+    {
+        id: 4,
+        name: 'سرير فاخر بتصميم عصري',
+        price: 3999,
+        oldPrice: 4999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1746549844299-2867f09c9a37?w=500',
+        rating: 4.5,
+        reviews: 156
+    },
+    {
+        id: 5,
+        name: 'مكتب عمل خشبي',
+        price: 1499,
+        category: 'المكاتب',
+        image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500',
+        rating: 4.2,
+        reviews: 45
+    },
+    {
+        id: 6,
+        name: 'خزانة ملابس واسعة',
+        price: 2599,
+        oldPrice: 2999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500',
+        rating: 4.7,
+        reviews: 82
+    }
+];
+
 function safeParse(key) {
     try {
         const raw = localStorage.getItem(key);
@@ -280,6 +346,81 @@ function initImageLightbox() {
             }));
             openLightbox(img.src.replace('w=500', 'w=1200'), img.alt, allImages, index);
         });
+    });
+}
+
+// ========== Rendering Products ==========
+function renderProducts(productsToRender) {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+
+    if (productsToRender.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">لا توجد منتجات مطابقة</p>';
+        return;
+    }
+
+    grid.innerHTML = productsToRender.map(product => {
+        // Calculate rating stars
+        const fullStars = Math.floor(product.rating);
+        const hasHalf = product.rating % 1 >= 0.5;
+        let starsHtml = '';
+        for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+        if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+
+        // Badge HTML
+        let badgeHtml = '';
+        if (product.badge) {
+            const badgeClass = product.badge.includes('%') ? 'badge-sale' : 'badge-new';
+            badgeHtml = `<span class="product-badge ${badgeClass}">${product.badge}</span>`;
+        }
+
+        // Old Price HTML
+        let oldPriceHtml = '';
+        if (product.oldPrice) {
+            oldPriceHtml = `<span class="old-price">${formatPrice(product.oldPrice)}</span>`;
+        }
+
+        return `
+            <div class="product-card" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-category="${product.category}" data-image="${product.image}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${product.badge}"` : ''}>
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                    ${badgeHtml}
+                    <div class="product-actions">
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">${product.category}</div>
+                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-rating">
+                        ${starsHtml}
+                        <span>(${product.reviews} تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${oldPriceHtml}
+                    </div>
+                    <button class="add-to-cart">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Re-attach event listeners
+    attachProductButtons();
+    initImageLightbox();
+    hydrateHeartsFromWishlist();
+
+    // Add animation
+    const cards = grid.querySelectorAll('.product-card');
+    cards.forEach((card, index) => {
+        card.style.animation = `fadeInUp 0.4s ease ${index * 0.1}s both`;
     });
 }
 
@@ -1204,16 +1345,7 @@ function performSearch(isSubmit = false) {
         return;
     }
     
-    // محاكاة نتائج البحث
-    const products = [
-        { name: 'كنبة مودرن فاخرة', price: 2799 },
-        { name: 'طاولة طعام خشب فاخر', price: 1899 },
-        { name: 'كرسي جلد إيطالي', price: 1199 },
-        { name: 'سرير فاخر بتصميم عصري', price: 3999 },
-        { name: 'مكتب عمل خشبي', price: 1499 },
-        { name: 'خزانة ملابس واسعة', price: 2599 }
-    ];
-    
+    // البحث في قائمة المنتجات
     const results = products.filter(p => p.name.includes(query));
     
     if (results.length === 0) {
@@ -1222,8 +1354,8 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" onclick="addToCart('${p.name}', ${p.price}); toggleSearch();">
-            <img src="${FALLBACK_IMG}&w=120" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+        <div class="search-result-item" onclick="addToCart('${p.name}', ${p.price}, '${p.image}'); toggleSearch();">
+            <img src="${p.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
                 <div style="font-weight: 600;">${p.name}</div>
                 <div style="color: #8B4513;">${formatPrice(p.price)}</div>
@@ -1420,11 +1552,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // تهيئة ترتيب المنتجات
     initProductSorting();
     
+    // عرض جميع المنتجات عند التحميل
+    renderProducts(products);
+
     // تشغيل العد التنازلي
     startCountdown();
 
-    // ربط الأزرار الديناميكي
-    attachProductButtons();
+    // ربط الأزرار الديناميكي (يتم استدعاؤه داخل renderProducts الآن)
+    // attachProductButtons();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
@@ -1432,7 +1567,15 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('click', function() {
             filterTabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            showNotification(`تم التصفية: ${this.textContent}`, 'success');
+
+            const category = this.dataset.filter;
+
+            if (category === 'all') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
         });
     });
     
