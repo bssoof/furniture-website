@@ -13,6 +13,24 @@ function debugLog(...args) {
         console.log('[DEBUG]', ...args);
     }
 }
+// دوال مساعدة مفقودة
+function normalizeSearchText(text) {
+    // توحيد النصوص للبحث (إزالة التشكيل وتوحيد الهمزات)
+    return String(text || '')
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // إزالة التشكيل
+        .replace(/[أإآ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي');
+}
+
+function decodeData(data) {
+    try {
+        return decodeURIComponent(data);
+    } catch {
+        return data; // في حال لم يكن مشفراً، أرجعه كما هو
+    }
+}
 
 // قائمة المنتجات
 const products = [
@@ -1542,56 +1560,99 @@ window.addEventListener('storage', (e) => {
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+// وظيفته: تفعيل كل الأزرار التي تحتوي على data-action
+function initGlobalActions() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        
+        const action = btn.dataset.action;
+        
+        // منع الرابط من القفز لأعلى الصفحة إذا كان زر تحكم
+        if (btn.tagName === 'A' && btn.getAttribute('href') === '#') e.preventDefault();
+        
+        // توجيه الأوامر حسب اسم الاكشن
+        switch(action) {
+            case 'toggle-theme': toggleTheme(); break;
+            case 'toggle-cart': toggleCart(); break;
+            case 'toggle-wishlist': toggleWishlist(); break;
+            case 'toggle-search': toggleSearch(); break;
+            case 'toggle-mobile-menu': toggleMobileMenu(); break;
+            
+            // أزرار الإغلاق
+            case 'close-search': toggleSearch(); break;
+            case 'close-checkout': closeCheckout(); break;
+            case 'close-quick-view': closeQuickView(); break;
+            case 'close-lightbox': closeLightbox(); break;
+            case 'toast-close': e.target.closest('.toast').remove(); break;
+            
+            // التحكم بالصور (Lightbox)
+            case 'lightbox-prev': lightboxPrev(); break;
+            case 'lightbox-next': lightboxNext(); break;
+            
+            // التحكم بالسلة
+            case 'cart-increase': increaseQty(btn.dataset.index); break;
+            case 'cart-decrease': decreaseQty(btn.dataset.index); break;
+            case 'cart-remove': removeFromCart(btn.dataset.index); break;
+            case 'apply-coupon': applyCoupon(); break;
+            case 'checkout': checkout(); break;
+            
+            // التحكم بالمفضلة
+            case 'wishlist-remove': removeFromWishlist(btn.dataset.index); break;
+            
+            // التحكم بالمعاينة السريعة
+            case 'quick-view-qty': changeQuickViewQty(parseInt(btn.dataset.qtyDelta)); break;
+            case 'add-from-quick-view': addFromQuickView(); break;
+            case 'wishlist-from-quick-view': addToWishlistFromQuickView(); break;
+            case 'share-product': shareProduct(); break;
+            
+            // زر البحث الداخلي
+            case 'perform-search': performSearch(); break;
+            
+            // زر العودة للأعلى
+            case 'scroll-top': scrollToTop(); break;
+        }
+    });
+
+    // تفعيل نماذج الإرسال (الدفع والنشرة البريدية)
+    document.addEventListener('submit', (e) => {
+        if (e.target.dataset.action === 'submit-order') submitOrder(e);
+        if (e.target.dataset.action === 'subscribe-newsletter') subscribeNewsletter(e);
+    });
+}
 
 // ========== تهيئة الصفحة ==========
-document.addEventListener('DOMContentLoaded', function() {
+function initApp() {
     debugLog('DOMContentLoaded');
-    // تحديث عدد السلة والمفضلة
+    
+    // 1. تفعيل الأزرار (هذا هو السطر المهم المفقود)
+    initGlobalActions(); 
+
+    // تحديث البيانات
     updateCartCount();
     updateWishlistCount();
     updateCartDisplay();
     updateWishlistDisplay();
     hydrateHeartsFromWishlist();
     
-    // تهيئة تحميل الصور
     initImageLoading();
-    
-    // تهيئة شريط التقدم
     initScrollProgress();
-    
-    // تهيئة العدادات المتحركة
     initAnimatedCounters();
-    
-    // تهيئة زر السلة العائم
     initFloatingCartButton();
-    
-    // عرض المنتجات المشاهدة مؤخراً
     renderRecentlyViewed();
-    
-    // تهيئة Lightbox للصور
     initImageLightbox();
-    
-    // تهيئة ترتيب المنتجات
     initProductSorting();
-    
-    // عرض جميع المنتجات عند التحميل
     renderProducts(products);
-
-    // تشغيل العد التنازلي
     startCountdown();
-
-    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
     initProductEventDelegation();
     
-    // تصفية المنتجات
+    // تفعيل التبويبات (Tabs)
     const filterTabs = document.querySelectorAll('.filter-tab');
     filterTabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            filterTabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-
             const category = this.dataset.filter;
-
             if (category === 'all') {
                 renderProducts(products);
             } else {
@@ -1601,6 +1662,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // تفعيل زر البحث (Enter Key)
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', () => performSearchDebounced());
@@ -1612,7 +1674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Smooth scroll للروابط
+    // Smooth Scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1624,8 +1686,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Dark Mode (كودك هنا صحيح)
+    const themeBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', toggleTheme);
+    }
     
-    // تأثير الـ navbar والزر العودة للأعلى عند التمرير
+    // Back to Top Button visibility
     const backToTop = document.getElementById('backToTop');
     window.addEventListener('scroll', function() {
         if (window.scrollY > 500) {
@@ -1634,19 +1702,16 @@ document.addEventListener('DOMContentLoaded', function() {
             backToTop?.classList.remove('visible');
         }
     }, { passive: true });
-    
-    // تفعيل أزرار المفضلة في المنتجات
-    // التحقق من المفضلة المحفوظة
-    hydrateHeartsFromWishlist();
 
-    // إغلاق النوافذ عند الضغط على زر Escape
+    // Close overlays on Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (document.getElementById('cartOverlay')?.classList.contains('active')) toggleCart();
             if (document.getElementById('wishlistOverlay')?.classList.contains('active')) toggleWishlist();
             if (document.getElementById('searchOverlay')?.classList.contains('active')) toggleSearch();
+            if (document.getElementById('quickViewOverlay')?.classList.contains('active')) closeQuickView();
             const navLinks = document.querySelector('.nav-links');
             if (navLinks?.classList.contains('active')) toggleMobileMenu();
         }
     });
-});
+}

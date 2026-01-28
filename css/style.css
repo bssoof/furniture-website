@@ -1363,7 +1363,7 @@ body.no-scroll {
     left: -450px;
     width: 450px;
     height: 100%;
-    background: white;
+    background: var(--bg-card);
     z-index: 2001;
     transition: all 0.4s;
     display: flex;
@@ -1371,6 +1371,10 @@ body.no-scroll {
 }
 
 .cart-overlay.active .cart-sidebar {
+    left: 0;
+}
+
+.cart-sidebar.active {
     left: 0;
 }
 
@@ -1548,7 +1552,7 @@ body.no-scroll {
     right: -450px;
     width: 450px;
     height: 100%;
-    background: white;
+    background: var(--bg-card);
     z-index: 2001;
     transition: all 0.4s;
     display: flex;
