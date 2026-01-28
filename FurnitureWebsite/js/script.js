@@ -13,6 +13,24 @@ function debugLog(...args) {
         console.log('[DEBUG]', ...args);
     }
 }
+// دوال مساعدة مفقودة
+function normalizeSearchText(text) {
+    // توحيد النصوص للبحث (إزالة التشكيل وتوحيد الهمزات)
+    return String(text || '')
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // إزالة التشكيل
+        .replace(/[أإآ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي');
+}
+
+function decodeData(data) {
+    try {
+        return decodeURIComponent(data);
+    } catch {
+        return data; // في حال لم يكن مشفراً، أرجعه كما هو
+    }
+}
 
 // قائمة المنتجات
 const products = [
@@ -258,7 +276,7 @@ function renderRecentlyViewed() {
     
     section.style.display = 'block';
     grid.innerHTML = items.map(item => `
-        <div class="recently-viewed-item" data-action="recently-viewed" data-name="${encodeURIComponent(item.name)}" data-price="${item.price}" data-image="${escapeHTML(item.image)}" data-category="${encodeURIComponent(item.category)}" ${item.oldPrice ? `data-old-price="${item.oldPrice}"` : ''}>
+        <div class="recently-viewed-item" onclick="openQuickView(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price}, '${escapeHTML(item.image)}', decodeURIComponent('${encodeURIComponent(item.category)}'), ${item.oldPrice || 'null'}, null)">
             <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
             <div class="item-info">
                 <div class="item-name">${escapeHTML(item.name)}</div>
@@ -395,7 +413,7 @@ function renderProducts(productsToRender) {
         }
 
         return `
-            <div class="product-card" data-id="${product.id}" data-name="${encodeURIComponent(product.name)}" data-price="${product.price}" data-category="${encodeURIComponent(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
+            <div class="product-card" data-id="${product.id}" data-name="${escapeHTML(product.name)}" data-price="${product.price}" data-category="${escapeHTML(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
                 <div class="product-image">
                     <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
                     ${badgeHtml}
@@ -889,19 +907,6 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
-function normalizeSearchText(text) {
-    return String(text || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u064B-\u065F]/g, '')
-        .replace(/[\u200B-\u200F]/g, '')
-        .trim();
-}
-
-products.forEach((product) => {
-    product.normalizedName = normalizeSearchText(product.name);
-});
-
 function escapeHTML(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -909,14 +914,6 @@ function escapeHTML(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-}
-
-function decodeData(value) {
-    try {
-        return decodeURIComponent(value || '');
-    } catch (e) {
-        return value || '';
-    }
 }
 
 function persistCart() {
@@ -1332,7 +1329,7 @@ function updateWishlistDisplay() {
                     <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button data-action="wishlist-add-to-cart" data-index="${index}" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
                         <button data-action="wishlist-remove" data-index="${index}" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -1394,7 +1391,7 @@ function performSearch(isSubmit = false) {
     
     // البحث في قائمة المنتجات
     const normalizedQuery = normalizeSearchText(query);
-    const results = products.filter(p => (p.normalizedName || normalizeSearchText(p.name)).includes(normalizedQuery));
+    const results = products.filter(p => normalizeSearchText(p.name).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1402,7 +1399,7 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" data-action="search-add" data-name="${encodeURIComponent(p.name)}" data-price="${p.price}" data-image="${escapeHTML(p.image)}">
+        <div class="search-result-item" onclick="addToCart(decodeURIComponent('${encodeURIComponent(p.name)}'), ${p.price}, '${escapeHTML(p.image)}'); toggleSearch();">
             <img src="${escapeHTML(p.image)}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
                 <div style="font-weight: 600;">${escapeHTML(p.name)}</div>
@@ -1481,7 +1478,7 @@ function initProductEventDelegation() {
         if (!card) return;
 
         if (addBtn) {
-            const name = card.querySelector('.product-name')?.textContent || decodeData(card.dataset.name) || 'منتج';
+            const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
@@ -1491,32 +1488,32 @@ function initProductEventDelegation() {
 
         if (quickViewBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
             const category = decodeData(card.dataset.category) || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
-            
+
             openQuickView(name, price, image, category, oldPrice, badge);
             return;
         }
 
         if (wishlistBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
+
             addToWishlist(name, price, wishlistBtn, image);
             return;
         }
 
         if (shareBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
@@ -1531,174 +1528,6 @@ function initProductEventDelegation() {
                 });
             }
         }
-    });
-}
-
-function initGlobalEventDelegation() {
-    if (document.body.dataset.globalDelegationBound) return;
-    document.body.dataset.globalDelegationBound = 'true';
-
-    const clickHandler = (event) => {
-        const target = event.target.closest('[data-action]');
-        if (!target) return;
-
-        const action = target.dataset.action;
-        debugLog('action', action);
-
-        switch (action) {
-            case 'toggle-theme':
-                toggleTheme();
-                break;
-            case 'toggle-search':
-                toggleSearch();
-                break;
-            case 'toggle-wishlist':
-                toggleWishlist();
-                break;
-            case 'toggle-cart':
-                toggleCart();
-                break;
-            case 'toggle-mobile-menu':
-                toggleMobileMenu();
-                break;
-            case 'apply-coupon':
-                applyCoupon();
-                break;
-            case 'checkout':
-                checkout();
-                break;
-            case 'close-cart':
-                if (target.id === 'cartOverlay' && event.target === target) toggleCart();
-                break;
-            case 'close-wishlist':
-                if (target.id === 'wishlistOverlay' && event.target === target) toggleWishlist();
-                break;
-            case 'close-search':
-                if (target.id === 'searchOverlay' && event.target === target) toggleSearch();
-                break;
-            case 'close-quick-view':
-                if ((target.id === 'quickViewOverlay' && event.target === target) || target.classList.contains('close-quick-view')) {
-                    closeQuickView();
-                }
-                break;
-            case 'quick-view-qty': {
-                const delta = parseInt(target.dataset.qtyDelta, 10) || 0;
-                changeQuickViewQty(delta);
-                break;
-            }
-            case 'add-from-quick-view':
-                addFromQuickView();
-                break;
-            case 'wishlist-from-quick-view':
-                addToWishlistFromQuickView();
-                break;
-            case 'share-product':
-                shareProduct();
-                break;
-            case 'perform-search':
-                performSearch(true);
-                break;
-            case 'search-add': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                addToCart(name, price, image);
-                toggleSearch();
-                break;
-            }
-            case 'recently-viewed': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                const category = decodeData(target.dataset.category) || 'أثاث';
-                const oldPrice = target.dataset.oldPrice ? parseFloat(target.dataset.oldPrice) : null;
-                openQuickView(name, price, image, category, oldPrice, null);
-                break;
-            }
-            case 'cart-increase':
-                increaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-decrease':
-                decreaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-remove':
-                removeFromCart(parseInt(target.dataset.index, 10));
-                break;
-            case 'wishlist-add-to-cart': {
-                const index = parseInt(target.dataset.index, 10);
-                const item = wishlist[index];
-                if (item) addToCart(item.name, item.price, item.image);
-                break;
-            }
-            case 'wishlist-remove':
-                removeFromWishlist(parseInt(target.dataset.index, 10));
-                break;
-            case 'scroll-top':
-                scrollToTop();
-                break;
-            case 'close-lightbox':
-                if ((target.id === 'lightboxOverlay' && event.target === target) || target.classList.contains('lightbox-close')) {
-                    closeLightbox();
-                }
-                break;
-            case 'lightbox-prev':
-                lightboxPrev();
-                break;
-            case 'lightbox-next':
-                lightboxNext();
-                break;
-            case 'close-checkout':
-                if ((target.id === 'checkoutOverlay' && event.target === target) || target.classList.contains('close-checkout')) {
-                    closeCheckout();
-                }
-                break;
-            case 'toast-close': {
-                const toast = target.closest('.toast');
-                toast?.remove();
-                break;
-            }
-            default:
-                break;
-        }
-    };
-
-    document.addEventListener('click', clickHandler, true);
-
-    document.addEventListener('submit', (event) => {
-        const form = event.target;
-        if (!form?.dataset?.action) return;
-
-        switch (form.dataset.action) {
-            case 'subscribe-newsletter':
-                subscribeNewsletter(event);
-                break;
-            case 'submit-order':
-                submitOrder(event);
-                break;
-            default:
-                break;
-        }
-    }, true);
-}
-
-function bindStaticActionButtons() {
-    const actionHandlers = {
-        'toggle-theme': () => toggleTheme(),
-        'toggle-search': () => toggleSearch(),
-        'toggle-wishlist': () => toggleWishlist(),
-        'toggle-cart': () => toggleCart(),
-        'toggle-mobile-menu': () => toggleMobileMenu()
-    };
-
-    Object.keys(actionHandlers).forEach((action) => {
-        document.querySelectorAll(`[data-action="${action}"]`).forEach((button) => {
-            if (button.dataset.bound === 'true') return;
-            button.dataset.bound = 'true';
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                actionHandlers[action]();
-            });
-        });
     });
 }
 
@@ -1731,58 +1560,99 @@ window.addEventListener('storage', (e) => {
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+// وظيفته: تفعيل كل الأزرار التي تحتوي على data-action
+function initGlobalActions() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        
+        const action = btn.dataset.action;
+        
+        // منع الرابط من القفز لأعلى الصفحة إذا كان زر تحكم
+        if (btn.tagName === 'A' && btn.getAttribute('href') === '#') e.preventDefault();
+        
+        // توجيه الأوامر حسب اسم الاكشن
+        switch(action) {
+            case 'toggle-theme': toggleTheme(); break;
+            case 'toggle-cart': toggleCart(); break;
+            case 'toggle-wishlist': toggleWishlist(); break;
+            case 'toggle-search': toggleSearch(); break;
+            case 'toggle-mobile-menu': toggleMobileMenu(); break;
+            
+            // أزرار الإغلاق
+            case 'close-search': toggleSearch(); break;
+            case 'close-checkout': closeCheckout(); break;
+            case 'close-quick-view': closeQuickView(); break;
+            case 'close-lightbox': closeLightbox(); break;
+            case 'toast-close': e.target.closest('.toast').remove(); break;
+            
+            // التحكم بالصور (Lightbox)
+            case 'lightbox-prev': lightboxPrev(); break;
+            case 'lightbox-next': lightboxNext(); break;
+            
+            // التحكم بالسلة
+            case 'cart-increase': increaseQty(btn.dataset.index); break;
+            case 'cart-decrease': decreaseQty(btn.dataset.index); break;
+            case 'cart-remove': removeFromCart(btn.dataset.index); break;
+            case 'apply-coupon': applyCoupon(); break;
+            case 'checkout': checkout(); break;
+            
+            // التحكم بالمفضلة
+            case 'wishlist-remove': removeFromWishlist(btn.dataset.index); break;
+            
+            // التحكم بالمعاينة السريعة
+            case 'quick-view-qty': changeQuickViewQty(parseInt(btn.dataset.qtyDelta)); break;
+            case 'add-from-quick-view': addFromQuickView(); break;
+            case 'wishlist-from-quick-view': addToWishlistFromQuickView(); break;
+            case 'share-product': shareProduct(); break;
+            
+            // زر البحث الداخلي
+            case 'perform-search': performSearch(); break;
+            
+            // زر العودة للأعلى
+            case 'scroll-top': scrollToTop(); break;
+        }
+    });
+
+    // تفعيل نماذج الإرسال (الدفع والنشرة البريدية)
+    document.addEventListener('submit', (e) => {
+        if (e.target.dataset.action === 'submit-order') submitOrder(e);
+        if (e.target.dataset.action === 'subscribe-newsletter') subscribeNewsletter(e);
+    });
+}
 
 // ========== تهيئة الصفحة ==========
 function initApp() {
     debugLog('DOMContentLoaded');
-    // تحديث عدد السلة والمفضلة
+    
+    // 1. تفعيل الأزرار (هذا هو السطر المهم المفقود)
+    initGlobalActions(); 
+
+    // تحديث البيانات
     updateCartCount();
     updateWishlistCount();
     updateCartDisplay();
     updateWishlistDisplay();
     hydrateHeartsFromWishlist();
     
-    // تهيئة تحميل الصور
     initImageLoading();
-    
-    // تهيئة شريط التقدم
     initScrollProgress();
-    
-    // تهيئة العدادات المتحركة
     initAnimatedCounters();
-    
-    // تهيئة زر السلة العائم
     initFloatingCartButton();
-    
-    // عرض المنتجات المشاهدة مؤخراً
     renderRecentlyViewed();
-    
-    // تهيئة Lightbox للصور
     initImageLightbox();
-    
-    // تهيئة ترتيب المنتجات
     initProductSorting();
-    
-    // عرض جميع المنتجات عند التحميل
     renderProducts(products);
-
-    // تشغيل العد التنازلي
     startCountdown();
-
-    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
     initProductEventDelegation();
-    initGlobalEventDelegation();
-    bindStaticActionButtons();
     
-    // تصفية المنتجات
+    // تفعيل التبويبات (Tabs)
     const filterTabs = document.querySelectorAll('.filter-tab');
     filterTabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            filterTabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-
             const category = this.dataset.filter;
-
             if (category === 'all') {
                 renderProducts(products);
             } else {
@@ -1792,6 +1662,7 @@ function initApp() {
         });
     });
     
+    // تفعيل زر البحث (Enter Key)
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', () => performSearchDebounced());
@@ -1803,7 +1674,7 @@ function initApp() {
         });
     }
     
-    // Smooth scroll للروابط
+    // Smooth Scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1815,8 +1686,14 @@ function initApp() {
             }
         });
     });
+
+    // Dark Mode (كودك هنا صحيح)
+    const themeBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', toggleTheme);
+    }
     
-    // تأثير الـ navbar والزر العودة للأعلى عند التمرير
+    // Back to Top Button visibility
     const backToTop = document.getElementById('backToTop');
     window.addEventListener('scroll', function() {
         if (window.scrollY > 500) {
@@ -1825,24 +1702,16 @@ function initApp() {
             backToTop?.classList.remove('visible');
         }
     }, { passive: true });
-    
-    // التحقق من المفضلة المحفوظة
-    hydrateHeartsFromWishlist();
 
-    // إغلاق النوافذ عند الضغط على زر Escape
+    // Close overlays on Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (document.getElementById('cartOverlay')?.classList.contains('active')) toggleCart();
             if (document.getElementById('wishlistOverlay')?.classList.contains('active')) toggleWishlist();
             if (document.getElementById('searchOverlay')?.classList.contains('active')) toggleSearch();
+            if (document.getElementById('quickViewOverlay')?.classList.contains('active')) closeQuickView();
             const navLinks = document.querySelector('.nav-links');
             if (navLinks?.classList.contains('active')) toggleMobileMenu();
         }
     });
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
 }
