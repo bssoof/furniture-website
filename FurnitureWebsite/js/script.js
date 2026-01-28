@@ -880,19 +880,6 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
-function normalizeSearchText(text) {
-    return String(text || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u064B-\u065F]/g, '')
-        .replace(/[\u200B-\u200F]/g, '')
-        .trim();
-}
-
-products.forEach((product) => {
-    product.normalizedName = normalizeSearchText(product.name);
-});
-
 function escapeHTML(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -1373,7 +1360,7 @@ function performSearch(isSubmit = false) {
     
     // البحث في قائمة المنتجات
     const normalizedQuery = normalizeSearchText(query);
-    const results = products.filter(p => (p.normalizedName || normalizeSearchText(p.name)).includes(normalizedQuery));
+    const results = products.filter(p => normalizeSearchText(p.name).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
