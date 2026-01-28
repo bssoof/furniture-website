@@ -132,11 +132,14 @@ function showToast(message, type = 'success', title = null) {
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    const safeTitle = escapeHTML(title || titles[type]);
+    const safeMessage = escapeHTML(message);
+
     toast.innerHTML = `
         <div class="toast-icon"><i class="fas ${icons[type]}" aria-hidden="true"></i></div>
         <div class="toast-content">
-            <div class="toast-title">${title || titles[type]}</div>
-            <div class="toast-message">${message}</div>
+            <div class="toast-title">${safeTitle}</div>
+            <div class="toast-message">${safeMessage}</div>
         </div>
         <button class="toast-close" onclick="this.parentElement.remove()" aria-label="إغلاق">
             <i class="fas fa-times" aria-hidden="true"></i>
@@ -248,10 +251,10 @@ function renderRecentlyViewed() {
     
     section.style.display = 'block';
     grid.innerHTML = items.map(item => `
-        <div class="recently-viewed-item" onclick="openQuickView('${item.name}', ${item.price}, '${item.image}', '${item.category}', ${item.oldPrice || 'null'}, null)">
-            <img src="${item.image}" alt="${item.name}" loading="lazy">
+        <div class="recently-viewed-item" onclick="openQuickView(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price}, '${escapeHTML(item.image)}', decodeURIComponent('${encodeURIComponent(item.category)}'), ${item.oldPrice || 'null'}, null)">
+            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
             <div class="item-info">
-                <div class="item-name">${item.name}</div>
+                <div class="item-name">${escapeHTML(item.name)}</div>
                 <div class="item-price">${formatPrice(item.price)}</div>
             </div>
         </div>
@@ -338,6 +341,8 @@ function lightboxKeyHandler(e) {
 function initImageLightbox() {
     // Make product images clickable to open lightbox
     document.querySelectorAll('.product-card .product-image img').forEach((img, index) => {
+        if (img.dataset.lightboxBound) return;
+        img.dataset.lightboxBound = 'true';
         img.style.cursor = 'zoom-in';
         img.addEventListener('click', () => {
             const allImages = Array.from(document.querySelectorAll('.product-card .product-image img')).map(i => ({
@@ -372,7 +377,7 @@ function renderProducts(productsToRender) {
         let badgeHtml = '';
         if (product.badge) {
             const badgeClass = product.badge.includes('%') ? 'badge-sale' : 'badge-new';
-            badgeHtml = `<span class="product-badge ${badgeClass}">${product.badge}</span>`;
+            badgeHtml = `<span class="product-badge ${badgeClass}">${escapeHTML(product.badge)}</span>`;
         }
 
         // Old Price HTML
@@ -382,9 +387,9 @@ function renderProducts(productsToRender) {
         }
 
         return `
-            <div class="product-card" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-category="${product.category}" data-image="${product.image}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${product.badge}"` : ''}>
+            <div class="product-card" data-id="${product.id}" data-name="${escapeHTML(product.name)}" data-price="${product.price}" data-category="${escapeHTML(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
                 <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
                     ${badgeHtml}
                     <div class="product-actions">
                         <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
@@ -393,8 +398,8 @@ function renderProducts(productsToRender) {
                     </div>
                 </div>
                 <div class="product-info">
-                    <div class="product-category">${product.category}</div>
-                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-category">${escapeHTML(product.category)}</div>
+                    <h3 class="product-name">${escapeHTML(product.name)}</h3>
                     <div class="product-rating">
                         ${starsHtml}
                         <span>(${product.reviews} تقييم)</span>
@@ -412,8 +417,7 @@ function renderProducts(productsToRender) {
         `;
     }).join('');
 
-    // Re-attach event listeners
-    attachProductButtons();
+    // Re-apply state & image lightbox bindings
     initImageLightbox();
     hydrateHeartsFromWishlist();
 
@@ -876,6 +880,28 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
+function normalizeSearchText(text) {
+    return String(text || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u064B-\u065F]/g, '')
+        .replace(/[\u200B-\u200F]/g, '')
+        .trim();
+}
+
+products.forEach((product) => {
+    product.normalizedName = normalizeSearchText(product.name);
+});
+
+function escapeHTML(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function persistCart() {
     localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
 }
@@ -1016,9 +1042,9 @@ function updateCartDisplay() {
     cart.forEach((item, index) => {
         html += `
             <div class="cart-item">
-                <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+                <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
                 <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div class="cart-item-qty">
                         <button class="qty-btn" onclick="decreaseQty(${index})">-</button>
@@ -1149,9 +1175,9 @@ function updateCheckoutSummary() {
     // Update items
     itemsContainer.innerHTML = cart.map(item => `
         <div class="checkout-item">
-            <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+            <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
             <div class="checkout-item-info">
-                <div class="checkout-item-name">${item.name}</div>
+                <div class="checkout-item-name">${escapeHTML(item.name)}</div>
                 <div class="checkout-item-qty">الكمية: ${item.quantity}</div>
             </div>
             <div class="checkout-item-price">${formatPrice(item.price * item.quantity)}</div>
@@ -1280,12 +1306,12 @@ function updateWishlistDisplay() {
     wishlist.forEach((item, index) => {
         html += `
             <div class="cart-item">
-                <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+                <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
                 <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button onclick="addToCart('${item.name}', ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
                         <button onclick="removeFromWishlist(${index})" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -1346,7 +1372,8 @@ function performSearch(isSubmit = false) {
     }
     
     // البحث في قائمة المنتجات
-    const results = products.filter(p => p.name.includes(query));
+    const normalizedQuery = normalizeSearchText(query);
+    const results = products.filter(p => (p.normalizedName || normalizeSearchText(p.name)).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1354,10 +1381,10 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" onclick="addToCart('${p.name}', ${p.price}, '${p.image}'); toggleSearch();">
-            <img src="${p.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+        <div class="search-result-item" onclick="addToCart(decodeURIComponent('${encodeURIComponent(p.name)}'), ${p.price}, '${escapeHTML(p.image)}'); toggleSearch();">
+            <img src="${escapeHTML(p.image)}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
-                <div style="font-weight: 600;">${p.name}</div>
+                <div style="font-weight: 600;">${escapeHTML(p.name)}</div>
                 <div style="color: #8B4513;">${formatPrice(p.price)}</div>
             </div>
         </div>
@@ -1418,69 +1445,63 @@ function startCountdown() {
     setInterval(update, 1000);
 }
 
-function attachProductButtons() {
-    // أزرار الإضافة للسلة
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const card = btn.closest('.product-card');
-            if (!card) return;
+function initProductEventDelegation() {
+    const grid = document.getElementById('productsGrid');
+    if (!grid || grid.dataset.actionsBound) return;
+    grid.dataset.actionsBound = 'true';
+
+    grid.addEventListener('click', (event) => {
+        const addBtn = event.target.closest('.add-to-cart');
+        const quickViewBtn = event.target.closest('.quick-view-btn');
+        const wishlistBtn = event.target.closest('.wishlist-btn');
+        const shareBtn = event.target.closest('.share-btn');
+
+        const card = event.target.closest('.product-card');
+        if (!card) return;
+
+        if (addBtn) {
             const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
             addToCart(name, price, img);
-        });
-    });
-    
-    // أزرار Quick View
-    document.querySelectorAll('.quick-view-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (quickViewBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
             const category = card.dataset.category || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
-            
+
             openQuickView(name, price, image, category, oldPrice, badge);
-        });
-    });
-    
-    // أزرار المفضلة
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (wishlistBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
-            addToWishlist(name, price, btn, image);
-        });
-    });
-    
-    // أزرار المشاركة
-    document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+
+            addToWishlist(name, price, wishlistBtn, image);
+            return;
+        }
+
+        if (shareBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
                 url: window.location.href
             };
-            
+
             if (navigator.share) {
                 navigator.share(shareData).catch(() => {});
             } else {
@@ -1488,7 +1509,7 @@ function attachProductButtons() {
                     showToast('تم نسخ الرابط!', 'success');
                 });
             }
-        });
+        }
     });
 }
 
@@ -1558,8 +1579,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // تشغيل العد التنازلي
     startCountdown();
 
-    // ربط الأزرار الديناميكي (يتم استدعاؤه داخل renderProducts الآن)
-    // attachProductButtons();
+    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
+    initProductEventDelegation();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
@@ -1614,27 +1635,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             backToTop?.classList.remove('visible');
         }
-    });
+    }, { passive: true });
     
     // تفعيل أزرار المفضلة في المنتجات
-    document.querySelectorAll('.product-card .action-btn:first-child').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const card = this.closest('.product-card');
-            const name = card.querySelector('.product-name').textContent;
-            const priceText = card.querySelector('.current-price').textContent;
-            const price = parseInt(priceText.replace(/[^0-9]/g, ''));
-            addToWishlist(name, price, this);
-        });
-    });
-    
     // التحقق من المفضلة المحفوظة
-    document.querySelectorAll('.product-card').forEach(card => {
-        const name = card.querySelector('.product-name').textContent;
-        const heartBtn = card.querySelector('.action-btn:first-child');
-        if (wishlist.find(item => item.name === name) && heartBtn) {
-            heartBtn.classList.add('active');
-        }
-    });
+    hydrateHeartsFromWishlist();
 
     // إغلاق النوافذ عند الضغط على زر Escape
     document.addEventListener('keydown', function(e) {
