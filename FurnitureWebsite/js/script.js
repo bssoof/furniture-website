@@ -880,15 +880,6 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
-function normalizeSearchText(text) {
-    return String(text || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u064B-\u065F]/g, '')
-        .replace(/[\u200B-\u200F]/g, '')
-        .trim();
-}
-
 function escapeHTML(text) {
     return String(text)
         .replace(/&/g, '&amp;')
