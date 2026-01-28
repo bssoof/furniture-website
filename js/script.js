@@ -6,6 +6,13 @@ const STORAGE_KEYS = {
     wishlist: 'wishlist',
     theme: 'theme'
 };
+const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
+
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log('[DEBUG]', ...args);
+    }
+}
 
 // قائمة المنتجات
 const products = [
@@ -358,6 +365,7 @@ function initImageLightbox() {
 function renderProducts(productsToRender) {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
+    debugLog('renderProducts', productsToRender.length);
 
     if (productsToRender.length === 0) {
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">لا توجد منتجات مطابقة</p>';
@@ -776,6 +784,7 @@ function toggleTheme() {
     const next = current === 'dark' ? 'light' : 'dark';
     applyTheme(next);
     showNotification(next === 'dark' ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري', 'success');
+    debugLog('toggleTheme', next);
 }
 
 // تطبيق الثيم عند التحميل
@@ -992,6 +1001,7 @@ function addToCart(productName, price, image = FALLBACK_IMG) {
     updateCartCount();
     updateCartDisplay();
     showNotification(`تم إضافة ${productName} إلى السلة`, 'success');
+    debugLog('addToCart', productName, price);
 }
 
 // عرض السلة
@@ -999,6 +1009,7 @@ function toggleCart() {
     const cartOverlay = document.getElementById('cartOverlay');
     const cartSidebar = document.querySelector('.cart-sidebar');
     const isActive = cartSidebar.classList.contains('active');
+    debugLog('toggleCart', isActive ? 'close' : 'open');
     
     if (isActive) {
         closeDialog(cartSidebar, cartOverlay);
@@ -1240,6 +1251,7 @@ function toggleWishlist() {
     const wishlistOverlay = document.getElementById('wishlistOverlay');
     const wishlistSidebar = document.getElementById('wishlistSidebar');
     const isActive = wishlistSidebar.classList.contains('active');
+    debugLog('toggleWishlist', isActive ? 'close' : 'open');
     
     if (isActive) {
         closeDialog(wishlistSidebar, wishlistOverlay);
@@ -1265,6 +1277,7 @@ function addToWishlist(productName, price, button, image = FALLBACK_IMG) {
     
     persistWishlist();
     updateWishlistCount();
+    debugLog('toggleWishlistItem', productName);
 }
 
 function updateWishlistCount() {
@@ -1532,6 +1545,7 @@ function scrollToTop() {
 
 // ========== تهيئة الصفحة ==========
 document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOMContentLoaded');
     // تحديث عدد السلة والمفضلة
     updateCartCount();
     updateWishlistCount();
