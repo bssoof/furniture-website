@@ -3448,4 +3448,27 @@ html {
     .checkout-items {
         max-height: 150px;
     }
+    /* ========== 24. Responsive للمودالات الجديدة ========== */
+@media (max-width: 768px) {
+    .product-details-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .details-main-image {
+        height: 300px;
+    }
+    
+    .similar-products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-details-modal {
+        width: 100%;
+    }
+    
+    .compare-modal,
+    .filters-modal {
+        width: 95%;
+    }
+}
 }
