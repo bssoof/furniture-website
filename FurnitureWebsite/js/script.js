@@ -341,6 +341,8 @@ function lightboxKeyHandler(e) {
 function initImageLightbox() {
     // Make product images clickable to open lightbox
     document.querySelectorAll('.product-card .product-image img').forEach((img, index) => {
+        if (img.dataset.lightboxBound) return;
+        img.dataset.lightboxBound = 'true';
         img.style.cursor = 'zoom-in';
         img.addEventListener('click', () => {
             const allImages = Array.from(document.querySelectorAll('.product-card .product-image img')).map(i => ({
@@ -415,8 +417,7 @@ function renderProducts(productsToRender) {
         `;
     }).join('');
 
-    // Re-attach event listeners
-    attachProductButtons();
+    // Re-apply state & image lightbox bindings
     initImageLightbox();
     hydrateHeartsFromWishlist();
 
@@ -1430,69 +1431,63 @@ function startCountdown() {
     setInterval(update, 1000);
 }
 
-function attachProductButtons() {
-    // أزرار الإضافة للسلة
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const card = btn.closest('.product-card');
-            if (!card) return;
+function initProductEventDelegation() {
+    const grid = document.getElementById('productsGrid');
+    if (!grid || grid.dataset.actionsBound) return;
+    grid.dataset.actionsBound = 'true';
+
+    grid.addEventListener('click', (event) => {
+        const addBtn = event.target.closest('.add-to-cart');
+        const quickViewBtn = event.target.closest('.quick-view-btn');
+        const wishlistBtn = event.target.closest('.wishlist-btn');
+        const shareBtn = event.target.closest('.share-btn');
+
+        const card = event.target.closest('.product-card');
+        if (!card) return;
+
+        if (addBtn) {
             const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
             addToCart(name, price, img);
-        });
-    });
-    
-    // أزرار Quick View
-    document.querySelectorAll('.quick-view-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (quickViewBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
             const category = card.dataset.category || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
-            
+
             openQuickView(name, price, image, category, oldPrice, badge);
-        });
-    });
-    
-    // أزرار المفضلة
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (wishlistBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
-            addToWishlist(name, price, btn, image);
-        });
-    });
-    
-    // أزرار المشاركة
-    document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+
+            addToWishlist(name, price, wishlistBtn, image);
+            return;
+        }
+
+        if (shareBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
                 url: window.location.href
             };
-            
+
             if (navigator.share) {
                 navigator.share(shareData).catch(() => {});
             } else {
@@ -1500,7 +1495,7 @@ function attachProductButtons() {
                     showToast('تم نسخ الرابط!', 'success');
                 });
             }
-        });
+        }
     });
 }
 
@@ -1570,8 +1565,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // تشغيل العد التنازلي
     startCountdown();
 
-    // ربط الأزرار الديناميكي (يتم استدعاؤه داخل renderProducts الآن)
-    // attachProductButtons();
+    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
+    initProductEventDelegation();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
