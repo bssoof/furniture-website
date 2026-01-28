@@ -15,8 +15,10 @@
     <meta property="og:type" content="website">
     
     <title>دار الأثاث الفاخر | أفضل أثاث في السعودية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -36,10 +38,10 @@
                     <i class="fas fa-envelope"></i> info@darfurniture.com
                 </div>
                 <div class="nav-social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -56,17 +58,17 @@
                 <li><a href="#contact">اتصل بنا</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي">
+                <button class="theme-toggle" data-action="toggle-theme" title="تبديل الوضع الليلي">
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
-                <button class="nav-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
-                <button class="nav-btn" onclick="toggleWishlist()"><i class="fas fa-heart"></i><span class="wishlist-count" id="wishlistCount">0</span></button>
-                <button class="nav-btn" onclick="toggleCart()">
+                <button class="nav-btn" data-action="toggle-search"><i class="fas fa-search"></i></button>
+                <button class="nav-btn" data-action="toggle-wishlist"><i class="fas fa-heart"></i><span class="wishlist-count" id="wishlistCount">0</span></button>
+                <button class="nav-btn" data-action="toggle-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </button>
-                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <button class="mobile-menu-btn" data-action="toggle-mobile-menu">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -287,7 +289,7 @@
                 </div>
                 <p class="testimonial-text">جودة ممتازة وخدمة لا تُضاهى! أثاث بيتي كله من دار الأثاث وأنا راضي جداً عن الاختيار.</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60" class="author-avatar" alt="محمد" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60" class="author-avatar" alt="محمد" loading="lazy" width="60" height="60" decoding="async">
                     <div class="author-info">
                         <h4>محمد أحمد</h4>
                         <p>مشتري متحقق</p>
@@ -304,7 +306,7 @@
                 </div>
                 <p class="testimonial-text">توصيل سريع وآمن جداً. المنتجات تطابق الصور بنسبة 100%. متجر موثوق وأنصح به بقوة!</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60" class="author-avatar" alt="فاطمة" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60" class="author-avatar" alt="فاطمة" loading="lazy" width="60" height="60" decoding="async">
                     <div class="author-info">
                         <h4>فاطمة محمود</h4>
                         <p>مشتري متحقق</p>
@@ -321,7 +323,7 @@
                 </div>
                 <p class="testimonial-text">أفضل سعر في السوق مع أفضل جودة! فريق الدعم رد على استفساراتي بسرعة واحترافية.</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60" class="author-avatar" alt="علي" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60" class="author-avatar" alt="علي" loading="lazy" width="60" height="60" decoding="async">
                     <div class="author-info">
                         <h4>علي خالد</h4>
                         <p>مشتري متحقق</p>
@@ -336,7 +338,7 @@
         <div class="newsletter-content">
             <h2>اشترك في نشرتنا البريدية</h2>
             <p>احصل على أحدث العروض والمنتجات الجديدة مباشرة في بريدك الإلكتروني</p>
-            <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+            <form class="newsletter-form" data-action="subscribe-newsletter">
                 <input type="email" placeholder="أدخل بريدك الإلكتروني" required>
                 <button type="submit">اشترك الآن</button>
             </form>
@@ -353,10 +355,10 @@
                 </div>
                 <p>متجر الأثاث الفاخر الأول في المملكة. نقدم أفضل تشكيلة من الأثاث العصري والكلاسيكي بأسعار منافسة وجودة عالية.</p>
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             <div class="footer-column">
@@ -414,9 +416,9 @@
         <div class="footer-bottom">
             <p>&copy; 2026 دار الأثاث الفاخر. جميع الحقوق محفوظة.</p>
             <div class="payment-methods">
-                <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa">
-                <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MasterCard">
-                <img src="https://img.icons8.com/color/48/000000/apple-pay.png" alt="Apple Pay">
+                <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" width="48" height="48" loading="lazy" decoding="async">
+                <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MasterCard" width="48" height="48" loading="lazy" decoding="async">
+                <img src="https://img.icons8.com/color/48/000000/apple-pay.png" alt="Apple Pay" width="48" height="48" loading="lazy" decoding="async">
             </div>
         </div>
     </footer>
@@ -424,11 +426,11 @@
     </main><!-- End main content -->
 
     <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" aria-hidden="true"></div>
+    <div class="cart-overlay" id="cartOverlay" data-action="close-cart" aria-hidden="true"></div>
     <aside class="cart-sidebar" role="dialog" aria-label="سلة التسوق" aria-modal="true">
         <div class="cart-header">
             <h3>سلة التسوق</h3>
-            <button class="close-cart" onclick="toggleCart()" aria-label="إغلاق السلة"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <button class="close-cart" data-action="toggle-cart" aria-label="إغلاق السلة"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
         <div class="cart-items" id="cartItems" role="list">
             <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
@@ -437,7 +439,7 @@
             <!-- Coupon Code -->
             <div class="coupon-section">
                 <input type="text" id="couponInput" placeholder="كود الخصم" aria-label="أدخل كود الخصم">
-                <button onclick="applyCoupon()" class="coupon-btn">تطبيق</button>
+                <button data-action="apply-coupon" class="coupon-btn">تطبيق</button>
             </div>
             <div class="cart-summary">
                 <div class="summary-row">
@@ -453,7 +455,7 @@
                     <span id="cartTotal" aria-live="polite">0 ر.س</span>
                 </div>
             </div>
-            <button class="checkout-btn" onclick="checkout()">
+            <button class="checkout-btn" data-action="checkout">
                 <i class="fas fa-lock"></i>
                 الدفع الآن
             </button>
@@ -461,9 +463,9 @@
     </aside>
 
     <!-- Quick View Modal -->
-    <div class="quick-view-overlay" id="quickViewOverlay" onclick="closeQuickView()" aria-hidden="true"></div>
+    <div class="quick-view-overlay" id="quickViewOverlay" data-action="close-quick-view" aria-hidden="true"></div>
     <div class="quick-view-modal" id="quickViewModal" role="dialog" aria-label="معاينة المنتج" aria-modal="true">
-        <button class="close-quick-view" onclick="closeQuickView()" aria-label="إغلاق">
+        <button class="close-quick-view" data-action="close-quick-view" aria-label="إغلاق">
             <i class="fas fa-times" aria-hidden="true"></i>
         </button>
         <div class="quick-view-content">
@@ -483,20 +485,20 @@
                 <div class="quick-view-quantity">
                     <label>الكمية:</label>
                     <div class="qty-selector">
-                        <button onclick="changeQuickViewQty(-1)">-</button>
+                        <button data-action="quick-view-qty" data-qty-delta="-1">-</button>
                         <input type="number" id="quickViewQty" value="1" min="1" max="10">
-                        <button onclick="changeQuickViewQty(1)">+</button>
+                        <button data-action="quick-view-qty" data-qty-delta="1">+</button>
                     </div>
                 </div>
                 <div class="quick-view-actions">
-                    <button class="qv-add-cart" onclick="addFromQuickView()">
+                    <button class="qv-add-cart" data-action="add-from-quick-view">
                         <i class="fas fa-cart-plus"></i>
                         أضف للسلة
                     </button>
-                    <button class="qv-wishlist" onclick="addToWishlistFromQuickView()">
+                    <button class="qv-wishlist" data-action="wishlist-from-quick-view">
                         <i class="fas fa-heart"></i>
                     </button>
-                    <button class="qv-share" onclick="shareProduct()">
+                    <button class="qv-share" data-action="share-product">
                         <i class="fas fa-share-alt"></i>
                     </button>
                 </div>
@@ -505,24 +507,24 @@
     </div>
 
     <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="البحث" aria-modal="true">
+    <div class="search-overlay" id="searchOverlay" data-action="close-search" role="dialog" aria-label="البحث" aria-modal="true">
         <div class="search-container">
-            <button class="close-search" onclick="toggleSearch()" aria-label="إغلاق البحث"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <button class="close-search" data-action="toggle-search" aria-label="إغلاق البحث"><i class="fas fa-times" aria-hidden="true"></i></button>
             <h2>ابحث عن منتجاتك</h2>
             <div class="search-input-wrapper">
-                <input type="search" id="searchInput" placeholder="اكتب اسم المنتج..." onkeyup="searchProducts(event)" aria-label="بحث عن منتج">
-                <button onclick="performSearch()" aria-label="بحث"><i class="fas fa-search" aria-hidden="true"></i></button>
+                <input type="search" id="searchInput" placeholder="اكتب اسم المنتج..." aria-label="بحث عن منتج">
+                <button data-action="perform-search" aria-label="بحث"><i class="fas fa-search" aria-hidden="true"></i></button>
             </div>
             <div class="search-results" id="searchResults" role="listbox" aria-live="polite"></div>
         </div>
     </div>
 
     <!-- Wishlist Sidebar -->
-    <div class="wishlist-overlay" id="wishlistOverlay" onclick="toggleWishlist()" aria-hidden="true"></div>
+    <div class="wishlist-overlay" id="wishlistOverlay" data-action="close-wishlist" aria-hidden="true"></div>
     <aside class="wishlist-sidebar" id="wishlistSidebar" role="dialog" aria-label="المفضلة" aria-modal="true">
         <div class="cart-header">
             <h3>المفضلة <i class="fas fa-heart" aria-hidden="true"></i></h3>
-            <button class="close-cart" onclick="toggleWishlist()" aria-label="إغلاق المفضلة"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <button class="close-cart" data-action="toggle-wishlist" aria-label="إغلاق المفضلة"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
         <div class="cart-items" id="wishlistItems" role="list">
             <p style="text-align: center; color: #999; padding: 40px 20px;">المفضلة فارغة</p>
@@ -530,35 +532,35 @@
     </aside>
 
     <!-- Back to Top -->
-    <button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="العودة إلى أعلى الصفحة">
+    <button class="back-to-top" id="backToTop" data-action="scroll-top" aria-label="العودة إلى أعلى الصفحة">
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
     <!-- Image Lightbox -->
-    <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()" aria-hidden="true"></div>
+    <div class="lightbox-overlay" id="lightboxOverlay" data-action="close-lightbox" aria-hidden="true"></div>
     <div class="lightbox" id="lightbox" role="dialog" aria-label="عرض الصورة" aria-modal="true">
-        <button class="lightbox-close" onclick="closeLightbox()" aria-label="إغلاق">
+        <button class="lightbox-close" data-action="close-lightbox" aria-label="إغلاق">
             <i class="fas fa-times"></i>
         </button>
-        <button class="lightbox-nav lightbox-prev" onclick="lightboxPrev()" aria-label="السابق">
+        <button class="lightbox-nav lightbox-prev" data-action="lightbox-prev" aria-label="السابق">
             <i class="fas fa-chevron-right"></i>
         </button>
         <div class="lightbox-content">
             <img id="lightboxImage" src="" alt="">
             <div class="lightbox-caption" id="lightboxCaption"></div>
         </div>
-        <button class="lightbox-nav lightbox-next" onclick="lightboxNext()" aria-label="التالي">
+        <button class="lightbox-nav lightbox-next" data-action="lightbox-next" aria-label="التالي">
             <i class="fas fa-chevron-left"></i>
         </button>
         <div class="lightbox-counter" id="lightboxCounter"></div>
     </div>
 
     <!-- Checkout Modal -->
-    <div class="checkout-overlay" id="checkoutOverlay" onclick="closeCheckout()" aria-hidden="true"></div>
+    <div class="checkout-overlay" id="checkoutOverlay" data-action="close-checkout" aria-hidden="true"></div>
     <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إتمام الطلب" aria-modal="true">
         <div class="checkout-header">
             <h3><i class="fas fa-shopping-bag"></i> إتمام الطلب</h3>
-            <button class="close-checkout" onclick="closeCheckout()" aria-label="إغلاق">
+            <button class="close-checkout" data-action="close-checkout" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -583,7 +585,7 @@
             </div>
             <div class="checkout-section">
                 <h4>معلومات التوصيل</h4>
-                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                <form id="checkoutForm" data-action="submit-order">
                     <div class="form-group">
                         <label for="checkoutName"><i class="fas fa-user"></i> الاسم الكامل</label>
                         <input type="text" id="checkoutName" required placeholder="أدخل اسمك الكامل">
@@ -608,6 +610,6 @@
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script src="js/script.js" defer></script>
 </body>
 </html>
