@@ -1,3 +1,0 @@
-FurnitureWebsite/
-GeneticAlgorithmProject/
-Pizza-al-sham/

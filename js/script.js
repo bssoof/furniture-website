@@ -7,6 +7,72 @@ const STORAGE_KEYS = {
     theme: 'theme'
 };
 
+// قائمة المنتجات
+const products = [
+    {
+        id: 1,
+        name: 'كنبة مودرن فاخرة',
+        price: 2799,
+        oldPrice: 3999,
+        category: 'غرف المعيشة',
+        badge: '-30%',
+        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500',
+        rating: 4.5,
+        reviews: 128
+    },
+    {
+        id: 2,
+        name: 'طاولة طعام خشب فاخر',
+        price: 1899,
+        oldPrice: 2299,
+        category: 'غرف الطعام',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1616362348473-c767bf9eb473?w=500',
+        rating: 5,
+        reviews: 95
+    },
+    {
+        id: 3,
+        name: 'كرسي جلد إيطالي',
+        price: 1199,
+        oldPrice: 1499,
+        category: 'مقاعد',
+        badge: '-20%',
+        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500',
+        rating: 4,
+        reviews: 64
+    },
+    {
+        id: 4,
+        name: 'سرير فاخر بتصميم عصري',
+        price: 3999,
+        oldPrice: 4999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1746549844299-2867f09c9a37?w=500',
+        rating: 4.5,
+        reviews: 156
+    },
+    {
+        id: 5,
+        name: 'مكتب عمل خشبي',
+        price: 1499,
+        category: 'المكاتب',
+        image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500',
+        rating: 4.2,
+        reviews: 45
+    },
+    {
+        id: 6,
+        name: 'خزانة ملابس واسعة',
+        price: 2599,
+        oldPrice: 2999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500',
+        rating: 4.7,
+        reviews: 82
+    }
+];
+
 function safeParse(key) {
     try {
         const raw = localStorage.getItem(key);
@@ -66,13 +132,16 @@ function showToast(message, type = 'success', title = null) {
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    const safeTitle = escapeHTML(title || titles[type]);
+    const safeMessage = escapeHTML(message);
+
     toast.innerHTML = `
         <div class="toast-icon"><i class="fas ${icons[type]}" aria-hidden="true"></i></div>
         <div class="toast-content">
-            <div class="toast-title">${title || titles[type]}</div>
-            <div class="toast-message">${message}</div>
+            <div class="toast-title">${safeTitle}</div>
+            <div class="toast-message">${safeMessage}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.remove()" aria-label="إغلاق">
+        <button class="toast-close" data-action="toast-close" aria-label="إغلاق">
             <i class="fas fa-times" aria-hidden="true"></i>
         </button>
         <div class="toast-progress" style="color: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'}"></div>
@@ -182,10 +251,10 @@ function renderRecentlyViewed() {
     
     section.style.display = 'block';
     grid.innerHTML = items.map(item => `
-        <div class="recently-viewed-item" onclick="openQuickView('${item.name}', ${item.price}, '${item.image}', '${item.category}', ${item.oldPrice || 'null'}, null)">
-            <img src="${item.image}" alt="${item.name}" loading="lazy">
+        <div class="recently-viewed-item" onclick="openQuickView(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price}, '${escapeHTML(item.image)}', decodeURIComponent('${encodeURIComponent(item.category)}'), ${item.oldPrice || 'null'}, null)">
+            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
             <div class="item-info">
-                <div class="item-name">${item.name}</div>
+                <div class="item-name">${escapeHTML(item.name)}</div>
                 <div class="item-price">${formatPrice(item.price)}</div>
             </div>
         </div>
@@ -272,6 +341,8 @@ function lightboxKeyHandler(e) {
 function initImageLightbox() {
     // Make product images clickable to open lightbox
     document.querySelectorAll('.product-card .product-image img').forEach((img, index) => {
+        if (img.dataset.lightboxBound) return;
+        img.dataset.lightboxBound = 'true';
         img.style.cursor = 'zoom-in';
         img.addEventListener('click', () => {
             const allImages = Array.from(document.querySelectorAll('.product-card .product-image img')).map(i => ({
@@ -280,6 +351,80 @@ function initImageLightbox() {
             }));
             openLightbox(img.src.replace('w=500', 'w=1200'), img.alt, allImages, index);
         });
+    });
+}
+
+// ========== Rendering Products ==========
+function renderProducts(productsToRender) {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+
+    if (productsToRender.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">لا توجد منتجات مطابقة</p>';
+        return;
+    }
+
+    grid.innerHTML = productsToRender.map(product => {
+        // Calculate rating stars
+        const fullStars = Math.floor(product.rating);
+        const hasHalf = product.rating % 1 >= 0.5;
+        let starsHtml = '';
+        for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+        if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+
+        // Badge HTML
+        let badgeHtml = '';
+        if (product.badge) {
+            const badgeClass = product.badge.includes('%') ? 'badge-sale' : 'badge-new';
+            badgeHtml = `<span class="product-badge ${badgeClass}">${escapeHTML(product.badge)}</span>`;
+        }
+
+        // Old Price HTML
+        let oldPriceHtml = '';
+        if (product.oldPrice) {
+            oldPriceHtml = `<span class="old-price">${formatPrice(product.oldPrice)}</span>`;
+        }
+
+        return `
+            <div class="product-card" data-id="${product.id}" data-name="${escapeHTML(product.name)}" data-price="${product.price}" data-category="${escapeHTML(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
+                <div class="product-image">
+                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
+                    ${badgeHtml}
+                    <div class="product-actions">
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">${escapeHTML(product.category)}</div>
+                    <h3 class="product-name">${escapeHTML(product.name)}</h3>
+                    <div class="product-rating">
+                        ${starsHtml}
+                        <span>(${product.reviews} تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${oldPriceHtml}
+                    </div>
+                    <button class="add-to-cart">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Re-apply state & image lightbox bindings
+    initImageLightbox();
+    hydrateHeartsFromWishlist();
+
+    // Add animation
+    const cards = grid.querySelectorAll('.product-card');
+    cards.forEach((card, index) => {
+        card.style.animation = `fadeInUp 0.4s ease ${index * 0.1}s both`;
     });
 }
 
@@ -408,7 +553,7 @@ function initFloatingCartButton() {
         fabContainer = document.createElement('div');
         fabContainer.className = 'fab-container';
         fabContainer.innerHTML = `
-            <button class="fab fab-cart" onclick="toggleCart()" aria-label="سلة التسوق">
+            <button class="fab fab-cart" data-action="toggle-cart" aria-label="سلة التسوق">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="fab-badge" id="fabCartBadge">0</span>
             </button>
@@ -735,6 +880,15 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
+function escapeHTML(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function persistCart() {
     localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
 }
@@ -865,7 +1019,7 @@ function updateCartDisplay() {
             <div style="text-align: center; padding: 60px 20px; color: #999;">
                 <i class="fas fa-shopping-cart" style="font-size: 60px; margin-bottom: 20px; opacity: 0.3;"></i>
                 <p>السلة فارغة حالياً</p>
-                <button onclick="toggleCart()" style="margin-top: 20px; padding: 12px 30px; background: #D4A574; color: white; border: none; border-radius: 25px; cursor: pointer;">تابع التسوق</button>
+                <button data-action="toggle-cart" style="margin-top: 20px; padding: 12px 30px; background: #D4A574; color: white; border: none; border-radius: 25px; cursor: pointer;">تابع التسوق</button>
             </div>
         `;
         return;
@@ -875,15 +1029,15 @@ function updateCartDisplay() {
     cart.forEach((item, index) => {
         html += `
             <div class="cart-item">
-                <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+                <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
                 <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div class="cart-item-qty">
-                        <button class="qty-btn" onclick="decreaseQty(${index})">-</button>
+                        <button class="qty-btn" data-action="cart-decrease" data-index="${index}">-</button>
                         <span>${item.quantity}</span>
-                        <button class="qty-btn" onclick="increaseQty(${index})">+</button>
-                        <button class="qty-btn" style="background: #EF4444; color: white;" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                        <button class="qty-btn" data-action="cart-increase" data-index="${index}">+</button>
+                        <button class="qty-btn" style="background: #EF4444; color: white;" data-action="cart-remove" data-index="${index}"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -1008,9 +1162,9 @@ function updateCheckoutSummary() {
     // Update items
     itemsContainer.innerHTML = cart.map(item => `
         <div class="checkout-item">
-            <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+            <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
             <div class="checkout-item-info">
-                <div class="checkout-item-name">${item.name}</div>
+                <div class="checkout-item-name">${escapeHTML(item.name)}</div>
                 <div class="checkout-item-qty">الكمية: ${item.quantity}</div>
             </div>
             <div class="checkout-item-price">${formatPrice(item.price * item.quantity)}</div>
@@ -1139,15 +1293,15 @@ function updateWishlistDisplay() {
     wishlist.forEach((item, index) => {
         html += `
             <div class="cart-item">
-                <img src="${item.image || FALLBACK_IMG}" alt="${item.name}">
+                <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
                 <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button onclick="addToCart('${item.name}', ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
-                        <button onclick="removeFromWishlist(${index})" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button data-action="wishlist-remove" data-index="${index}" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -1204,17 +1358,9 @@ function performSearch(isSubmit = false) {
         return;
     }
     
-    // محاكاة نتائج البحث
-    const products = [
-        { name: 'كنبة مودرن فاخرة', price: 2799 },
-        { name: 'طاولة طعام خشب فاخر', price: 1899 },
-        { name: 'كرسي جلد إيطالي', price: 1199 },
-        { name: 'سرير فاخر بتصميم عصري', price: 3999 },
-        { name: 'مكتب عمل خشبي', price: 1499 },
-        { name: 'خزانة ملابس واسعة', price: 2599 }
-    ];
-    
-    const results = products.filter(p => p.name.includes(query));
+    // البحث في قائمة المنتجات
+    const normalizedQuery = normalizeSearchText(query);
+    const results = products.filter(p => normalizeSearchText(p.name).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1222,10 +1368,10 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" onclick="addToCart('${p.name}', ${p.price}); toggleSearch();">
-            <img src="${FALLBACK_IMG}&w=120" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+        <div class="search-result-item" onclick="addToCart(decodeURIComponent('${encodeURIComponent(p.name)}'), ${p.price}, '${escapeHTML(p.image)}'); toggleSearch();">
+            <img src="${escapeHTML(p.image)}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
-                <div style="font-weight: 600;">${p.name}</div>
+                <div style="font-weight: 600;">${escapeHTML(p.name)}</div>
                 <div style="color: #8B4513;">${formatPrice(p.price)}</div>
             </div>
         </div>
@@ -1286,69 +1432,63 @@ function startCountdown() {
     setInterval(update, 1000);
 }
 
-function attachProductButtons() {
-    // أزرار الإضافة للسلة
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const card = btn.closest('.product-card');
-            if (!card) return;
+function initProductEventDelegation() {
+    const grid = document.getElementById('productsGrid');
+    if (!grid || grid.dataset.actionsBound) return;
+    grid.dataset.actionsBound = 'true';
+
+    grid.addEventListener('click', (event) => {
+        const addBtn = event.target.closest('.add-to-cart');
+        const quickViewBtn = event.target.closest('.quick-view-btn');
+        const wishlistBtn = event.target.closest('.wishlist-btn');
+        const shareBtn = event.target.closest('.share-btn');
+
+        const card = event.target.closest('.product-card');
+        if (!card) return;
+
+        if (addBtn) {
             const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
             addToCart(name, price, img);
-        });
-    });
-    
-    // أزرار Quick View
-    document.querySelectorAll('.quick-view-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (quickViewBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            const category = card.dataset.category || card.querySelector('.product-category')?.textContent || 'أثاث';
+            const category = decodeData(card.dataset.category) || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
-            
+
             openQuickView(name, price, image, category, oldPrice, badge);
-        });
-    });
-    
-    // أزرار المفضلة
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+            return;
+        }
+
+        if (wishlistBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
-            addToWishlist(name, price, btn, image);
-        });
-    });
-    
-    // أزرار المشاركة
-    document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.product-card');
-            if (!card) return;
-            
+
+            addToWishlist(name, price, wishlistBtn, image);
+            return;
+        }
+
+        if (shareBtn) {
+            event.preventDefault();
             const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
                 url: window.location.href
             };
-            
+
             if (navigator.share) {
                 navigator.share(shareData).catch(() => {});
             } else {
@@ -1356,7 +1496,7 @@ function attachProductButtons() {
                     showToast('تم نسخ الرابط!', 'success');
                 });
             }
-        });
+        }
     });
 }
 
@@ -1420,11 +1560,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // تهيئة ترتيب المنتجات
     initProductSorting();
     
+    // عرض جميع المنتجات عند التحميل
+    renderProducts(products);
+
     // تشغيل العد التنازلي
     startCountdown();
 
-    // ربط الأزرار الديناميكي
-    attachProductButtons();
+    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
+    initProductEventDelegation();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
@@ -1432,23 +1575,28 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('click', function() {
             filterTabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            showNotification(`تم التصفية: ${this.textContent}`, 'success');
+
+            const category = this.dataset.filter;
+
+            if (category === 'all') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
         });
     });
     
-    // إغلاق السلة والمفضلة عند الضغط على الـ overlay
-    document.getElementById('cartOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleCart();
-    });
-    
-    document.getElementById('wishlistOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleWishlist();
-    });
-
-    // إغلاق البحث عند الضغط على الخلفية
-    document.getElementById('searchOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleSearch();
-    });
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => performSearchDebounced());
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                performSearch(true);
+            }
+        });
+    }
     
     // Smooth scroll للروابط
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1471,27 +1619,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             backToTop?.classList.remove('visible');
         }
-    });
+    }, { passive: true });
     
     // تفعيل أزرار المفضلة في المنتجات
-    document.querySelectorAll('.product-card .action-btn:first-child').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const card = this.closest('.product-card');
-            const name = card.querySelector('.product-name').textContent;
-            const priceText = card.querySelector('.current-price').textContent;
-            const price = parseInt(priceText.replace(/[^0-9]/g, ''));
-            addToWishlist(name, price, this);
-        });
-    });
-    
     // التحقق من المفضلة المحفوظة
-    document.querySelectorAll('.product-card').forEach(card => {
-        const name = card.querySelector('.product-name').textContent;
-        const heartBtn = card.querySelector('.action-btn:first-child');
-        if (wishlist.find(item => item.name === name) && heartBtn) {
-            heartBtn.classList.add('active');
-        }
-    });
+    hydrateHeartsFromWishlist();
 
     // إغلاق النوافذ عند الضغط على زر Escape
     document.addEventListener('keydown', function(e) {
