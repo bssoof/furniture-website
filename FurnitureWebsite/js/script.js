@@ -1535,7 +1535,10 @@ function initProductEventDelegation() {
 }
 
 function initGlobalEventDelegation() {
-    document.addEventListener('click', (event) => {
+    if (document.body.dataset.globalDelegationBound) return;
+    document.body.dataset.globalDelegationBound = 'true';
+
+    const clickHandler = (event) => {
         const target = event.target.closest('[data-action]');
         if (!target) return;
 
@@ -1657,7 +1660,9 @@ function initGlobalEventDelegation() {
             default:
                 break;
         }
-    });
+    };
+
+    document.addEventListener('click', clickHandler, true);
 
     document.addEventListener('submit', (event) => {
         const form = event.target;
@@ -1673,7 +1678,7 @@ function initGlobalEventDelegation() {
             default:
                 break;
         }
-    });
+    }, true);
 }
 
 function hydrateHeartsFromWishlist() {
