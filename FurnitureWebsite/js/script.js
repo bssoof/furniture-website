@@ -258,7 +258,7 @@ function renderRecentlyViewed() {
     
     section.style.display = 'block';
     grid.innerHTML = items.map(item => `
-        <div class="recently-viewed-item" data-action="recently-viewed" data-name="${encodeURIComponent(item.name)}" data-price="${item.price}" data-image="${escapeHTML(item.image)}" data-category="${encodeURIComponent(item.category)}" ${item.oldPrice ? `data-old-price="${item.oldPrice}"` : ''}>
+        <div class="recently-viewed-item" onclick="openQuickView(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price}, '${escapeHTML(item.image)}', decodeURIComponent('${encodeURIComponent(item.category)}'), ${item.oldPrice || 'null'}, null)">
             <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
             <div class="item-info">
                 <div class="item-name">${escapeHTML(item.name)}</div>
@@ -395,7 +395,7 @@ function renderProducts(productsToRender) {
         }
 
         return `
-            <div class="product-card" data-id="${product.id}" data-name="${encodeURIComponent(product.name)}" data-price="${product.price}" data-category="${encodeURIComponent(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
+            <div class="product-card" data-id="${product.id}" data-name="${escapeHTML(product.name)}" data-price="${product.price}" data-category="${escapeHTML(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
                 <div class="product-image">
                     <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
                     ${badgeHtml}
@@ -889,19 +889,6 @@ function formatPrice(num) {
     return Number(num || 0).toLocaleString() + ' ر.س';
 }
 
-function normalizeSearchText(text) {
-    return String(text || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u064B-\u065F]/g, '')
-        .replace(/[\u200B-\u200F]/g, '')
-        .trim();
-}
-
-products.forEach((product) => {
-    product.normalizedName = normalizeSearchText(product.name);
-});
-
 function escapeHTML(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -909,14 +896,6 @@ function escapeHTML(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-}
-
-function decodeData(value) {
-    try {
-        return decodeURIComponent(value || '');
-    } catch (e) {
-        return value || '';
-    }
 }
 
 function persistCart() {
@@ -1332,7 +1311,7 @@ function updateWishlistDisplay() {
                     <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button data-action="wishlist-add-to-cart" data-index="${index}" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
                         <button data-action="wishlist-remove" data-index="${index}" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -1394,7 +1373,7 @@ function performSearch(isSubmit = false) {
     
     // البحث في قائمة المنتجات
     const normalizedQuery = normalizeSearchText(query);
-    const results = products.filter(p => (p.normalizedName || normalizeSearchText(p.name)).includes(normalizedQuery));
+    const results = products.filter(p => normalizeSearchText(p.name).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1402,7 +1381,7 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" data-action="search-add" data-name="${encodeURIComponent(p.name)}" data-price="${p.price}" data-image="${escapeHTML(p.image)}">
+        <div class="search-result-item" onclick="addToCart(decodeURIComponent('${encodeURIComponent(p.name)}'), ${p.price}, '${escapeHTML(p.image)}'); toggleSearch();">
             <img src="${escapeHTML(p.image)}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
                 <div style="font-weight: 600;">${escapeHTML(p.name)}</div>
@@ -1481,7 +1460,7 @@ function initProductEventDelegation() {
         if (!card) return;
 
         if (addBtn) {
-            const name = card.querySelector('.product-name')?.textContent || decodeData(card.dataset.name) || 'منتج';
+            const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
@@ -1491,32 +1470,32 @@ function initProductEventDelegation() {
 
         if (quickViewBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
             const category = decodeData(card.dataset.category) || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
-            
+
             openQuickView(name, price, image, category, oldPrice, badge);
             return;
         }
 
         if (wishlistBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
+
             addToWishlist(name, price, wishlistBtn, image);
             return;
         }
 
         if (shareBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
@@ -1530,148 +1509,6 @@ function initProductEventDelegation() {
                     showToast('تم نسخ الرابط!', 'success');
                 });
             }
-        }
-    });
-}
-
-function initGlobalEventDelegation() {
-    document.addEventListener('click', (event) => {
-        const target = event.target.closest('[data-action]');
-        if (!target) return;
-
-        const action = target.dataset.action;
-        debugLog('action', action);
-
-        switch (action) {
-            case 'toggle-theme':
-                toggleTheme();
-                break;
-            case 'toggle-search':
-                toggleSearch();
-                break;
-            case 'toggle-wishlist':
-                toggleWishlist();
-                break;
-            case 'toggle-cart':
-                toggleCart();
-                break;
-            case 'toggle-mobile-menu':
-                toggleMobileMenu();
-                break;
-            case 'apply-coupon':
-                applyCoupon();
-                break;
-            case 'checkout':
-                checkout();
-                break;
-            case 'close-cart':
-                if (target.id === 'cartOverlay' && event.target === target) toggleCart();
-                break;
-            case 'close-wishlist':
-                if (target.id === 'wishlistOverlay' && event.target === target) toggleWishlist();
-                break;
-            case 'close-search':
-                if (target.id === 'searchOverlay' && event.target === target) toggleSearch();
-                break;
-            case 'close-quick-view':
-                if ((target.id === 'quickViewOverlay' && event.target === target) || target.classList.contains('close-quick-view')) {
-                    closeQuickView();
-                }
-                break;
-            case 'quick-view-qty': {
-                const delta = parseInt(target.dataset.qtyDelta, 10) || 0;
-                changeQuickViewQty(delta);
-                break;
-            }
-            case 'add-from-quick-view':
-                addFromQuickView();
-                break;
-            case 'wishlist-from-quick-view':
-                addToWishlistFromQuickView();
-                break;
-            case 'share-product':
-                shareProduct();
-                break;
-            case 'perform-search':
-                performSearch(true);
-                break;
-            case 'search-add': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                addToCart(name, price, image);
-                toggleSearch();
-                break;
-            }
-            case 'recently-viewed': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                const category = decodeData(target.dataset.category) || 'أثاث';
-                const oldPrice = target.dataset.oldPrice ? parseFloat(target.dataset.oldPrice) : null;
-                openQuickView(name, price, image, category, oldPrice, null);
-                break;
-            }
-            case 'cart-increase':
-                increaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-decrease':
-                decreaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-remove':
-                removeFromCart(parseInt(target.dataset.index, 10));
-                break;
-            case 'wishlist-add-to-cart': {
-                const index = parseInt(target.dataset.index, 10);
-                const item = wishlist[index];
-                if (item) addToCart(item.name, item.price, item.image);
-                break;
-            }
-            case 'wishlist-remove':
-                removeFromWishlist(parseInt(target.dataset.index, 10));
-                break;
-            case 'scroll-top':
-                scrollToTop();
-                break;
-            case 'close-lightbox':
-                if ((target.id === 'lightboxOverlay' && event.target === target) || target.classList.contains('lightbox-close')) {
-                    closeLightbox();
-                }
-                break;
-            case 'lightbox-prev':
-                lightboxPrev();
-                break;
-            case 'lightbox-next':
-                lightboxNext();
-                break;
-            case 'close-checkout':
-                if ((target.id === 'checkoutOverlay' && event.target === target) || target.classList.contains('close-checkout')) {
-                    closeCheckout();
-                }
-                break;
-            case 'toast-close': {
-                const toast = target.closest('.toast');
-                toast?.remove();
-                break;
-            }
-            default:
-                break;
-        }
-    });
-
-    document.addEventListener('submit', (event) => {
-        const form = event.target;
-        if (!form?.dataset?.action) return;
-
-        switch (form.dataset.action) {
-            case 'subscribe-newsletter':
-                subscribeNewsletter(event);
-                break;
-            case 'submit-order':
-                submitOrder(event);
-                break;
-            default:
-                break;
         }
     });
 }
@@ -1745,7 +1582,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
     initProductEventDelegation();
-    initGlobalEventDelegation();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
