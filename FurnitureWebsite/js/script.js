@@ -141,7 +141,7 @@ function showToast(message, type = 'success', title = null) {
             <div class="toast-title">${safeTitle}</div>
             <div class="toast-message">${safeMessage}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.remove()" aria-label="إغلاق">
+        <button class="toast-close" data-action="toast-close" aria-label="إغلاق">
             <i class="fas fa-times" aria-hidden="true"></i>
         </button>
         <div class="toast-progress" style="color: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'}"></div>
@@ -553,7 +553,7 @@ function initFloatingCartButton() {
         fabContainer = document.createElement('div');
         fabContainer.className = 'fab-container';
         fabContainer.innerHTML = `
-            <button class="fab fab-cart" onclick="toggleCart()" aria-label="سلة التسوق">
+            <button class="fab fab-cart" data-action="toggle-cart" aria-label="سلة التسوق">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="fab-badge" id="fabCartBadge">0</span>
             </button>
@@ -1019,7 +1019,7 @@ function updateCartDisplay() {
             <div style="text-align: center; padding: 60px 20px; color: #999;">
                 <i class="fas fa-shopping-cart" style="font-size: 60px; margin-bottom: 20px; opacity: 0.3;"></i>
                 <p>السلة فارغة حالياً</p>
-                <button onclick="toggleCart()" style="margin-top: 20px; padding: 12px 30px; background: #D4A574; color: white; border: none; border-radius: 25px; cursor: pointer;">تابع التسوق</button>
+                <button data-action="toggle-cart" style="margin-top: 20px; padding: 12px 30px; background: #D4A574; color: white; border: none; border-radius: 25px; cursor: pointer;">تابع التسوق</button>
             </div>
         `;
         return;
@@ -1034,10 +1034,10 @@ function updateCartDisplay() {
                     <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div class="cart-item-qty">
-                        <button class="qty-btn" onclick="decreaseQty(${index})">-</button>
+                        <button class="qty-btn" data-action="cart-decrease" data-index="${index}">-</button>
                         <span>${item.quantity}</span>
-                        <button class="qty-btn" onclick="increaseQty(${index})">+</button>
-                        <button class="qty-btn" style="background: #EF4444; color: white;" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                        <button class="qty-btn" data-action="cart-increase" data-index="${index}">+</button>
+                        <button class="qty-btn" style="background: #EF4444; color: white;" data-action="cart-remove" data-index="${index}"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -1301,7 +1301,7 @@ function updateWishlistDisplay() {
                         <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price})" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
-                        <button onclick="removeFromWishlist(${index})" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button data-action="wishlist-remove" data-index="${index}" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -1461,7 +1461,7 @@ function initProductEventDelegation() {
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            const category = card.dataset.category || card.querySelector('.product-category')?.textContent || 'أثاث';
+            const category = decodeData(card.dataset.category) || card.querySelector('.product-category')?.textContent || 'أثاث';
             const badge = card.dataset.badge || null;
 
             openQuickView(name, price, image, category, oldPrice, badge);
@@ -1587,19 +1587,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // إغلاق السلة والمفضلة عند الضغط على الـ overlay
-    document.getElementById('cartOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleCart();
-    });
-    
-    document.getElementById('wishlistOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleWishlist();
-    });
-
-    // إغلاق البحث عند الضغط على الخلفية
-    document.getElementById('searchOverlay')?.addEventListener('click', function(e) {
-        if (e.target === this) toggleSearch();
-    });
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => performSearchDebounced());
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                performSearch(true);
+            }
+        });
+    }
     
     // Smooth scroll للروابط
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
