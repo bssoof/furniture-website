@@ -1681,6 +1681,27 @@ function initGlobalEventDelegation() {
     }, true);
 }
 
+function bindStaticActionButtons() {
+    const actionHandlers = {
+        'toggle-theme': () => toggleTheme(),
+        'toggle-search': () => toggleSearch(),
+        'toggle-wishlist': () => toggleWishlist(),
+        'toggle-cart': () => toggleCart(),
+        'toggle-mobile-menu': () => toggleMobileMenu()
+    };
+
+    Object.keys(actionHandlers).forEach((action) => {
+        document.querySelectorAll(`[data-action="${action}"]`).forEach((button) => {
+            if (button.dataset.bound === 'true') return;
+            button.dataset.bound = 'true';
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                actionHandlers[action]();
+            });
+        });
+    });
+}
+
 function hydrateHeartsFromWishlist() {
     document.querySelectorAll('.product-card').forEach(card => {
         const name = card.querySelector('.product-name')?.textContent;
@@ -1751,6 +1772,7 @@ function initApp() {
     // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
     initProductEventDelegation();
     initGlobalEventDelegation();
+    bindStaticActionButtons();
     
     // تصفية المنتجات
     const filterTabs = document.querySelectorAll('.filter-tab');
