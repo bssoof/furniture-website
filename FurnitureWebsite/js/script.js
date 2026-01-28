@@ -1359,7 +1359,8 @@ function performSearch(isSubmit = false) {
     }
     
     // البحث في قائمة المنتجات
-    const results = products.filter(p => p.name.includes(query));
+    const normalizedQuery = normalizeSearchText(query);
+    const results = products.filter(p => normalizeSearchText(p.name).includes(normalizedQuery));
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1621,7 +1622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             backToTop?.classList.remove('visible');
         }
-    });
+    }, { passive: true });
     
     // تفعيل أزرار المفضلة في المنتجات
     // التحقق من المفضلة المحفوظة
