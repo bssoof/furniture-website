@@ -1,84 +1,51 @@
-// متغيرات عامة
+// ==================== Global Variables ====================
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600';
 const BODY_SCROLL_LOCK_CLASS = 'no-scroll';
 const STORAGE_KEYS = {
     cart: 'cart',
     wishlist: 'wishlist',
-    theme: 'theme'
+    theme: 'theme',
+    compare: 'compare',
+    reviews: 'reviews'
 };
 const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
 
+// ==================== Utility Functions ====================
 function debugLog(...args) {
     if (DEBUG_MODE) {
         console.log('[DEBUG]', ...args);
     }
 }
 
-// قائمة المنتجات
-const products = [
-    {
-        id: 1,
-        name: 'كنبة مودرن فاخرة',
-        price: 2799,
-        oldPrice: 3999,
-        category: 'غرف المعيشة',
-        badge: '-30%',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500',
-        rating: 4.5,
-        reviews: 128
-    },
-    {
-        id: 2,
-        name: 'طاولة طعام خشب فاخر',
-        price: 1899,
-        oldPrice: 2299,
-        category: 'غرف الطعام',
-        badge: 'جديد',
-        image: 'https://images.unsplash.com/photo-1616362348473-c767bf9eb473?w=500',
-        rating: 5,
-        reviews: 95
-    },
-    {
-        id: 3,
-        name: 'كرسي جلد إيطالي',
-        price: 1199,
-        oldPrice: 1499,
-        category: 'مقاعد',
-        badge: '-20%',
-        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500',
-        rating: 4,
-        reviews: 64
-    },
-    {
-        id: 4,
-        name: 'سرير فاخر بتصميم عصري',
-        price: 3999,
-        oldPrice: 4999,
-        category: 'غرف النوم',
-        image: 'https://images.unsplash.com/photo-1746549844299-2867f09c9a37?w=500',
-        rating: 4.5,
-        reviews: 156
-    },
-    {
-        id: 5,
-        name: 'مكتب عمل خشبي',
-        price: 1499,
-        category: 'المكاتب',
-        image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500',
-        rating: 4.2,
-        reviews: 45
-    },
-    {
-        id: 6,
-        name: 'خزانة ملابس واسعة',
-        price: 2599,
-        oldPrice: 2999,
-        category: 'غرف النوم',
-        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500',
-        rating: 4.7,
-        reviews: 82
+function normalizeSearchText(text) {
+    return String(text || '')
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[أإآ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي');
+}
+
+function decodeData(data) {
+    try {
+        return decodeURIComponent(data);
+    } catch {
+        return data;
     }
-];
+}
+
+function formatPrice(num) {
+    return Number(num || 0).toLocaleString() + ' ر.س';
+}
+
+function escapeHTML(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 function safeParse(key) {
     try {
@@ -90,24 +57,378 @@ function safeParse(key) {
     }
 }
 
-let cart = safeParse(STORAGE_KEYS.cart);
-let wishlist = safeParse(STORAGE_KEYS.wishlist);
-let cartTotal = 0;
-
-// ========== Scroll Progress Bar ==========
-function initScrollProgress() {
-    const progressBar = document.getElementById('scrollProgress');
-    if (!progressBar) return;
-    
-    window.addEventListener('scroll', () => {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
-        progressBar.style.width = scrollPercent + '%';
-    }, { passive: true });
+function persistCart() {
+    localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
 }
 
-// ========== Enhanced Toast Notifications ==========
+function persistWishlist() {
+    localStorage.setItem(STORAGE_KEYS.wishlist, JSON.stringify(wishlist));
+}
+
+function persistCompare() {
+    localStorage.setItem(STORAGE_KEYS.compare, JSON.stringify(compareList));
+}
+
+function persistReviews() {
+    localStorage.setItem(STORAGE_KEYS.reviews, JSON.stringify(productReviews));
+}
+
+function parsePriceText(text) {
+    return parseInt(String(text || '').replace(/[^0-9]/g, ''), 10) || 0;
+}
+
+function setBodyScrollLocked(locked) {
+    document.body.classList.toggle(BODY_SCROLL_LOCK_CLASS, locked);
+}
+
+function debounce(fn, delay = 220) {
+    let t;
+    return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(null, args), delay);
+    };
+}
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+    return /^[\d\s\-+()]{9,}$/.test(phone);
+}
+
+// ==================== Products Data ====================
+const products = [
+    // غرف المعيشة
+    {
+        id: 1,
+        name: 'كنبة مودرن فاخرة',
+        price: 2799,
+        oldPrice: 3999,
+        category: 'غرف المعيشة',
+        badge: '-30%',
+        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500',
+        rating: 4.5,
+        reviews: 128,
+        colors: ['رمادي', 'بيج', 'أزرق'],
+        material: 'قماش',
+        dimensions: '220x90x85 سم',
+        inStock: true,
+        tags: ['كنبة', 'مودرن', 'صالون']
+    },
+    {
+        id: 2,
+        name: 'كنبة زاوية كلاسيكية',
+        price: 3499,
+        oldPrice: 4299,
+        category: 'غرف المعيشة',
+        badge: '-18%',
+        image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=500',
+        rating: 4.7,
+        reviews: 95,
+        colors: ['بني', 'كريمي'],
+        material: 'جلد طبيعي',
+        dimensions: '280x180x90 سم',
+        inStock: true,
+        tags: ['كنبة', 'زاوية', 'كلاسيك']
+    },
+    {
+        id: 3,
+        name: 'طقم كنب 3+2+1',
+        price: 4999,
+        oldPrice: 6500,
+        category: 'غرف المعيشة',
+        badge: '-23%',
+        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500',
+        rating: 4.8,
+        reviews: 156,
+        colors: ['أسود', 'رمادي فاتح'],
+        material: 'قماش وجلد',
+        dimensions: 'طقم كامل',
+        inStock: true,
+        tags: ['طقم', 'كنب', 'مودرن']
+    },
+    {
+        id: 4,
+        name: 'كرسي استرخاء مع مسند قدم',
+        price: 1299,
+        oldPrice: 1699,
+        category: 'مقاعد',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500',
+        rating: 4.6,
+        reviews: 73,
+        colors: ['رمادي غامق', 'بيج'],
+        material: 'قماش',
+        dimensions: '85x90x100 سم',
+        inStock: true,
+        tags: ['كرسي', 'استرخاء', 'مودرن']
+    },
+    // غرف الطعام
+    {
+        id: 5,
+        name: 'طاولة طعام خشب فاخر',
+        price: 1899,
+        oldPrice: 2299,
+        category: 'غرف الطعام',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1616362348473-c767bf9eb473?w=500',
+        rating: 5,
+        reviews: 95,
+        colors: ['بني غامق', 'عسلي'],
+        material: 'خشب بلوط',
+        dimensions: '180x90x75 سم',
+        inStock: true,
+        tags: ['طاولة', 'طعام', 'خشب']
+    },
+    {
+        id: 6,
+        name: 'طاولة طعام رخام مع 6 كراسي',
+        price: 3299,
+        oldPrice: 4199,
+        category: 'غرف الطعام',
+        badge: '-21%',
+        image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=500',
+        rating: 4.9,
+        reviews: 142,
+        colors: ['أبيض', 'أسود'],
+        material: 'رخام وخشب',
+        dimensions: '200x100x75 سم',
+        inStock: true,
+        tags: ['طاولة', 'رخام', 'فاخر']
+    },
+    {
+        id: 7,
+        name: 'بوفيه طعام عصري',
+        price: 2199,
+        category: 'غرف الطعام',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500',
+        rating: 4.4,
+        reviews: 67,
+        colors: ['بني', 'أبيض'],
+        material: 'خشب MDF',
+        dimensions: '160x45x85 سم',
+        inStock: true,
+        tags: ['بوفيه', 'تخزين', 'طعام']
+    },
+    // مقاعد
+    {
+        id: 8,
+        name: 'كرسي جلد إيطالي',
+        price: 1199,
+        oldPrice: 1499,
+        category: 'مقاعد',
+        badge: '-20%',
+        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500',
+        rating: 4,
+        reviews: 64,
+        colors: ['أسود', 'بني'],
+        material: 'جلد طبيعي',
+        dimensions: '65x70x95 سم',
+        inStock: true,
+        tags: ['كرسي', 'جلد', 'فاخر']
+    },
+    {
+        id: 9,
+        name: 'كرسي هزاز خشبي',
+        price: 899,
+        category: 'مقاعد',
+        image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=500',
+        rating: 4.3,
+        reviews: 45,
+        colors: ['خشبي طبيعي'],
+        material: 'خشب زان',
+        dimensions: '70x85x105 سم',
+        inStock: true,
+        tags: ['كرسي', 'هزاز', 'كلاسيك']
+    },
+    {
+        id: 10,
+        name: 'كرسي مكتب تنفيذي',
+        price: 1599,
+        oldPrice: 1999,
+        category: 'المكاتب',
+        badge: '-20%',
+        image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=500',
+        rating: 4.7,
+        reviews: 98,
+        colors: ['أسود', 'رمادي'],
+        material: 'جلد صناعي',
+        dimensions: '65x70x120 سم',
+        inStock: true,
+        tags: ['كرسي', 'مكتب', 'تنفيذي']
+    },
+    // غرف النوم
+    {
+        id: 11,
+        name: 'سرير فاخر بتصميم عصري',
+        price: 3999,
+        oldPrice: 4999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=500',
+        rating: 4.5,
+        reviews: 156,
+        colors: ['رمادي', 'بيج'],
+        material: 'خشب وقماش',
+        dimensions: '200x180x120 سم',
+        inStock: true,
+        tags: ['سرير', 'مودرن', 'فاخر']
+    },
+    {
+        id: 12,
+        name: 'خزانة ملابس واسعة',
+        price: 2599,
+        oldPrice: 2999,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500',
+        rating: 4.7,
+        reviews: 82,
+        colors: ['أبيض', 'بني'],
+        material: 'خشب MDF',
+        dimensions: '220x60x200 سم',
+        inStock: true,
+        tags: ['خزانة', 'ملابس', 'تخزين']
+    },
+    {
+        id: 13,
+        name: 'تسريحة مع مرآة',
+        price: 1499,
+        category: 'غرف النوم',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=500',
+        rating: 4.6,
+        reviews: 54,
+        colors: ['أبيض', 'وردي فاتح'],
+        material: 'خشب وزجاج',
+        dimensions: '120x50x160 سم',
+        inStock: true,
+        tags: ['تسريحة', 'مرآة', 'غرفة نوم']
+    },
+    {
+        id: 14,
+        name: 'كومودينو عصري',
+        price: 599,
+        category: 'غرف النوم',
+        image: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=500',
+        rating: 4.2,
+        reviews: 38,
+        colors: ['أبيض', 'رمادي', 'خشبي'],
+        material: 'خشب',
+        dimensions: '45x40x55 سم',
+        inStock: true,
+        tags: ['كومودينو', 'تخزين', 'جانبي']
+    },
+    // المكاتب
+    {
+        id: 15,
+        name: 'مكتب عمل خشبي',
+        price: 1499,
+        category: 'المكاتب',
+        image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500',
+        rating: 4.2,
+        reviews: 45,
+        colors: ['بني', 'أبيض'],
+        material: 'خشب',
+        dimensions: '140x70x75 سم',
+        inStock: true,
+        tags: ['مكتب', 'عمل', 'دراسة']
+    },
+    {
+        id: 16,
+        name: 'مكتب زاوية مع أرفف',
+        price: 1899,
+        oldPrice: 2299,
+        category: 'المكاتب',
+        badge: '-17%',
+        image: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=500',
+        rating: 4.5,
+        reviews: 71,
+        colors: ['أبيض', 'أسود'],
+        material: 'خشب وحديد',
+        dimensions: '150x150x75 سم',
+        inStock: true,
+        tags: ['مكتب', 'زاوية', 'أرفف']
+    },
+    {
+        id: 17,
+        name: 'مكتبة كتب خشبية',
+        price: 1299,
+        category: 'المكاتب',
+        image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=500',
+        rating: 4.4,
+        reviews: 52,
+        colors: ['بني غامق', 'خشبي فاتح'],
+        material: 'خشب صلب',
+        dimensions: '180x40x200 سم',
+        inStock: true,
+        tags: ['مكتبة', 'أرفف', 'كتب']
+    },
+    // إكسسوارات
+    {
+        id: 18,
+        name: 'مرآة حائط ديكور',
+        price: 499,
+        category: 'إكسسوارات',
+        badge: 'جديد',
+        image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=500',
+        rating: 4.3,
+        reviews: 67,
+        colors: ['ذهبي', 'فضي', 'أسود'],
+        material: 'زجاج وإطار معدني',
+        dimensions: '80x80 سم',
+        inStock: true,
+        tags: ['مرآة', 'ديكور', 'حائط']
+    },
+    {
+        id: 19,
+        name: 'طقم طاولات قهوة 3 قطع',
+        price: 899,
+        oldPrice: 1199,
+        category: 'غرف المعيشة',
+        badge: '-25%',
+        image: 'https://images.unsplash.com/photo-1565191999001-551c187427bb?w=500',
+        rating: 4.6,
+        reviews: 89,
+        colors: ['خشبي', 'أسود'],
+        material: 'خشب وحديد',
+        dimensions: 'متدرج الأحجام',
+        inStock: true,
+        tags: ['طاولة', 'قهوة', 'صالون']
+    },
+    {
+        id: 20,
+        name: 'رف حائط عائم',
+        price: 299,
+        category: 'إكسسوارات',
+        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
+        rating: 4.1,
+        reviews: 43,
+        colors: ['أبيض', 'أسود', 'خشبي'],
+        material: 'خشب MDF',
+        dimensions: '80x25x4 سم',
+        inStock: true,
+        tags: ['رف', 'حائط', 'عائم']
+    }
+];
+
+// ==================== State Variables ====================
+let cart = safeParse(STORAGE_KEYS.cart);
+let wishlist = safeParse(STORAGE_KEYS.wishlist);
+let compareList = safeParse(STORAGE_KEYS.compare);
+let productReviews = safeParse(STORAGE_KEYS.reviews);
+let cartTotal = 0;
+let currentQuickViewProduct = null;
+let appliedCoupon = null;
+let activeFilters = {
+    category: 'all',
+    priceRange: [0, 10000],
+    rating: 0,
+    colors: [],
+    inStock: false,
+    sortBy: 'default'
+};
+
+// ==================== Toast Notifications ====================
 function createToastContainer() {
     let container = document.querySelector('.toast-container');
     if (!container) {
@@ -151,655 +472,39 @@ function showToast(message, type = 'success', title = null) {
         <button class="toast-close" data-action="toast-close" aria-label="إغلاق">
             <i class="fas fa-times" aria-hidden="true"></i>
         </button>
-        <div class="toast-progress" style="color: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'}"></div>
+        <div class="toast-progress"></div>
     `;
     
     container.appendChild(toast);
-    
-    // Announce to screen readers
     announceToScreenReader(message);
     
     setTimeout(() => toast.classList.add('show'), 10);
-    
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 400);
     }, 3000);
 }
 
-// ========== Animated Counters ==========
-function animateCounter(element) {
-    const target = parseInt(element.dataset.count);
-    const duration = 2000;
-    const start = 0;
-    const startTime = performance.now();
-    
-    element.classList.add('counting');
-    
-    function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(start + (target - start) * easeOut);
-        
-        // Format large numbers
-        if (current >= 1000) {
-            element.textContent = (current / 1000).toFixed(current >= 10000 ? 0 : 1) + 'K';
-        } else {
-            element.textContent = current;
-        }
-        
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        } else {
-            element.classList.remove('counting');
-        }
+function showNotification(message, type = 'success') {
+    showToast(message, type);
+}
+
+// ==================== Accessibility ====================
+function announceToScreenReader(message) {
+    let announcer = document.getElementById('sr-announcer');
+    if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = 'sr-announcer';
+        announcer.setAttribute('role', 'status');
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;';
+        document.body.appendChild(announcer);
     }
-    
-    requestAnimationFrame(update);
+    announcer.textContent = '';
+    setTimeout(() => { announcer.textContent = message; }, 100);
 }
 
-function initAnimatedCounters() {
-    const counters = document.querySelectorAll('.stat-number[data-count]');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !entry.target.dataset.animated) {
-                entry.target.dataset.animated = 'true';
-                animateCounter(entry.target);
-            }
-        });
-    }, { threshold: 0.5 });
-    
-    counters.forEach(counter => observer.observe(counter));
-}
-
-// ========== Recently Viewed ==========
-const RECENTLY_VIEWED_KEY = 'recentlyViewed';
-const MAX_RECENTLY_VIEWED = 8;
-
-function getRecentlyViewed() {
-    try {
-        return JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY)) || [];
-    } catch {
-        return [];
-    }
-}
-
-function addToRecentlyViewed(product) {
-    let items = getRecentlyViewed();
-    
-    // Remove if already exists
-    items = items.filter(item => item.name !== product.name);
-    
-    // Add to beginning
-    items.unshift(product);
-    
-    // Keep only max items
-    items = items.slice(0, MAX_RECENTLY_VIEWED);
-    
-    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(items));
-    renderRecentlyViewed();
-}
-
-function renderRecentlyViewed() {
-    const section = document.getElementById('recentlyViewed');
-    const grid = document.getElementById('recentlyViewedGrid');
-    const items = getRecentlyViewed();
-    
-    if (!section || !grid) return;
-    
-    if (items.length === 0) {
-        section.style.display = 'none';
-        return;
-    }
-    
-    section.style.display = 'block';
-    grid.innerHTML = items.map(item => `
-        <div class="recently-viewed-item" data-action="recently-viewed" data-name="${encodeURIComponent(item.name)}" data-price="${item.price}" data-image="${escapeHTML(item.image)}" data-category="${encodeURIComponent(item.category)}" ${item.oldPrice ? `data-old-price="${item.oldPrice}"` : ''}>
-            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
-            <div class="item-info">
-                <div class="item-name">${escapeHTML(item.name)}</div>
-                <div class="item-price">${formatPrice(item.price)}</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ========== Image Lightbox ==========
-let lightboxImages = [];
-let lightboxCurrentIndex = 0;
-
-function openLightbox(imageSrc, caption = '', images = null, currentIndex = 0) {
-    const overlay = document.getElementById('lightboxOverlay');
-    const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImage');
-    const captionEl = document.getElementById('lightboxCaption');
-    const counter = document.getElementById('lightboxCounter');
-    
-    if (!overlay || !lightbox) return;
-    
-    if (images && images.length > 0) {
-        lightboxImages = images;
-        lightboxCurrentIndex = currentIndex;
-    } else {
-        lightboxImages = [{ src: imageSrc, caption: caption }];
-        lightboxCurrentIndex = 0;
-    }
-    
-    updateLightboxImage();
-    
-    overlay.classList.add('active');
-    lightbox.classList.add('active');
-    setBodyScrollLocked(true);
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', lightboxKeyHandler);
-}
-
-function updateLightboxImage() {
-    const img = document.getElementById('lightboxImage');
-    const captionEl = document.getElementById('lightboxCaption');
-    const counter = document.getElementById('lightboxCounter');
-    
-    const current = lightboxImages[lightboxCurrentIndex];
-    img.src = current.src;
-    captionEl.textContent = current.caption || '';
-    
-    if (lightboxImages.length > 1) {
-        counter.textContent = `${lightboxCurrentIndex + 1} / ${lightboxImages.length}`;
-        counter.style.display = 'block';
-    } else {
-        counter.style.display = 'none';
-    }
-}
-
-function closeLightbox() {
-    const overlay = document.getElementById('lightboxOverlay');
-    const lightbox = document.getElementById('lightbox');
-    
-    overlay?.classList.remove('active');
-    lightbox?.classList.remove('active');
-    setBodyScrollLocked(false);
-    
-    document.removeEventListener('keydown', lightboxKeyHandler);
-}
-
-function lightboxNext() {
-    if (lightboxImages.length <= 1) return;
-    lightboxCurrentIndex = (lightboxCurrentIndex + 1) % lightboxImages.length;
-    updateLightboxImage();
-}
-
-function lightboxPrev() {
-    if (lightboxImages.length <= 1) return;
-    lightboxCurrentIndex = (lightboxCurrentIndex - 1 + lightboxImages.length) % lightboxImages.length;
-    updateLightboxImage();
-}
-
-function lightboxKeyHandler(e) {
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') lightboxNext();
-    if (e.key === 'ArrowRight') lightboxPrev();
-}
-
-function initImageLightbox() {
-    // Make product images clickable to open lightbox
-    document.querySelectorAll('.product-card .product-image img').forEach((img, index) => {
-        if (img.dataset.lightboxBound) return;
-        img.dataset.lightboxBound = 'true';
-        img.style.cursor = 'zoom-in';
-        img.addEventListener('click', () => {
-            const allImages = Array.from(document.querySelectorAll('.product-card .product-image img')).map(i => ({
-                src: i.src.replace('w=500', 'w=1200'),
-                caption: i.alt
-            }));
-            openLightbox(img.src.replace('w=500', 'w=1200'), img.alt, allImages, index);
-        });
-    });
-}
-
-// ========== Rendering Products ==========
-function renderProducts(productsToRender) {
-    const grid = document.getElementById('productsGrid');
-    if (!grid) return;
-    debugLog('renderProducts', productsToRender.length);
-
-    if (productsToRender.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">لا توجد منتجات مطابقة</p>';
-        return;
-    }
-
-    grid.innerHTML = productsToRender.map(product => {
-        // Calculate rating stars
-        const fullStars = Math.floor(product.rating);
-        const hasHalf = product.rating % 1 >= 0.5;
-        let starsHtml = '';
-        for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
-        if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-        for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
-
-        // Badge HTML
-        let badgeHtml = '';
-        if (product.badge) {
-            const badgeClass = product.badge.includes('%') ? 'badge-sale' : 'badge-new';
-            badgeHtml = `<span class="product-badge ${badgeClass}">${escapeHTML(product.badge)}</span>`;
-        }
-
-        // Old Price HTML
-        let oldPriceHtml = '';
-        if (product.oldPrice) {
-            oldPriceHtml = `<span class="old-price">${formatPrice(product.oldPrice)}</span>`;
-        }
-
-        return `
-            <div class="product-card" data-id="${product.id}" data-name="${encodeURIComponent(product.name)}" data-price="${product.price}" data-category="${encodeURIComponent(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
-                <div class="product-image">
-                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
-                    ${badgeHtml}
-                    <div class="product-actions">
-                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn quick-view-btn" aria-label="معاينة سريعة"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn share-btn" aria-label="مشاركة"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-category">${escapeHTML(product.category)}</div>
-                    <h3 class="product-name">${escapeHTML(product.name)}</h3>
-                    <div class="product-rating">
-                        ${starsHtml}
-                        <span>(${product.reviews} تقييم)</span>
-                    </div>
-                    <div class="product-price">
-                        <span class="current-price">${formatPrice(product.price)}</span>
-                        ${oldPriceHtml}
-                    </div>
-                    <button class="add-to-cart">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Re-apply state & image lightbox bindings
-    initImageLightbox();
-    hydrateHeartsFromWishlist();
-
-    // Add animation
-    const cards = grid.querySelectorAll('.product-card');
-    cards.forEach((card, index) => {
-        card.style.animation = `fadeInUp 0.4s ease ${index * 0.1}s both`;
-    });
-}
-
-// ========== Button Loading States ==========
-function setButtonLoading(button, loading = true) {
-    if (loading) {
-        button.classList.add('btn-loading');
-        button.disabled = true;
-    } else {
-        button.classList.remove('btn-loading');
-        button.disabled = false;
-    }
-}
-
-// ========== Form Validation ==========
-function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function validatePhone(phone) {
-    return /^[\d\s\-+()]{9,}$/.test(phone);
-}
-
-// ========== Product Sorting ==========
-function sortProducts(sortValue) {
-    const productsGrid = document.querySelector('.products-grid');
-    if (!productsGrid) return;
-    
-    const products = Array.from(productsGrid.querySelectorAll('.product-card'));
-    
-    products.sort((a, b) => {
-        const priceA = parseFloat(a.dataset.price) || 0;
-        const priceB = parseFloat(b.dataset.price) || 0;
-        const nameA = a.dataset.name || '';
-        const nameB = b.dataset.name || '';
-        
-        switch(sortValue) {
-            case 'price-low':
-                return priceA - priceB;
-            case 'price-high':
-                return priceB - priceA;
-            case 'name':
-                return nameA.localeCompare(nameB, 'ar');
-            case 'default':
-            default:
-                return 0;
-        }
-    });
-    
-    // Re-append sorted products with animation
-    products.forEach((product, index) => {
-        product.style.animation = 'none';
-        product.offsetHeight; // Trigger reflow
-        product.style.animation = `fadeInUp 0.4s ease ${index * 0.05}s both`;
-        productsGrid.appendChild(product);
-    });
-    
-    showToast('تم ترتيب المنتجات', 'info');
-}
-
-// Initialize sort dropdown
-function initProductSorting() {
-    const sortDropdown = document.getElementById('sortProducts');
-    if (sortDropdown) {
-        sortDropdown.addEventListener('change', (e) => {
-            sortProducts(e.target.value);
-        });
-    }
-}
-
-function showFieldError(input, message) {
-    clearFieldError(input);
-    input.classList.add('error');
-    input.classList.remove('success');
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'form-error';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-    input.parentNode.appendChild(errorDiv);
-}
-
-function clearFieldError(input) {
-    input.classList.remove('error');
-    const error = input.parentNode.querySelector('.form-error');
-    if (error) error.remove();
-}
-
-function showFieldSuccess(input) {
-    clearFieldError(input);
-    input.classList.add('success');
-}
-
-function validateField(input) {
-    const value = input.value.trim();
-    const type = input.type;
-    const required = input.required;
-    
-    if (required && !value) {
-        showFieldError(input, 'هذا الحقل مطلوب');
-        return false;
-    }
-    
-    if (type === 'email' && value && !validateEmail(value)) {
-        showFieldError(input, 'البريد الإلكتروني غير صالح');
-        return false;
-    }
-    
-    if (type === 'tel' && value && !validatePhone(value)) {
-        showFieldError(input, 'رقم الهاتف غير صالح');
-        return false;
-    }
-    
-    if (value) {
-        showFieldSuccess(input);
-    } else {
-        clearFieldError(input);
-    }
-    return true;
-}
-
-// ========== Floating Cart Button ==========
-function initFloatingCartButton() {
-    // Create FAB container
-    let fabContainer = document.querySelector('.fab-container');
-    if (!fabContainer) {
-        fabContainer = document.createElement('div');
-        fabContainer.className = 'fab-container';
-        fabContainer.innerHTML = `
-            <button class="fab fab-cart" data-action="toggle-cart" aria-label="سلة التسوق">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="fab-badge" id="fabCartBadge">0</span>
-            </button>
-        `;
-        document.body.appendChild(fabContainer);
-    }
-    
-    const fabCart = document.querySelector('.fab-cart');
-    
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 600) {
-            fabCart?.classList.add('visible');
-        } else {
-            fabCart?.classList.remove('visible');
-        }
-    }, { passive: true });
-}
-
-function updateFabCartBadge() {
-    const badge = document.getElementById('fabCartBadge');
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    if (badge) {
-        badge.textContent = totalItems;
-        badge.style.display = totalItems > 0 ? 'flex' : 'none';
-    }
-}
-
-// ========== Quick View ==========
-let currentQuickViewProduct = null;
-
-function openQuickView(name, price, image, category = 'أثاث', oldPrice = null, badge = null, rating = 4.5) {
-    const overlay = document.getElementById('quickViewOverlay');
-    const modal = document.getElementById('quickViewModal');
-    
-    // Set product data
-    document.getElementById('quickViewImage').src = image;
-    document.getElementById('quickViewImage').alt = name;
-    document.getElementById('quickViewName').textContent = name;
-    document.getElementById('quickViewPrice').textContent = formatPrice(price);
-    document.getElementById('quickViewCategory').textContent = category;
-    document.getElementById('quickViewQty').value = 1;
-    
-    // Old price
-    const oldPriceEl = document.getElementById('quickViewOldPrice');
-    if (oldPrice) {
-        oldPriceEl.textContent = formatPrice(oldPrice);
-        oldPriceEl.style.display = 'inline';
-    } else {
-        oldPriceEl.style.display = 'none';
-    }
-    
-    // Badge
-    const badgeEl = document.getElementById('quickViewBadge');
-    if (badge) {
-        badgeEl.textContent = badge;
-        badgeEl.className = 'quick-view-badge ' + (badge.includes('%') ? 'sale' : 'new');
-        badgeEl.style.display = 'block';
-    } else {
-        badgeEl.style.display = 'none';
-    }
-    
-    // Rating
-    const ratingEl = document.getElementById('quickViewRating');
-    const fullStars = Math.floor(rating);
-    const hasHalf = rating % 1 >= 0.5;
-    let starsHtml = '';
-    for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
-    if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-    for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
-    starsHtml += `<span>(${Math.floor(Math.random() * 200 + 50)} تقييم)</span>`;
-    ratingEl.innerHTML = starsHtml;
-    
-    currentQuickViewProduct = { name, price, image, category, oldPrice };
-    
-    // Add to recently viewed
-    addToRecentlyViewed(currentQuickViewProduct);
-    
-    // Show modal
-    overlay.classList.add('active');
-    modal.classList.add('active');
-    setBodyScrollLocked(true);
-    
-    announceToScreenReader('تم فتح معاينة المنتج: ' + name);
-}
-
-function closeQuickView() {
-    document.getElementById('quickViewOverlay').classList.remove('active');
-    document.getElementById('quickViewModal').classList.remove('active');
-    setBodyScrollLocked(false);
-    currentQuickViewProduct = null;
-}
-
-function changeQuickViewQty(delta) {
-    const input = document.getElementById('quickViewQty');
-    let val = parseInt(input.value) + delta;
-    if (val < 1) val = 1;
-    if (val > 10) val = 10;
-    input.value = val;
-}
-
-function addFromQuickView() {
-    if (!currentQuickViewProduct) return;
-    const qty = parseInt(document.getElementById('quickViewQty').value);
-    
-    for (let i = 0; i < qty; i++) {
-        addToCart(currentQuickViewProduct.name, currentQuickViewProduct.price, currentQuickViewProduct.image);
-    }
-    
-    closeQuickView();
-}
-
-function addToWishlistFromQuickView() {
-    if (!currentQuickViewProduct) return;
-    
-    const existingIndex = wishlist.findIndex(item => item.name === currentQuickViewProduct.name);
-    if (existingIndex > -1) {
-        showToast('المنتج موجود بالفعل في المفضلة', 'warning');
-    } else {
-        wishlist.push({
-            name: currentQuickViewProduct.name,
-            price: currentQuickViewProduct.price,
-            image: currentQuickViewProduct.image
-        });
-        persistWishlist();
-        updateWishlistCount();
-        showToast('تم إضافة المنتج للمفضلة', 'success');
-    }
-}
-
-function shareProduct() {
-    if (!currentQuickViewProduct) return;
-    
-    const shareData = {
-        title: currentQuickViewProduct.name,
-        text: `شاهد هذا المنتج: ${currentQuickViewProduct.name} - ${formatPrice(currentQuickViewProduct.price)}`,
-        url: window.location.href
-    };
-    
-    if (navigator.share) {
-        navigator.share(shareData).catch(() => {});
-    } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(shareData.url).then(() => {
-            showToast('تم نسخ الرابط!', 'success');
-        });
-    }
-}
-
-// ========== Coupon System ==========
-const COUPONS = {
-    'WELCOME10': { discount: 10, type: 'percent', minOrder: 0 },
-    'SAVE20': { discount: 20, type: 'percent', minOrder: 500 },
-    'FLAT50': { discount: 50, type: 'fixed', minOrder: 200 },
-    'VIP25': { discount: 25, type: 'percent', minOrder: 1000 }
-};
-
-let appliedCoupon = null;
-
-function applyCoupon() {
-    const input = document.getElementById('couponInput');
-    const code = input.value.trim().toUpperCase();
-    
-    if (!code) {
-        showToast('الرجاء إدخال كود الخصم', 'warning');
-        return;
-    }
-    
-    if (appliedCoupon) {
-        showToast('يوجد كوبون مطبق بالفعل', 'warning');
-        return;
-    }
-    
-    const coupon = COUPONS[code];
-    
-    if (!coupon) {
-        showToast('كود الخصم غير صالح', 'error');
-        input.value = '';
-        return;
-    }
-    
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    if (subtotal < coupon.minOrder) {
-        showToast(`الحد الأدنى للطلب ${formatPrice(coupon.minOrder)}`, 'warning');
-        return;
-    }
-    
-    appliedCoupon = { code, ...coupon };
-    input.value = code;
-    input.disabled = true;
-    
-    updateCartTotal();
-    showToast(`تم تطبيق كود الخصم: ${coupon.type === 'percent' ? coupon.discount + '%' : formatPrice(coupon.discount)}`, 'success', '🎉 مبروك!');
-}
-
-function removeCoupon() {
-    appliedCoupon = null;
-    const input = document.getElementById('couponInput');
-    if (input) {
-        input.value = '';
-        input.disabled = false;
-    }
-    updateCartTotal();
-}
-
-// ========== Dark Mode ==========
-function getPreferredTheme() {
-    const saved = localStorage.getItem(STORAGE_KEYS.theme);
-    if (saved) return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(STORAGE_KEYS.theme, theme);
-}
-
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const next = current === 'dark' ? 'light' : 'dark';
-    applyTheme(next);
-    showNotification(next === 'dark' ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري', 'success');
-    debugLog('toggleTheme', next);
-}
-
-// تطبيق الثيم عند التحميل
-(function initTheme() {
-    applyTheme(getPreferredTheme());
-})();
-
-// الاستماع لتغيير تفضيل النظام
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem(STORAGE_KEYS.theme)) {
-        applyTheme(e.matches ? 'dark' : 'light');
-    }
-});
-
-// ========== Accessibility - Focus Trap ==========
 const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 let lastFocusedElement = null;
 
@@ -842,10 +547,8 @@ function openDialog(dialogEl, overlayEl) {
     dialogEl.setAttribute('aria-hidden', 'false');
     setBodyScrollLocked(true);
     
-    // Trap focus
     dialogEl._cleanupFocusTrap = trapFocus(dialogEl);
     
-    // Close on Escape
     dialogEl._handleEscape = (e) => {
         if (e.key === 'Escape') closeDialog(dialogEl, overlayEl);
     };
@@ -861,147 +564,524 @@ function closeDialog(dialogEl, overlayEl) {
     dialogEl.setAttribute('aria-hidden', 'true');
     setBodyScrollLocked(false);
     
-    // Cleanup
     if (dialogEl._cleanupFocusTrap) dialogEl._cleanupFocusTrap();
     if (dialogEl._handleEscape) document.removeEventListener('keydown', dialogEl._handleEscape);
     
-    // Return focus
     if (lastFocusedElement) lastFocusedElement.focus();
 }
 
-// Announce dynamic content for screen readers
-function announceToScreenReader(message) {
-    let announcer = document.getElementById('sr-announcer');
-    if (!announcer) {
-        announcer = document.createElement('div');
-        announcer.id = 'sr-announcer';
-        announcer.setAttribute('role', 'status');
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;';
-        document.body.appendChild(announcer);
-    }
-    announcer.textContent = '';
-    setTimeout(() => { announcer.textContent = message; }, 100);
+// ==================== Dark Mode ====================
+function getPreferredTheme() {
+    const saved = localStorage.getItem(STORAGE_KEYS.theme);
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function formatPrice(num) {
-    return Number(num || 0).toLocaleString() + ' ر.س';
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(STORAGE_KEYS.theme, theme);
 }
 
-function normalizeSearchText(text) {
-    return String(text || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u064B-\u065F]/g, '')
-        .replace(/[\u200B-\u200F]/g, '')
-        .trim();
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    showNotification(next === 'dark' ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري', 'success');
+    debugLog('toggleTheme', next);
 }
 
-products.forEach((product) => {
-    product.normalizedName = normalizeSearchText(product.name);
-});
+// ==================== Coupon System ====================
+const COUPONS = {
+    'WELCOME20': { type: 'percent', discount: 20, minAmount: 500 },
+    'SAVE100': { type: 'fixed', discount: 100, minAmount: 1000 },
+    'VIP30': { type: 'percent', discount: 30, minAmount: 2000 }
+};
 
-function escapeHTML(text) {
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function decodeData(value) {
-    try {
-        return decodeURIComponent(value || '');
-    } catch (e) {
-        return value || '';
-    }
-}
-
-function persistCart() {
-    localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
-}
-
-function persistWishlist() {
-    localStorage.setItem(STORAGE_KEYS.wishlist, JSON.stringify(wishlist));
-}
-
-function parsePriceText(text) {
-    return parseInt(String(text || '').replace(/[^0-9]/g, ''), 10) || 0;
-}
-
-function setBodyScrollLocked(locked) {
-    document.body.classList.toggle(BODY_SCROLL_LOCK_CLASS, locked);
-}
-
-function debounce(fn, delay = 220) {
-    let t;
-    return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(null, args), delay);
-    };
-}
-
-// ========== Image Loading ==========
-function initImageLoading() {
-    const images = document.querySelectorAll('img[loading="lazy"]');
+function applyCoupon() {
+    const input = document.getElementById('couponInput');
+    if (!input) return;
     
-    images.forEach(img => {
-        if (img.complete) {
-            img.classList.add('loaded');
-        } else {
-            img.classList.add('loading');
-            img.addEventListener('load', () => {
-                img.classList.remove('loading');
-                img.classList.add('loaded');
-            });
-            img.addEventListener('error', () => {
-                img.src = FALLBACK_IMG;
-                img.classList.remove('loading');
-                img.classList.add('loaded');
-            });
-        }
-    });
+    const code = input.value.trim().toUpperCase();
+    
+    if (!code) {
+        showNotification('الرجاء إدخال كود الخصم', 'warning');
+        return;
+    }
+    
+    const coupon = COUPONS[code];
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    if (!coupon) {
+        showNotification('كود الخصم غير صحيح', 'error');
+        return;
+    }
+    
+    if (subtotal < coupon.minAmount) {
+        showNotification(`الحد الأدنى للطلب ${formatPrice(coupon.minAmount)}`, 'warning');
+        return;
+    }
+    
+    appliedCoupon = coupon;
+    updateCartTotal();
+    showNotification('تم تطبيق كود الخصم بنجاح!', 'success');
+    input.value = '';
 }
 
-// ========== Skeleton Loading ==========
-function createSkeletonCard() {
-    return `
-        <div class="skeleton-card">
-            <div class="skeleton-image skeleton"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-text short skeleton"></div>
-                <div class="skeleton-text medium skeleton"></div>
-                <div class="skeleton-text long skeleton"></div>
-                <div class="skeleton-price skeleton"></div>
-                <div class="skeleton-button skeleton"></div>
+// ==================== Advanced Filters ====================
+function applyFilters() {
+    let filtered = [...products];
+    
+    // Category filter
+    if (activeFilters.category !== 'all') {
+        filtered = filtered.filter(p => p.category === activeFilters.category);
+    }
+    
+    // Price range filter
+    filtered = filtered.filter(p => 
+        p.price >= activeFilters.priceRange[0] && 
+        p.price <= activeFilters.priceRange[1]
+    );
+    
+    // Rating filter
+    if (activeFilters.rating > 0) {
+        filtered = filtered.filter(p => p.rating >= activeFilters.rating);
+    }
+    
+    // Color filter
+    if (activeFilters.colors.length > 0) {
+        filtered = filtered.filter(p => 
+            p.colors && p.colors.some(c => activeFilters.colors.includes(c))
+        );
+    }
+    
+    // Stock filter
+    if (activeFilters.inStock) {
+        filtered = filtered.filter(p => p.inStock);
+    }
+    
+    // Sort
+    switch(activeFilters.sortBy) {
+        case 'price-low':
+            filtered.sort((a, b) => a.price - b.price);
+            break;
+        case 'price-high':
+            filtered.sort((a, b) => b.price - a.price);
+            break;
+        case 'rating':
+            filtered.sort((a, b) => b.rating - a.rating);
+            break;
+        case 'name':
+            filtered.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+            break;
+        case 'newest':
+            filtered.sort((a, b) => b.id - a.id);
+            break;
+    }
+    
+    renderProducts(filtered);
+    updateFilterBadges();
+}
+
+function updateFilterBadges() {
+    const activeCount = 
+        (activeFilters.category !== 'all' ? 1 : 0) +
+        (activeFilters.rating > 0 ? 1 : 0) +
+        activeFilters.colors.length +
+        (activeFilters.inStock ? 1 : 0);
+    
+    const badge = document.getElementById('filterBadge');
+    if (badge) {
+        badge.textContent = activeCount;
+        badge.style.display = activeCount > 0 ? 'flex' : 'none';
+    }
+}
+
+function resetFilters() {
+    activeFilters = {
+        category: 'all',
+        priceRange: [0, 10000],
+        rating: 0,
+        colors: [],
+        inStock: false,
+        sortBy: 'default'
+    };
+    
+    // Reset UI
+    const priceSlider = document.getElementById('priceSlider');
+    if (priceSlider) priceSlider.value = 10000;
+    
+    const ratingBtns = document.querySelectorAll('.rating-filter-btn');
+    ratingBtns.forEach(btn => btn.classList.remove('active'));
+    
+    const colorBtns = document.querySelectorAll('.color-filter-btn');
+    colorBtns.forEach(btn => btn.classList.remove('active'));
+    
+    const stockCheck = document.getElementById('inStockOnly');
+    if (stockCheck) stockCheck.checked = false;
+    
+    applyFilters();
+    showNotification('تم إعادة تعيين الفلاتر', 'info');
+}
+
+// ==================== Similar Products ====================
+function getSimilarProducts(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return [];
+    
+    // Find products in same category
+    let similar = products.filter(p => 
+        p.id !== productId && 
+        p.category === product.category
+    );
+    
+    // If not enough, add products with similar tags
+    if (similar.length < 4 && product.tags) {
+        const byTags = products.filter(p => 
+            p.id !== productId && 
+            p.id !== similar.find(s => s.id === p.id)?.id &&
+            p.tags && 
+            p.tags.some(t => product.tags.includes(t))
+        );
+        similar = [...similar, ...byTags];
+    }
+    
+    // Limit to 4 products
+    return similar.slice(0, 4);
+}
+
+function renderSimilarProducts(productId) {
+    const container = document.getElementById('similarProducts');
+    if (!container) return;
+    
+    const similar = getSimilarProducts(productId);
+    
+    if (similar.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    const grid = container.querySelector('.similar-products-grid');
+    
+    grid.innerHTML = similar.map(product => `
+        <div class="similar-product-card" onclick="openProductDetails(${product.id})">
+            <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
+            <div class="similar-product-info">
+                <div class="similar-product-name">${escapeHTML(product.name)}</div>
+                <div class="similar-product-price">${formatPrice(product.price)}</div>
+                <div class="similar-product-rating">
+                    ${'<i class="fas fa-star"></i>'.repeat(Math.floor(product.rating))}
+                    <span>${product.rating}</span>
+                </div>
             </div>
         </div>
+    `).join('');
+}
+
+// ==================== Product Details Modal ====================
+function openProductDetails(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const modal = document.getElementById('productDetailsModal');
+    const overlay = document.getElementById('productDetailsOverlay');
+    
+    if (!modal || !overlay) return;
+    
+    // Fill modal content
+    document.getElementById('detailsProductImage').src = product.image;
+    document.getElementById('detailsProductName').textContent = product.name;
+    document.getElementById('detailsProductCategory').textContent = product.category;
+    document.getElementById('detailsProductPrice').textContent = formatPrice(product.price);
+    
+    if (product.oldPrice) {
+        document.getElementById('detailsProductOldPrice').textContent = formatPrice(product.oldPrice);
+        document.getElementById('detailsProductOldPrice').style.display = 'inline';
+    } else {
+        document.getElementById('detailsProductOldPrice').style.display = 'none';
+    }
+    
+    // Rating
+    const rating = product.rating;
+    const fullStars = Math.floor(rating);
+    const hasHalf = rating % 1 >= 0.5;
+    let starsHtml = '';
+    for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+    if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+    for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+    starsHtml += ` <span>(${product.reviews} تقييم)</span>`;
+    
+    document.getElementById('detailsProductRating').innerHTML = starsHtml;
+    
+    // Specs
+    const specs = document.getElementById('detailsProductSpecs');
+    specs.innerHTML = `
+        <div class="spec-item"><strong>المادة:</strong> ${product.material}</div>
+        <div class="spec-item"><strong>الأبعاد:</strong> ${product.dimensions}</div>
+        <div class="spec-item"><strong>الألوان المتاحة:</strong> ${product.colors.join('، ')}</div>
+        <div class="spec-item"><strong>الحالة:</strong> ${product.inStock ? '<span style="color: #10B981;">متوفر</span>' : '<span style="color: #EF4444;">غير متوفر</span>'}</div>
+    `;
+    
+    // Reviews
+    renderProductReviews(productId);
+    
+    // Similar products
+    renderSimilarProducts(productId);
+    
+    // Store current product
+    currentQuickViewProduct = product;
+    
+    // Open modal
+    openDialog(modal, overlay);
+}
+
+function closeProductDetails() {
+    const modal = document.getElementById('productDetailsModal');
+    const overlay = document.getElementById('productDetailsOverlay');
+    closeDialog(modal, overlay);
+}
+
+// ==================== Reviews System ====================
+function renderProductReviews(productId) {
+    const container = document.getElementById('productReviewsList');
+    if (!container) return;
+    
+    const reviews = productReviews.filter(r => r.productId === productId);
+    
+    if (reviews.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">لا توجد تقييمات بعد. كن أول من يقيّم!</p>';
+        return;
+    }
+    
+    container.innerHTML = reviews.map(review => `
+        <div class="review-item">
+            <div class="review-header">
+                <div class="review-author">
+                    <i class="fas fa-user-circle"></i>
+                    <span>${escapeHTML(review.name)}</span>
+                </div>
+                <div class="review-rating">
+                    ${'<i class="fas fa-star"></i>'.repeat(review.rating)}
+                    ${'<i class="far fa-star"></i>'.repeat(5 - review.rating)}
+                </div>
+            </div>
+            <div class="review-date">${new Date(review.date).toLocaleDateString('ar-SA')}</div>
+            <div class="review-text">${escapeHTML(review.text)}</div>
+        </div>
+    `).join('');
+}
+
+function submitReview(e) {
+    e.preventDefault();
+    
+    if (!currentQuickViewProduct) return;
+    
+    const form = e.target;
+    const name = form.querySelector('#reviewName').value.trim();
+    const rating = parseInt(form.querySelector('input[name="rating"]:checked')?.value || 0);
+    const text = form.querySelector('#reviewText').value.trim();
+    
+    if (!name || !rating || !text) {
+        showNotification('الرجاء تعبئة جميع الحقول', 'error');
+        return;
+    }
+    
+    const review = {
+        id: Date.now(),
+        productId: currentQuickViewProduct.id,
+        name,
+        rating,
+        text,
+        date: new Date().toISOString()
+    };
+    
+    productReviews.push(review);
+    persistReviews();
+    
+    // Update product rating
+    const productIndex = products.findIndex(p => p.id === currentQuickViewProduct.id);
+    if (productIndex > -1) {
+        const allReviews = productReviews.filter(r => r.productId === currentQuickViewProduct.id);
+        const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+        products[productIndex].rating = Math.round(avgRating * 10) / 10;
+        products[productIndex].reviews = allReviews.length;
+    }
+    
+    renderProductReviews(currentQuickViewProduct.id);
+    form.reset();
+    showNotification('تم إضافة تقييمك بنجاح!', 'success');
+}
+
+// ==================== Compare System ====================
+function addToCompare(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    if (compareList.length >= 4) {
+        showNotification('يمكنك مقارنة 4 منتجات كحد أقصى', 'warning');
+        return;
+    }
+    
+    if (compareList.find(p => p.id === productId)) {
+        showNotification('المنتج موجود في المقارنة بالفعل', 'warning');
+        return;
+    }
+    
+    compareList.push(product);
+    persistCompare();
+    updateCompareCount();
+    showNotification('تم إضافة المنتج للمقارنة', 'success');
+}
+
+function removeFromCompare(productId) {
+    compareList = compareList.filter(p => p.id !== productId);
+    persistCompare();
+    updateCompareCount();
+    renderCompareModal();
+}
+
+function updateCompareCount() {
+    const badge = document.getElementById('compareBadge');
+    if (badge) {
+        badge.textContent = compareList.length;
+        badge.style.display = compareList.length > 0 ? 'flex' : 'none';
+    }
+}
+
+function openCompareModal() {
+    if (compareList.length === 0) {
+        showNotification('لا توجد منتجات للمقارنة', 'warning');
+        return;
+    }
+    
+    const modal = document.getElementById('compareModal');
+    const overlay = document.getElementById('compareOverlay');
+    
+    if (!modal || !overlay) return;
+    
+    renderCompareModal();
+    openDialog(modal, overlay);
+}
+
+function renderCompareModal() {
+    const container = document.getElementById('compareContent');
+    if (!container) return;
+    
+    if (compareList.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">لا توجد منتجات للمقارنة</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    ${compareList.map(p => `
+                        <th>
+                            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                            <div style="margin-top: 10px; font-weight: 600;">${escapeHTML(p.name)}</div>
+                            <button onclick="removeFromCompare(${p.id})" style="margin-top: 10px; padding: 5px 15px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-times"></i> إزالة
+                            </button>
+                        </th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>السعر</strong></td>
+                    ${compareList.map(p => `<td>${formatPrice(p.price)}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>التقييم</strong></td>
+                    ${compareList.map(p => `<td>${'⭐'.repeat(Math.floor(p.rating))} ${p.rating}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>الفئة</strong></td>
+                    ${compareList.map(p => `<td>${escapeHTML(p.category)}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>المادة</strong></td>
+                    ${compareList.map(p => `<td>${escapeHTML(p.material)}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>الأبعاد</strong></td>
+                    ${compareList.map(p => `<td>${escapeHTML(p.dimensions)}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>الألوان</strong></td>
+                    ${compareList.map(p => `<td>${p.colors.join('، ')}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>التوفر</strong></td>
+                    ${compareList.map(p => `<td>${p.inStock ? '<span style="color: #10B981;">✓ متوفر</span>' : '<span style="color: #EF4444;">✗ غير متوفر</span>'}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td><strong>الإجراء</strong></td>
+                    ${compareList.map(p => `
+                        <td>
+                            <button onclick="addToCart('${escapeHTML(p.name)}', ${p.price}, '${escapeHTML(p.image)}')" style="width: 100%; padding: 10px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 5px;">
+                                <i class="fas fa-cart-plus"></i> أضف للسلة
+                            </button>
+                        </td>
+                    `).join('')}
+                </tr>
+            </tbody>
+        </table>
     `;
 }
 
-function showProductsSkeleton(count = 4) {
-    const grid = document.querySelector('.products-grid');
-    if (!grid) return;
-    grid.innerHTML = Array(count).fill(createSkeletonCard()).join('');
+function closeCompareModal() {
+    const modal = document.getElementById('compareModal');
+    const overlay = document.getElementById('compareOverlay');
+    closeDialog(modal, overlay);
 }
 
-function hideSkeleton() {
-    document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
+// ==================== Shipping Calculator ====================
+const SHIPPING_ZONES = {
+    'الرياض': { price: 0, days: '1-2' },
+    'جدة': { price: 30, days: '2-3' },
+    'الدمام': { price: 40, days: '2-3' },
+    'مكة': { price: 25, days: '2-3' },
+    'المدينة': { price: 35, days: '3-4' },
+    'أخرى': { price: 50, days: '3-5' }
+};
+
+function calculateShipping() {
+    const city = document.getElementById('shippingCity')?.value;
+    if (!city) return { price: 0, days: '1-2' };
+    
+    return SHIPPING_ZONES[city] || SHIPPING_ZONES['أخرى'];
 }
 
-// ========== وظائف السلة ==========
+function updateShippingCost() {
+    const shipping = calculateShipping();
+    const shippingCostEl = document.getElementById('shippingCost');
+    const deliveryTimeEl = document.getElementById('deliveryTime');
+    
+    if (shippingCostEl) {
+        shippingCostEl.textContent = shipping.price === 0 ? 'مجاني' : formatPrice(shipping.price);
+    }
+    
+    if (deliveryTimeEl) {
+        deliveryTimeEl.textContent = `${shipping.days} أيام`;
+    }
+    
+    updateCartTotal();
+}
 
-// تحديث عدد عناصر السلة
+// ==================== Cart Functions ====================
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('cartCount').textContent = totalItems;
+    const cartCountEl = document.getElementById('cartCount');
+    if (cartCountEl) {
+        cartCountEl.textContent = totalItems;
+    }
     updateFabCartBadge();
     updateCartTotal();
 }
 
-// إضافة منتج للسلة
 function addToCart(productName, price, image = FALLBACK_IMG) {
     const existingIndex = cart.findIndex(item => item.name === productName);
     
@@ -1025,10 +1105,11 @@ function addToCart(productName, price, image = FALLBACK_IMG) {
     debugLog('addToCart', productName, price);
 }
 
-// عرض السلة
 function toggleCart() {
     const cartOverlay = document.getElementById('cartOverlay');
     const cartSidebar = document.querySelector('.cart-sidebar');
+    if (!cartSidebar) return;
+    
     const isActive = cartSidebar.classList.contains('active');
     debugLog('toggleCart', isActive ? 'close' : 'open');
     
@@ -1041,7 +1122,6 @@ function toggleCart() {
     }
 }
 
-// تحديث عرض السلة
 function updateCartDisplay() {
     const cartItems = document.getElementById('cartItems');
     if (!cartItems) return;
@@ -1079,7 +1159,6 @@ function updateCartDisplay() {
     cartItems.innerHTML = html;
 }
 
-// حذف منتج من السلة
 function removeFromCart(index) {
     const itemName = cart[index].name;
     cart.splice(index, 1);
@@ -1089,7 +1168,6 @@ function removeFromCart(index) {
     showNotification(`تم حذف ${itemName} من السلة`, 'error');
 }
 
-// زيادة الكمية
 function increaseQty(index) {
     cart[index].quantity++;
     persistCart();
@@ -1097,7 +1175,6 @@ function increaseQty(index) {
     updateCartCount();
 }
 
-// تقليل الكمية
 function decreaseQty(index) {
     if (cart[index].quantity > 1) {
         cart[index].quantity--;
@@ -1109,15 +1186,12 @@ function decreaseQty(index) {
     }
 }
 
-// تحديث إجمالي السلة
 function updateCartTotal() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // Update subtotal
     const subtotalEl = document.getElementById('cartSubtotal');
     if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
     
-    // Calculate discount
     let discount = 0;
     const discountRow = document.getElementById('discountRow');
     const discountAmountEl = document.getElementById('discountAmount');
@@ -1135,33 +1209,32 @@ function updateCartTotal() {
         if (discountRow) discountRow.style.display = 'none';
     }
     
-    // Final total
-    cartTotal = subtotal - discount;
+    // Calculate shipping
+    const shipping = calculateShipping();
+    const shippingCostEl = document.getElementById('cartShippingCost');
+    if (shippingCostEl) {
+        shippingCostEl.textContent = shipping.price === 0 ? 'مجاني' : formatPrice(shipping.price);
+    }
+    
+    cartTotal = subtotal - discount + shipping.price;
     const totalEl = document.getElementById('cartTotal');
     if (totalEl) totalEl.textContent = formatPrice(cartTotal);
 }
 
-// الدفع
 function checkout() {
     if (cart.length === 0) {
         showNotification('السلة فارغة!', 'error');
         return;
     }
     
-    // Show checkout modal
     const modal = document.getElementById('checkoutModal');
     const overlay = document.getElementById('checkoutOverlay');
     
     if (modal && overlay) {
-        // Update checkout summary
         updateCheckoutSummary();
-        overlay.classList.add('active');
-        modal.classList.add('active');
-        setBodyScrollLocked(true);
+        openDialog(modal, overlay);
     } else {
-        // Fallback if modal doesn't exist
         showNotification('🎉 شكراً لك! سيتم التواصل معك قريباً لتأكيد الطلب.', 'success');
-        // Clear cart
         cart = [];
         appliedCoupon = null;
         persistCart();
@@ -1175,11 +1248,11 @@ function updateCheckoutSummary() {
     const itemsContainer = document.getElementById('checkoutItems');
     const subtotalEl = document.getElementById('checkoutSubtotal');
     const discountEl = document.getElementById('checkoutDiscount');
+    const shippingEl = document.getElementById('checkoutShipping');
     const totalEl = document.getElementById('checkoutTotal');
     
     if (!itemsContainer) return;
     
-    // Calculate values
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     let discount = 0;
     
@@ -1189,9 +1262,9 @@ function updateCheckoutSummary() {
             : appliedCoupon.discount;
     }
     
-    const total = subtotal - discount;
+    const shipping = calculateShipping();
+    const total = subtotal - discount + shipping.price;
     
-    // Update items
     itemsContainer.innerHTML = cart.map(item => `
         <div class="checkout-item">
             <img src="${escapeHTML(item.image || FALLBACK_IMG)}" alt="${escapeHTML(item.name)}">
@@ -1203,10 +1276,12 @@ function updateCheckoutSummary() {
         </div>
     `).join('');
     
-    // Update totals
     if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
     if (discountEl) {
         discountEl.textContent = discount > 0 ? '-' + formatPrice(discount) : formatPrice(0);
+    }
+    if (shippingEl) {
+        shippingEl.textContent = shipping.price === 0 ? 'مجاني' : formatPrice(shipping.price);
     }
     if (totalEl) totalEl.textContent = formatPrice(total);
 }
@@ -1214,9 +1289,7 @@ function updateCheckoutSummary() {
 function closeCheckout() {
     const modal = document.getElementById('checkoutModal');
     const overlay = document.getElementById('checkoutOverlay');
-    if (modal) modal.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-    setBodyScrollLocked(false);
+    closeDialog(modal, overlay);
 }
 
 function submitOrder(e) {
@@ -1226,8 +1299,9 @@ function submitOrder(e) {
     const name = form.querySelector('#checkoutName').value.trim();
     const phone = form.querySelector('#checkoutPhone').value.trim();
     const address = form.querySelector('#checkoutAddress').value.trim();
+    const city = form.querySelector('#shippingCity')?.value;
     
-    if (!name || !phone || !address) {
+    if (!name || !phone || !address || !city) {
         showNotification('الرجاء تعبئة جميع الحقول', 'error');
         return;
     }
@@ -1237,40 +1311,36 @@ function submitOrder(e) {
         return;
     }
     
-    // Show loading
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب...';
     
-    // Simulate order submission
     setTimeout(() => {
-        showNotification('🎉 تم استلام طلبك بنجاح! سنتواصل معك قريباً.', 'success');
+        const shipping = calculateShipping();
+        showNotification(`🎉 تم استلام طلبك بنجاح! سيتم التوصيل خلال ${shipping.days} أيام.`, 'success');
         
-        // Clear cart
         cart = [];
         appliedCoupon = null;
         persistCart();
         updateCartCount();
         updateCartDisplay();
         
-        // Close modals
         closeCheckout();
         toggleCart();
         
-        // Reset button
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-check"></i> تأكيد الطلب';
         
-        // Reset form
         form.reset();
     }, 1500);
 }
 
-// ========== وظائف المفضلة ==========
-
+// ==================== Wishlist Functions ====================
 function toggleWishlist() {
     const wishlistOverlay = document.getElementById('wishlistOverlay');
     const wishlistSidebar = document.getElementById('wishlistSidebar');
+    if (!wishlistSidebar) return;
+    
     const isActive = wishlistSidebar.classList.contains('active');
     debugLog('toggleWishlist', isActive ? 'close' : 'open');
     
@@ -1332,7 +1402,7 @@ function updateWishlistDisplay() {
                     <div class="cart-item-name">${escapeHTML(item.name)}</div>
                     <div class="cart-item-price">${formatPrice(item.price)}</div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button data-action="wishlist-add-to-cart" data-index="${index}" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="addToCart(decodeURIComponent('${encodeURIComponent(item.name)}'), ${item.price}, '${escapeHTML(item.image)}')" style="flex: 1; padding: 8px; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-cart-plus"></i> أضف للسلة
                         </button>
                         <button data-action="wishlist-remove" data-index="${index}" style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -1354,47 +1424,47 @@ function removeFromWishlist(index) {
     updateWishlistCount();
     updateWishlistDisplay();
     showNotification(`تم إزالة ${itemName} من المفضلة`, 'error');
+    hydrateHeartsFromWishlist();
 }
 
-// ========== وظائف البحث ==========
-
+// ==================== Search Functions ====================
 function toggleSearch() {
     const searchOverlay = document.getElementById('searchOverlay');
-    const searchContainer = searchOverlay.querySelector('.search-container');
+    if (!searchOverlay) return;
+    
     const isActive = searchOverlay.classList.contains('active');
     
     if (isActive) {
         closeDialog(searchOverlay, null);
     } else {
         openDialog(searchOverlay, null);
-        document.getElementById('searchInput').focus();
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.focus();
         announceToScreenReader('تم فتح نافذة البحث');
-    }
-}
-
-function searchProducts(event) {
-    if (event.key === 'Enter') {
-        performSearch(true);
-    } else {
-        performSearchDebounced();
     }
 }
 
 const performSearchDebounced = debounce(() => performSearch(false), 200);
 
 function performSearch(isSubmit = false) {
-    const query = document.getElementById('searchInput').value.trim();
+    const searchInput = document.getElementById('searchInput');
     const resultsContainer = document.getElementById('searchResults');
-    if (!resultsContainer) return;
+    
+    if (!searchInput || !resultsContainer) return;
+    
+    const query = searchInput.value.trim();
     
     if (!query) {
         resultsContainer.innerHTML = '';
         return;
     }
     
-    // البحث في قائمة المنتجات
     const normalizedQuery = normalizeSearchText(query);
-    const results = products.filter(p => (p.normalizedName || normalizeSearchText(p.name)).includes(normalizedQuery));
+    const results = products.filter(p => 
+        normalizeSearchText(p.name).includes(normalizedQuery) ||
+        normalizeSearchText(p.category).includes(normalizedQuery) ||
+        (p.tags && p.tags.some(t => normalizeSearchText(t).includes(normalizedQuery)))
+    );
     
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p style="color: white; margin-top: 20px;">لا توجد نتائج</p>';
@@ -1402,33 +1472,26 @@ function performSearch(isSubmit = false) {
     }
     
     resultsContainer.innerHTML = results.map(p => `
-        <div class="search-result-item" data-action="search-add" data-name="${encodeURIComponent(p.name)}" data-price="${p.price}" data-image="${escapeHTML(p.image)}">
+        <div class="search-result-item" onclick="openProductDetails(${p.id}); toggleSearch();">
             <img src="${escapeHTML(p.image)}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
             <div>
                 <div style="font-weight: 600;">${escapeHTML(p.name)}</div>
-                <div style="color: #8B4513;">${formatPrice(p.price)}</div>
+                <div style="color: #D4A574;">${formatPrice(p.price)}</div>
+                <div style="font-size: 12px; color: #999;">${escapeHTML(p.category)}</div>
             </div>
         </div>
     `).join('');
 }
 
-// ========== وظائف أخرى ==========
-
-// القائمة المتنقلة للجوال
+// ==================== Other Functions ====================
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuBtn = document.querySelector('.mobile-menu-btn');
-    navLinks.classList.toggle('active');
-    menuBtn.classList.toggle('active');
-    setBodyScrollLocked(navLinks.classList.contains('active'));
+    if (navLinks) navLinks.classList.toggle('active');
+    if (menuBtn) menuBtn.classList.toggle('active');
+    setBodyScrollLocked(navLinks?.classList.contains('active'));
 }
 
-// عرض تنبيه (استخدام Toast الجديد)
-function showNotification(message, type = 'success') {
-    showToast(message, type);
-}
-
-// الاشتراك في النشرة البريدية
 function subscribeNewsletter(e) {
     e.preventDefault();
     const form = e.target;
@@ -1440,7 +1503,6 @@ function subscribeNewsletter(e) {
     }
 }
 
-// العد التنازلي للعرض
 function startCountdown() {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 5);
@@ -1456,14 +1518,137 @@ function startCountdown() {
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         
-        document.getElementById('days').textContent = days.toString().padStart(2, '0');
-        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
     }
     
     update();
     setInterval(update, 1000);
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateFabCartBadge() {
+    const badge = document.getElementById('fabCartBadge');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (badge) {
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+}
+
+function initFloatingCartButton() {
+    let fabContainer = document.querySelector('.fab-container');
+    if (!fabContainer) {
+        fabContainer = document.createElement('div');
+        fabContainer.className = 'fab-container';
+        fabContainer.innerHTML = `
+            <button class="fab fab-cart" data-action="toggle-cart" aria-label="سلة التسوق">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="fab-badge" id="fabCartBadge">0</span>
+            </button>
+        `;
+        document.body.appendChild(fabContainer);
+    }
+    
+    const fabCart = document.querySelector('.fab-cart');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 600) {
+            fabCart?.classList.add('visible');
+        } else {
+            fabCart?.classList.remove('visible');
+        }
+    }, { passive: true });
+}
+
+function hydrateHeartsFromWishlist() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        const name = card.querySelector('.product-name')?.textContent;
+        const heartBtn = card.querySelector('.wishlist-btn');
+        if (name && wishlist.find(item => item.name === name) && heartBtn) {
+            heartBtn.classList.add('active');
+        } else if (heartBtn) {
+            heartBtn.classList.remove('active');
+        }
+    });
+}
+
+function renderProducts(productsToRender) {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    debugLog('renderProducts', productsToRender.length);
+
+    if (productsToRender.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">لا توجد منتجات مطابقة</p>';
+        return;
+    }
+
+    grid.innerHTML = productsToRender.map(product => {
+        const fullStars = Math.floor(product.rating);
+        const hasHalf = product.rating % 1 >= 0.5;
+        let starsHtml = '';
+        for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+        if (hasHalf) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+
+        let badgeHtml = '';
+        if (product.badge) {
+            const badgeClass = product.badge.includes('%') ? 'badge-sale' : 'badge-new';
+            badgeHtml = `<span class="product-badge ${badgeClass}">${escapeHTML(product.badge)}</span>`;
+        }
+
+        let oldPriceHtml = '';
+        if (product.oldPrice) {
+            oldPriceHtml = `<span class="old-price">${formatPrice(product.oldPrice)}</span>`;
+        }
+
+        return `
+            <div class="product-card" data-id="${product.id}" data-name="${escapeHTML(product.name)}" data-price="${product.price}" data-category="${escapeHTML(product.category)}" data-image="${escapeHTML(product.image)}" ${product.oldPrice ? `data-old-price="${product.oldPrice}"` : ''} ${product.badge ? `data-badge="${escapeHTML(product.badge)}"` : ''}>
+                <div class="product-image" onclick="openProductDetails(${product.id})">
+                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">
+                    ${badgeHtml}
+                    <div class="product-actions">
+                        <button class="action-btn wishlist-btn" aria-label="أضف للمفضلة" onclick="event.stopPropagation()"><i class="fas fa-heart"></i></button>
+                        <button class="action-btn compare-btn" aria-label="مقارنة" onclick="event.stopPropagation(); addToCompare(${product.id})"><i class="fas fa-balance-scale"></i></button>
+                        <button class="action-btn share-btn" aria-label="مشاركة" onclick="event.stopPropagation()"><i class="fas fa-share-alt"></i></button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">${escapeHTML(product.category)}</div>
+                    <h3 class="product-name">${escapeHTML(product.name)}</h3>
+                    <div class="product-rating">
+                        ${starsHtml}
+                        <span>(${product.reviews} تقييم)</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${oldPriceHtml}
+                    </div>
+                    <button class="add-to-cart">
+                        <i class="fas fa-cart-plus"></i>
+                        أضف للسلة
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    hydrateHeartsFromWishlist();
+
+    const cards = grid.querySelectorAll('.product-card');
+    cards.forEach((card, index) => {
+        card.style.animation = `fadeInUp 0.4s ease ${index * 0.1}s both`;
+    });
 }
 
 function initProductEventDelegation() {
@@ -1473,7 +1658,6 @@ function initProductEventDelegation() {
 
     grid.addEventListener('click', (event) => {
         const addBtn = event.target.closest('.add-to-cart');
-        const quickViewBtn = event.target.closest('.quick-view-btn');
         const wishlistBtn = event.target.closest('.wishlist-btn');
         const shareBtn = event.target.closest('.share-btn');
 
@@ -1481,7 +1665,8 @@ function initProductEventDelegation() {
         if (!card) return;
 
         if (addBtn) {
-            const name = card.querySelector('.product-name')?.textContent || decodeData(card.dataset.name) || 'منتج';
+            event.stopPropagation();
+            const name = card.querySelector('.product-name')?.textContent || 'منتج';
             const priceText = card.querySelector('.current-price')?.textContent || '';
             const price = parsePriceText(priceText);
             const img = card.querySelector('img')?.src || FALLBACK_IMG;
@@ -1489,34 +1674,23 @@ function initProductEventDelegation() {
             return;
         }
 
-        if (quickViewBtn) {
-            event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
-            const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            const oldPrice = card.dataset.oldPrice ? parseInt(card.dataset.oldPrice) : null;
-            const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            const category = decodeData(card.dataset.category) || card.querySelector('.product-category')?.textContent || 'أثاث';
-            const badge = card.dataset.badge || null;
-            
-            openQuickView(name, price, image, category, oldPrice, badge);
-            return;
-        }
-
         if (wishlistBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            event.stopPropagation();
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
             const image = card.dataset.image || card.querySelector('img')?.src || FALLBACK_IMG;
-            
+
             addToWishlist(name, price, wishlistBtn, image);
             return;
         }
 
         if (shareBtn) {
             event.preventDefault();
-            const name = decodeData(card.dataset.name) || card.querySelector('.product-name')?.textContent || 'منتج';
+            event.stopPropagation();
+            const name = card.dataset.name || card.querySelector('.product-name')?.textContent || 'منتج';
             const price = parseInt(card.dataset.price) || parsePriceText(card.querySelector('.current-price')?.textContent);
-            
+
             const shareData = {
                 title: name,
                 text: `شاهد هذا المنتج: ${name} - ${formatPrice(price)}`,
@@ -1534,205 +1708,217 @@ function initProductEventDelegation() {
     });
 }
 
-function initGlobalEventDelegation() {
-    if (document.body.dataset.globalDelegationBound) return;
-    document.body.dataset.globalDelegationBound = 'true';
+// ==================== Global Actions System ====================
+function initGlobalActions() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        
+        const action = btn.dataset.action;
+        
+        if (btn.tagName === 'A' && btn.getAttribute('href') === '#') e.preventDefault();
+        
+        switch(action) {
+            case 'toggle-theme': toggleTheme(); break;
+            case 'toggle-cart': toggleCart(); break;
+            case 'toggle-wishlist': toggleWishlist(); break;
+            case 'toggle-search': toggleSearch(); break;
+            case 'toggle-mobile-menu': toggleMobileMenu(); break;
+            case 'open-compare': openCompareModal(); break;
+            case 'open-filters': toggleFiltersModal(); break;
+            
+            case 'close-search': toggleSearch(); break;
+            case 'close-checkout': closeCheckout(); break;
+            case 'close-product-details': closeProductDetails(); break;
+            case 'close-compare': closeCompareModal(); break;
+            case 'close-filters': toggleFiltersModal(); break;
+            case 'toast-close': e.target.closest('.toast')?.remove(); break;
+            
+            case 'cart-increase': increaseQty(parseInt(btn.dataset.index)); break;
+            case 'cart-decrease': decreaseQty(parseInt(btn.dataset.index)); break;
+            case 'cart-remove': removeFromCart(parseInt(btn.dataset.index)); break;
+            case 'checkout': checkout(); break;
+            case 'apply-coupon': applyCoupon(); break;
+            
+            case 'wishlist-remove': removeFromWishlist(parseInt(btn.dataset.index)); break;
+            
+            case 'apply-filters': applyFilters(); break;
+            case 'reset-filters': resetFilters(); break;
+            
+            case 'scroll-top': scrollToTop(); break;
+        }
+    });
 
-    const clickHandler = (event) => {
-        const target = event.target.closest('[data-action]');
-        if (!target) return;
+    document.addEventListener('submit', (e) => {
+        if (e.target.dataset.action === 'submit-order') submitOrder(e);
+        if (e.target.dataset.action === 'subscribe-newsletter') subscribeNewsletter(e);
+        if (e.target.dataset.action === 'submit-review') submitReview(e);
+    });
+    
+    // Shipping city change
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'shippingCity') {
+            updateShippingCost();
+        }
+    });
+}
 
-        const action = target.dataset.action;
-        debugLog('action', action);
+// ==================== Filters Modal ====================
+function toggleFiltersModal() {
+    const modal = document.getElementById('filtersModal');
+    const overlay = document.getElementById('filtersOverlay');
+    
+    if (!modal || !overlay) return;
+    
+    if (modal.classList.contains('active')) {
+        closeDialog(modal, overlay);
+    } else {
+        openDialog(modal, overlay);
+    }
+}
 
-        switch (action) {
-            case 'toggle-theme':
-                toggleTheme();
-                break;
-            case 'toggle-search':
-                toggleSearch();
-                break;
-            case 'toggle-wishlist':
-                toggleWishlist();
-                break;
-            case 'toggle-cart':
-                toggleCart();
-                break;
-            case 'toggle-mobile-menu':
-                toggleMobileMenu();
-                break;
-            case 'apply-coupon':
-                applyCoupon();
-                break;
-            case 'checkout':
-                checkout();
-                break;
-            case 'close-cart':
-                if (target.id === 'cartOverlay' && event.target === target) toggleCart();
-                break;
-            case 'close-wishlist':
-                if (target.id === 'wishlistOverlay' && event.target === target) toggleWishlist();
-                break;
-            case 'close-search':
-                if (target.id === 'searchOverlay' && event.target === target) toggleSearch();
-                break;
-            case 'close-quick-view':
-                if ((target.id === 'quickViewOverlay' && event.target === target) || target.classList.contains('close-quick-view')) {
-                    closeQuickView();
-                }
-                break;
-            case 'quick-view-qty': {
-                const delta = parseInt(target.dataset.qtyDelta, 10) || 0;
-                changeQuickViewQty(delta);
-                break;
-            }
-            case 'add-from-quick-view':
-                addFromQuickView();
-                break;
-            case 'wishlist-from-quick-view':
-                addToWishlistFromQuickView();
-                break;
-            case 'share-product':
-                shareProduct();
-                break;
-            case 'perform-search':
+// ==================== Initialization ====================
+function initApp() {
+    debugLog('DOMContentLoaded');
+    
+    applyTheme(getPreferredTheme());
+    initGlobalActions();
+
+    updateCartCount();
+    updateWishlistCount();
+    updateCompareCount();
+    updateCartDisplay();
+    updateWishlistDisplay();
+    hydrateHeartsFromWishlist();
+    updateFilterBadges();
+    
+    initFloatingCartButton();
+    renderProducts(products);
+    startCountdown();
+    initProductEventDelegation();
+    
+    // Filter tabs
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            activeFilters.category = this.dataset.filter;
+            applyFilters();
+        });
+    });
+    
+    // Search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => performSearchDebounced());
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
                 performSearch(true);
-                break;
-            case 'search-add': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                addToCart(name, price, image);
-                toggleSearch();
-                break;
             }
-            case 'recently-viewed': {
-                const name = decodeData(target.dataset.name);
-                const price = parseFloat(target.dataset.price) || 0;
-                const image = target.dataset.image || FALLBACK_IMG;
-                const category = decodeData(target.dataset.category) || 'أثاث';
-                const oldPrice = target.dataset.oldPrice ? parseFloat(target.dataset.oldPrice) : null;
-                openQuickView(name, price, image, category, oldPrice, null);
-                break;
-            }
-            case 'cart-increase':
-                increaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-decrease':
-                decreaseQty(parseInt(target.dataset.index, 10));
-                break;
-            case 'cart-remove':
-                removeFromCart(parseInt(target.dataset.index, 10));
-                break;
-            case 'wishlist-add-to-cart': {
-                const index = parseInt(target.dataset.index, 10);
-                const item = wishlist[index];
-                if (item) addToCart(item.name, item.price, item.image);
-                break;
-            }
-            case 'wishlist-remove':
-                removeFromWishlist(parseInt(target.dataset.index, 10));
-                break;
-            case 'scroll-top':
-                scrollToTop();
-                break;
-            case 'close-lightbox':
-                if ((target.id === 'lightboxOverlay' && event.target === target) || target.classList.contains('lightbox-close')) {
-                    closeLightbox();
-                }
-                break;
-            case 'lightbox-prev':
-                lightboxPrev();
-                break;
-            case 'lightbox-next':
-                lightboxNext();
-                break;
-            case 'close-checkout':
-                if ((target.id === 'checkoutOverlay' && event.target === target) || target.classList.contains('close-checkout')) {
-                    closeCheckout();
-                }
-                break;
-            case 'toast-close': {
-                const toast = target.closest('.toast');
-                toast?.remove();
-                break;
-            }
-            default:
-                break;
-        }
-    };
-
-    document.addEventListener('click', clickHandler, true);
-
-    document.addEventListener('submit', (event) => {
-        const form = event.target;
-        if (!form?.dataset?.action) return;
-
-        switch (form.dataset.action) {
-            case 'subscribe-newsletter':
-                subscribeNewsletter(event);
-                break;
-            case 'submit-order':
-                submitOrder(event);
-                break;
-            default:
-                break;
-        }
-    }, true);
-}
-
-function bindStaticActionButtons() {
-    const actionHandlers = {
-        'toggle-theme': () => toggleTheme(),
-        'toggle-search': () => toggleSearch(),
-        'toggle-wishlist': () => toggleWishlist(),
-        'toggle-cart': () => toggleCart(),
-        'toggle-mobile-menu': () => toggleMobileMenu()
-    };
-
-    Object.keys(actionHandlers).forEach((action) => {
-        document.querySelectorAll(`[data-action="${action}"]`).forEach((button) => {
-            if (button.dataset.bound === 'true') return;
-            button.dataset.bound = 'true';
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                actionHandlers[action]();
-            });
+        });
+    }
+    
+    // Sort dropdown
+    const sortDropdown = document.getElementById('sortProducts');
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', (e) => {
+            activeFilters.sortBy = e.target.value;
+            applyFilters();
+        });
+    }
+    
+    // Price slider
+    const priceSlider = document.getElementById('priceSlider');
+    const priceValue = document.getElementById('priceValue');
+    if (priceSlider && priceValue) {
+        priceSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            priceValue.textContent = formatPrice(value);
+            activeFilters.priceRange = [0, parseInt(value)];
+        });
+    }
+    
+    // Rating filters
+    document.querySelectorAll('.rating-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.rating-filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            activeFilters.rating = parseFloat(this.dataset.rating);
         });
     });
-
-    const heuristicBindings = [
-        { selector: '.nav-btn .fa-search', handler: actionHandlers['toggle-search'] },
-        { selector: '.nav-btn .fa-shopping-cart', handler: actionHandlers['toggle-cart'] },
-        { selector: '.nav-btn .fa-heart', handler: actionHandlers['toggle-wishlist'] },
-        { selector: '.theme-toggle', handler: actionHandlers['toggle-theme'] },
-        { selector: '.mobile-menu-btn', handler: actionHandlers['toggle-mobile-menu'] }
-    ];
-
-    heuristicBindings.forEach(({ selector, handler }) => {
-        document.querySelectorAll(selector).forEach((icon) => {
-            const button = icon.closest('button');
-            if (!button || button.dataset.bound === 'true') return;
-            button.dataset.bound = 'true';
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                handler();
-            });
+    
+    // Color filters
+    document.querySelectorAll('.color-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const color = this.dataset.color;
+            if (this.classList.contains('active')) {
+                activeFilters.colors.push(color);
+            } else {
+                activeFilters.colors = activeFilters.colors.filter(c => c !== color);
+            }
         });
     });
-}
+    
+    // Stock filter
+    const stockCheck = document.getElementById('inStockOnly');
+    if (stockCheck) {
+        stockCheck.addEventListener('change', (e) => {
+            activeFilters.inStock = e.target.checked;
+        });
+    }
+    
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.querySelector('.nav-links')?.classList.remove('active');
+                document.querySelector('.mobile-menu-btn')?.classList.remove('active');
+            }
+        });
+    });
+    
+    // Back to top
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 500) {
+            backToTop?.classList.add('visible');
+        } else {
+            backToTop?.classList.remove('visible');
+        }
+    }, { passive: true });
 
-function hydrateHeartsFromWishlist() {
-    document.querySelectorAll('.product-card').forEach(card => {
-        const name = card.querySelector('.product-name')?.textContent;
-        const heartBtn = card.querySelector('.action-btn:first-child');
-        if (name && wishlist.find(item => item.name === name) && heartBtn) {
-            heartBtn.classList.add('active');
+    // Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('cartOverlay')?.classList.contains('active')) toggleCart();
+            if (document.getElementById('wishlistOverlay')?.classList.contains('active')) toggleWishlist();
+            if (document.getElementById('searchOverlay')?.classList.contains('active')) toggleSearch();
+            if (document.getElementById('productDetailsOverlay')?.classList.contains('active')) closeProductDetails();
+            if (document.getElementById('compareOverlay')?.classList.contains('active')) closeCompareModal();
+            if (document.getElementById('filtersOverlay')?.classList.contains('active')) toggleFiltersModal();
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks?.classList.contains('active')) toggleMobileMenu();
         }
     });
 }
 
-// مزامنة عبر التبويبات
+// Initialize
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+// Storage sync
 window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_KEYS.cart) {
         cart = safeParse(STORAGE_KEYS.cart);
@@ -1745,124 +1931,23 @@ window.addEventListener('storage', (e) => {
         updateWishlistDisplay();
         hydrateHeartsFromWishlist();
     }
+    if (e.key === STORAGE_KEYS.compare) {
+        compareList = safeParse(STORAGE_KEYS.compare);
+        updateCompareCount();
+    }
+    if (e.key === STORAGE_KEYS.theme) {
+        applyTheme(getPreferredTheme());
+    }
 });
 
-// العودة للأعلى
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+// Apply theme on load
+(function initTheme() {
+    applyTheme(getPreferredTheme());
+})();
 
-// ========== تهيئة الصفحة ==========
-function initApp() {
-    debugLog('DOMContentLoaded');
-    // تحديث عدد السلة والمفضلة
-    updateCartCount();
-    updateWishlistCount();
-    updateCartDisplay();
-    updateWishlistDisplay();
-    hydrateHeartsFromWishlist();
-    
-    // تهيئة تحميل الصور
-    initImageLoading();
-    
-    // تهيئة شريط التقدم
-    initScrollProgress();
-    
-    // تهيئة العدادات المتحركة
-    initAnimatedCounters();
-    
-    // تهيئة زر السلة العائم
-    initFloatingCartButton();
-    
-    // عرض المنتجات المشاهدة مؤخراً
-    renderRecentlyViewed();
-    
-    // تهيئة Lightbox للصور
-    initImageLightbox();
-    
-    // تهيئة ترتيب المنتجات
-    initProductSorting();
-    
-    // عرض جميع المنتجات عند التحميل
-    renderProducts(products);
-
-    // تشغيل العد التنازلي
-    startCountdown();
-
-    // ربط الأزرار الديناميكي مرة واحدة عبر التفويض
-    initProductEventDelegation();
-    initGlobalEventDelegation();
-    bindStaticActionButtons();
-    
-    // تصفية المنتجات
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            filterTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-
-            const category = this.dataset.filter;
-
-            if (category === 'all') {
-                renderProducts(products);
-            } else {
-                const filtered = products.filter(p => p.category === category);
-                renderProducts(filtered);
-            }
-        });
-    });
-    
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', () => performSearchDebounced());
-        searchInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                performSearch(true);
-            }
-        });
+// System theme preference
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem(STORAGE_KEYS.theme)) {
+        applyTheme(e.matches ? 'dark' : 'light');
     }
-    
-    // Smooth scroll للروابط
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                document.querySelector('.nav-links')?.classList.remove('active');
-                document.querySelector('.mobile-menu-btn')?.classList.remove('active');
-            }
-        });
-    });
-    
-    // تأثير الـ navbar والزر العودة للأعلى عند التمرير
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 500) {
-            backToTop?.classList.add('visible');
-        } else {
-            backToTop?.classList.remove('visible');
-        }
-    }, { passive: true });
-    
-    // التحقق من المفضلة المحفوظة
-    hydrateHeartsFromWishlist();
-
-    // إغلاق النوافذ عند الضغط على زر Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (document.getElementById('cartOverlay')?.classList.contains('active')) toggleCart();
-            if (document.getElementById('wishlistOverlay')?.classList.contains('active')) toggleWishlist();
-            if (document.getElementById('searchOverlay')?.classList.contains('active')) toggleSearch();
-            const navLinks = document.querySelector('.nav-links');
-            if (navLinks?.classList.contains('active')) toggleMobileMenu();
-        }
-    });
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
-}
+});

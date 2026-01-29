@@ -4,29 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="دار الأثاث الفاخر - أفضل متجر أثاث في المملكة العربية السعودية. تشكيلة واسعة من الأثاث العصري والكلاسيكي بأسعار منافسة وجودة عالية.">
-    <meta name="keywords" content="أثاث، أثاث فاخر، كنب، طاولات، غرف نوم، غرف معيشة، أثاث سعودي">
-    <meta name="author" content="دار الأثاث">
-    <meta name="theme-color" content="#8B4513">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="دار الأثاث الفاخر">
-    <meta property="og:description" content="اكتشف مجموعتنا الفاخرة من الأثاث العصري والكلاسيكي">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200">
-    <meta property="og:type" content="website">
-    
     <title>دار الأثاث الفاخر | أفضل أثاث في السعودية</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enhancements.css">
 </head>
 <body>
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
-    
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="skip-link">تخطي إلى المحتوى الرئيسي</a>
     
     <!-- Navigation -->
     <nav class="navbar" role="navigation" aria-label="القائمة الرئيسية">
@@ -58,12 +47,23 @@
                 <li><a href="#contact">اتصل بنا</a></li>
             </ul>
             <div class="nav-actions">
+                <button class="nav-btn" data-action="open-filters" title="فلاتر البحث">
+                    <i class="fas fa-filter"></i>
+                    <span class="cart-count" id="filterBadge" style="display: none;">0</span>
+                </button>
+                <button class="nav-btn" data-action="open-compare" title="المقارنة">
+                    <i class="fas fa-balance-scale"></i>
+                    <span class="cart-count" id="compareBadge" style="display: none;">0</span>
+                </button>
                 <button class="theme-toggle" data-action="toggle-theme" title="تبديل الوضع الليلي">
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
                 <button class="nav-btn" data-action="toggle-search"><i class="fas fa-search"></i></button>
-                <button class="nav-btn" data-action="toggle-wishlist"><i class="fas fa-heart"></i><span class="wishlist-count" id="wishlistCount">0</span></button>
+                <button class="nav-btn" data-action="toggle-wishlist">
+                    <i class="fas fa-heart"></i>
+                    <span class="cart-count" id="wishlistCount">0</span>
+                </button>
                 <button class="nav-btn" data-action="toggle-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
@@ -81,11 +81,11 @@
     <main id="main-content">
     
     <!-- Hero Section -->
-    <section class="hero" id="home" aria-labelledby="hero-title">
+    <section class="hero" id="home">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 id="hero-title">صمم منزلك <span>بأناقة لا مثيل لها</span></h1>
-                <p>اكتشف مجموعتنا الفاخرة من الأثاث العصري والكلاسيكي. جودة استثنائية وتصاميم تناسب جميع الأذواق مع ضمان شامل وتوصيل مجاني.</p>
+                <h1>صمم منزلك <span>بأناقة لا مثيل لها</span></h1>
+                <p>اكتشف مجموعتنا الفاخرة من الأثاث العصري والكلاسيكي. جودة استثنائية وتصاميم تناسب جميع الأذواق.</p>
                 <div class="hero-btns">
                     <a href="#products" class="btn-primary">
                         <i class="fas fa-shopping-bag"></i>
@@ -163,7 +163,7 @@
         </div>
         <div class="categories-grid">
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرم المعيشة" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرف المعيشة" loading="lazy">
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف المعيشة</h3>
@@ -179,7 +179,7 @@
                 </div>
             </div>
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرم الطعام" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرف الطعام" loading="lazy">
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف الطعام</h3>
@@ -212,12 +212,15 @@
                     <button class="filter-tab" data-filter="غرف الطعام">غرف الطعام</button>
                     <button class="filter-tab" data-filter="المكاتب">المكاتب</button>
                     <button class="filter-tab" data-filter="مقاعد">مقاعد</button>
+                    <button class="filter-tab" data-filter="إكسسوارات">إكسسوارات</button>
                 </div>
                 <div class="sort-dropdown">
-                    <select id="sortProducts" onchange="sortProducts()" aria-label="ترتيب المنتجات">
+                    <select id="sortProducts" aria-label="ترتيب المنتجات">
                         <option value="default">الترتيب الافتراضي</option>
                         <option value="price-low">السعر: من الأقل للأعلى</option>
                         <option value="price-high">السعر: من الأعلى للأقل</option>
+                        <option value="rating">الأعلى تقييماً</option>
+                        <option value="newest">الأحدث</option>
                     </select>
                 </div>
             </div>
@@ -227,24 +230,12 @@
         </div>
     </section>
 
-    <!-- Recently Viewed Products -->
-    <section class="recently-viewed" id="recentlyViewed" style="display: none;">
-        <div class="section-header">
-            <h2>شاهدتها مؤخراً</h2>
-            <p>المنتجات التي قمت بمعاينتها</p>
-            <div class="line"></div>
-        </div>
-        <div class="recently-viewed-grid" id="recentlyViewedGrid">
-            <!-- Products will be added dynamically -->
-        </div>
-    </section>
-
     <!-- Special Offer -->
     <section class="special-offer" id="offer">
         <div class="offer-content">
             <div class="offer-text">
                 <h2>عرض خاص <span>محدود الوقت</span></h2>
-                <p>احصل على خصم يصل إلى 50% على مجموعة مختارة من الأثاث الفاخر. هذا العرض متاح لفترة محدودة فقط!</p>
+                <p>احصل على خصم يصل إلى 50% على مجموعة مختارة من الأثاث الفاخر!</p>
                 <div class="countdown">
                     <div class="countdown-item">
                         <div class="countdown-number" id="days">05</div>
@@ -353,7 +344,7 @@
                     <div class="logo-icon"><i class="fas fa-couch"></i></div>
                     <div class="logo-text">دار <span>الأثاث</span></div>
                 </div>
-                <p>متجر الأثاث الفاخر الأول في المملكة. نقدم أفضل تشكيلة من الأثاث العصري والكلاسيكي بأسعار منافسة وجودة عالية.</p>
+                <p>متجر الأثاث الفاخر الأول في المملكة</p>
                 <div class="social-links">
                     <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
@@ -367,49 +358,25 @@
                     <li><a href="#">الرئيسية</a></li>
                     <li><a href="#">المنتجات</a></li>
                     <li><a href="#">العروض</a></li>
-                    <li><a href="#">المجموعات</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h4>خدمات</h4>
                 <ul>
-                    <li><a href="#">سياسة الإرجاع</a></li>
                     <li><a href="#">الشحن والتوصيل</a></li>
                     <li><a href="#">الضمان</a></li>
-                    <li><a href="#">التثبيت</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4>المساعدة</h4>
-                <ul>
-                    <li><a href="#">الأسئلة الشائعة</a></li>
-                    <li><a href="#">اتصل بنا</a></li>
-                    <li><a href="#">الشروط والأحكام</a></li>
-                    <li><a href="#">سياسة الخصوصية</a></li>
+                    <li><a href="#">سياسة الإرجاع</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h4>تواصل معنا</h4>
                 <div class="contact-item">
                     <i class="fas fa-phone"></i>
-                    <div>
-                        <p style="margin: 0;">+966 50 123 4567</p>
-                        <p style="margin: 0; font-size: 13px;">من 9 صباحاً إلى 11 مساءً</p>
-                    </div>
+                    <p>+966 50 123 4567</p>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-envelope"></i>
-                    <div>
-                        <p style="margin: 0;">info@darfurniture.com</p>
-                        <p style="margin: 0; font-size: 13px;">رد خلال 24 ساعة</p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <p style="margin: 0;">الرياض - المملكة العربية السعودية</p>
-                        <p style="margin: 0; font-size: 13px;">50 فرع في الدول الخليجية</p>
-                    </div>
+                    <p>info@darfurniture.com</p>
                 </div>
             </div>
         </div>
@@ -423,22 +390,21 @@
         </div>
     </footer>
     
-    </main><!-- End main content -->
+    </main>
 
     <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay" data-action="close-cart" aria-hidden="true"></div>
+    <div class="cart-overlay" id="cartOverlay" aria-hidden="true"></div>
     <aside class="cart-sidebar" role="dialog" aria-label="سلة التسوق" aria-modal="true">
         <div class="cart-header">
             <h3>سلة التسوق</h3>
-            <button class="close-cart" data-action="toggle-cart" aria-label="إغلاق السلة"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <button class="close-cart" data-action="toggle-cart" aria-label="إغلاق"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items" id="cartItems" role="list">
             <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
         </div>
         <div class="cart-footer">
-            <!-- Coupon Code -->
             <div class="coupon-section">
-                <input type="text" id="couponInput" placeholder="كود الخصم" aria-label="أدخل كود الخصم">
+                <input type="text" id="couponInput" placeholder="كود الخصم">
                 <button data-action="apply-coupon" class="coupon-btn">تطبيق</button>
             </div>
             <div class="cart-summary">
@@ -450,9 +416,13 @@
                     <span>الخصم:</span>
                     <span id="discountAmount">-0 ر.س</span>
                 </div>
+                <div class="summary-row" id="shippingRow">
+                    <span>الشحن:</span>
+                    <span id="cartShippingCost">0 ر.س</span>
+                </div>
                 <div class="summary-row total-row">
                     <span>الإجمالي:</span>
-                    <span id="cartTotal" aria-live="polite">0 ر.س</span>
+                    <span id="cartTotal">0 ر.س</span>
                 </div>
             </div>
             <button class="checkout-btn" data-action="checkout">
@@ -462,101 +432,209 @@
         </div>
     </aside>
 
-    <!-- Quick View Modal -->
-    <div class="quick-view-overlay" id="quickViewOverlay" data-action="close-quick-view" aria-hidden="true"></div>
-    <div class="quick-view-modal" id="quickViewModal" role="dialog" aria-label="معاينة المنتج" aria-modal="true">
-        <button class="close-quick-view" data-action="close-quick-view" aria-label="إغلاق">
-            <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
-        <div class="quick-view-content">
-            <div class="quick-view-image">
-                <img id="quickViewImage" src="" alt="">
-                <div class="quick-view-badge" id="quickViewBadge"></div>
-            </div>
-            <div class="quick-view-info">
-                <span class="quick-view-category" id="quickViewCategory"></span>
-                <h2 id="quickViewName"></h2>
-                <div class="quick-view-rating" id="quickViewRating"></div>
-                <div class="quick-view-price">
-                    <span class="current-price" id="quickViewPrice"></span>
-                    <span class="old-price" id="quickViewOldPrice"></span>
-                </div>
-                <p class="quick-view-desc" id="quickViewDesc">منتج فاخر بجودة عالية وتصميم عصري يناسب جميع الأذواق. مصنوع من أفضل الخامات مع ضمان شامل.</p>
-                <div class="quick-view-quantity">
-                    <label>الكمية:</label>
-                    <div class="qty-selector">
-                        <button data-action="quick-view-qty" data-qty-delta="-1">-</button>
-                        <input type="number" id="quickViewQty" value="1" min="1" max="10">
-                        <button data-action="quick-view-qty" data-qty-delta="1">+</button>
-                    </div>
-                </div>
-                <div class="quick-view-actions">
-                    <button class="qv-add-cart" data-action="add-from-quick-view">
-                        <i class="fas fa-cart-plus"></i>
-                        أضف للسلة
-                    </button>
-                    <button class="qv-wishlist" data-action="wishlist-from-quick-view">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <button class="qv-share" data-action="share-product">
-                        <i class="fas fa-share-alt"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay" data-action="close-search" role="dialog" aria-label="البحث" aria-modal="true">
-        <div class="search-container">
-            <button class="close-search" data-action="toggle-search" aria-label="إغلاق البحث"><i class="fas fa-times" aria-hidden="true"></i></button>
-            <h2>ابحث عن منتجاتك</h2>
-            <div class="search-input-wrapper">
-                <input type="search" id="searchInput" placeholder="اكتب اسم المنتج..." aria-label="بحث عن منتج">
-                <button data-action="perform-search" aria-label="بحث"><i class="fas fa-search" aria-hidden="true"></i></button>
-            </div>
-            <div class="search-results" id="searchResults" role="listbox" aria-live="polite"></div>
-        </div>
-    </div>
-
     <!-- Wishlist Sidebar -->
-    <div class="wishlist-overlay" id="wishlistOverlay" data-action="close-wishlist" aria-hidden="true"></div>
+    <div class="wishlist-overlay" id="wishlistOverlay" aria-hidden="true"></div>
     <aside class="wishlist-sidebar" id="wishlistSidebar" role="dialog" aria-label="المفضلة" aria-modal="true">
         <div class="cart-header">
-            <h3>المفضلة <i class="fas fa-heart" aria-hidden="true"></i></h3>
-            <button class="close-cart" data-action="toggle-wishlist" aria-label="إغلاق المفضلة"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <h3>المفضلة <i class="fas fa-heart"></i></h3>
+            <button class="close-cart" data-action="toggle-wishlist" aria-label="إغلاق"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items" id="wishlistItems" role="list">
             <p style="text-align: center; color: #999; padding: 40px 20px;">المفضلة فارغة</p>
         </div>
     </aside>
 
-    <!-- Back to Top -->
-    <button class="back-to-top" id="backToTop" data-action="scroll-top" aria-label="العودة إلى أعلى الصفحة">
-        <i class="fas fa-arrow-up" aria-hidden="true"></i>
-    </button>
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="البحث" aria-modal="true">
+        <div class="search-container">
+            <button class="close-search" data-action="toggle-search" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <h2>ابحث عن منتجاتك</h2>
+            <div class="search-input-wrapper">
+                <input type="search" id="searchInput" placeholder="اكتب اسم المنتج...">
+                <button data-action="perform-search"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
 
-    <!-- Image Lightbox -->
-    <div class="lightbox-overlay" id="lightboxOverlay" data-action="close-lightbox" aria-hidden="true"></div>
-    <div class="lightbox" id="lightbox" role="dialog" aria-label="عرض الصورة" aria-modal="true">
-        <button class="lightbox-close" data-action="close-lightbox" aria-label="إغلاق">
+    <!-- Product Details Modal -->
+    <div class="overlay" id="productDetailsOverlay" aria-hidden="true"></div>
+    <div class="product-details-modal" id="productDetailsModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <button class="modal-close" data-action="close-product-details" aria-label="إغلاق">
             <i class="fas fa-times"></i>
         </button>
-        <button class="lightbox-nav lightbox-prev" data-action="lightbox-prev" aria-label="السابق">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        <div class="lightbox-content">
-            <img id="lightboxImage" src="" alt="">
-            <div class="lightbox-caption" id="lightboxCaption"></div>
+        <div class="product-details-container">
+            <div class="product-details-gallery">
+                <img id="detailsProductImage" src="" alt="" class="details-main-image">
+                <div id="detailsProductBadge" class="details-badge"></div>
+            </div>
+            <div class="product-details-content">
+                <div class="details-header">
+                    <span class="details-category" id="detailsProductCategory"></span>
+                    <h2 class="details-title" id="detailsProductName"></h2>
+                    <div class="details-rating" id="detailsProductRating"></div>
+                    <div class="details-price-section">
+                        <span class="details-price" id="detailsProductPrice"></span>
+                        <span class="details-old-price" id="detailsProductOldPrice"></span>
+                    </div>
+                </div>
+                <div class="details-specs" id="detailsProductSpecs"></div>
+                <div class="details-actions">
+                    <button class="details-add-to-cart" onclick="if(currentQuickViewProduct) addToCart(currentQuickViewProduct.name, currentQuickViewProduct.price, currentQuickViewProduct.image)">
+                        <i class="fas fa-cart-plus"></i> أضف للسلة
+                    </button>
+                    <button class="details-add-to-wishlist" onclick="if(currentQuickViewProduct) addToWishlist(currentQuickViewProduct.name, currentQuickViewProduct.price, this, currentQuickViewProduct.image)">
+                        <i class="fas fa-heart"></i> المفضلة
+                    </button>
+                    <button class="details-compare" onclick="if(currentQuickViewProduct) addToCompare(currentQuickViewProduct.id)">
+                        <i class="fas fa-balance-scale"></i> مقارنة
+                    </button>
+                </div>
+                
+                <!-- Reviews -->
+                <div class="details-reviews-section">
+                    <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--text-primary);">
+                        <i class="fas fa-star" style="color: #F59E0B;"></i> التقييمات والمراجعات
+                    </h3>
+                    <div id="productReviewsList" class="reviews-list"></div>
+                    <div class="add-review-section">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">أضف تقييمك</h4>
+                        <form data-action="submit-review" class="review-form">
+                            <div class="form-group">
+                                <label for="reviewName">الاسم</label>
+                                <input type="text" id="reviewName" placeholder="أدخل اسمك" required>
+                            </div>
+                            <div class="form-group">
+                                <label>التقييم</label>
+                                <div class="rating-input">
+                                    <input type="radio" name="rating" value="5" id="star5" required>
+                                    <label for="star5"><i class="fas fa-star"></i></label>
+                                    <input type="radio" name="rating" value="4" id="star4">
+                                    <label for="star4"><i class="fas fa-star"></i></label>
+                                    <input type="radio" name="rating" value="3" id="star3">
+                                    <label for="star3"><i class="fas fa-star"></i></label>
+                                    <input type="radio" name="rating" value="2" id="star2">
+                                    <label for="star2"><i class="fas fa-star"></i></label>
+                                    <input type="radio" name="rating" value="1" id="star1">
+                                    <label for="star1"><i class="fas fa-star"></i></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reviewText">تعليقك</label>
+                                <textarea id="reviewText" rows="4" placeholder="شاركنا رأيك..." required></textarea>
+                            </div>
+                            <button type="submit" class="submit-review-btn">
+                                <i class="fas fa-paper-plane"></i> إرسال التقييم
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Similar Products -->
+                <div id="similarProducts" class="similar-products-section" style="display: none;">
+                    <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--text-primary);">
+                        <i class="fas fa-layer-group"></i> منتجات مشابهة
+                    </h3>
+                    <div class="similar-products-grid"></div>
+                </div>
+            </div>
         </div>
-        <button class="lightbox-nav lightbox-next" data-action="lightbox-next" aria-label="التالي">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div class="overlay" id="compareOverlay" aria-hidden="true"></div>
+    <div class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-header">
+            <h2 id="compareTitle">
+                <i class="fas fa-balance-scale"></i> مقارنة المنتجات
+            </h2>
+            <button class="modal-close" data-action="close-compare" aria-label="إغلاق">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="compareContent"></div>
+        </div>
+    </div>
+
+    <!-- Filters Modal -->
+    <div class="overlay" id="filtersOverlay" aria-hidden="true"></div>
+    <div class="filters-modal" id="filtersModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-header">
+            <h2 id="filtersTitle">
+                <i class="fas fa-filter"></i> تصفية المنتجات
+            </h2>
+            <button class="modal-close" data-action="close-filters" aria-label="إغلاق">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="filters-content">
+                <div class="filter-group">
+                    <h3 class="filter-title">
+                        <i class="fas fa-dollar-sign"></i> نطاق السعر
+                    </h3>
+                    <div class="price-range-container">
+                        <input type="range" id="priceSlider" min="0" max="10000" value="10000" step="100">
+                        <div class="price-range-labels">
+                            <span>0 ر.س</span>
+                            <span id="priceValue">10,000 ر.س</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3 class="filter-title">
+                        <i class="fas fa-star"></i> التقييم
+                    </h3>
+                    <div class="rating-filters">
+                        <button class="rating-filter-btn" data-rating="4.5">
+                            <i class="fas fa-star"></i> 4.5+
+                        </button>
+                        <button class="rating-filter-btn" data-rating="4">
+                            <i class="fas fa-star"></i> 4+
+                        </button>
+                        <button class="rating-filter-btn" data-rating="3">
+                            <i class="fas fa-star"></i> 3+
+                        </button>
+                        <button class="rating-filter-btn" data-rating="0">الكل</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3 class="filter-title">
+                        <i class="fas fa-palette"></i> الألوان المتاحة
+                    </h3>
+                    <div class="color-filters">
+                        <button class="color-filter-btn" data-color="أبيض" style="background: #fff; border: 1px solid #ddd;"></button>
+                        <button class="color-filter-btn" data-color="أسود" style="background: #000;"></button>
+                        <button class="color-filter-btn" data-color="رمادي" style="background: #888;"></button>
+                        <button class="color-filter-btn" data-color="بني" style="background: #8B4513;"></button>
+                        <button class="color-filter-btn" data-color="بيج" style="background: #F5F5DC;"></button>
+                        <button class="color-filter-btn" data-color="أزرق" style="background: #4A90E2;"></button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3 class="filter-title">
+                        <i class="fas fa-box"></i> التوفر
+                    </h3>
+                    <label class="stock-filter-label">
+                        <input type="checkbox" id="inStockOnly">
+                        <span>المنتجات المتوفرة فقط</span>
+                    </label>
+                </div>
+                <div class="filter-actions">
+                    <button class="apply-filters-btn" data-action="apply-filters">
+                        <i class="fas fa-check"></i> تطبيق الفلاتر
+                    </button>
+                    <button class="reset-filters-btn" data-action="reset-filters">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Checkout Modal -->
-    <div class="checkout-overlay" id="checkoutOverlay" data-action="close-checkout" aria-hidden="true"></div>
+    <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true"></div>
     <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إتمام الطلب" aria-modal="true">
         <div class="checkout-header">
             <h3><i class="fas fa-shopping-bag"></i> إتمام الطلب</h3>
@@ -570,12 +648,16 @@
                 <div class="checkout-items" id="checkoutItems"></div>
                 <div class="checkout-totals">
                     <div class="checkout-row">
-                        <span>المجموع الفرعي:</span>
+                        <span>المجموع:</span>
                         <span id="checkoutSubtotal">0 ر.س</span>
                     </div>
                     <div class="checkout-row discount">
                         <span>الخصم:</span>
                         <span id="checkoutDiscount">0 ر.س</span>
+                    </div>
+                    <div class="checkout-row">
+                        <span>الشحن:</span>
+                        <span id="checkoutShipping">0 ر.س</span>
                     </div>
                     <div class="checkout-row total">
                         <span>الإجمالي:</span>
@@ -588,19 +670,27 @@
                 <form id="checkoutForm" data-action="submit-order">
                     <div class="form-group">
                         <label for="checkoutName"><i class="fas fa-user"></i> الاسم الكامل</label>
-                        <input type="text" id="checkoutName" required placeholder="أدخل اسمك الكامل">
+                        <input type="text" id="checkoutName" required placeholder="أدخل اسمك">
                     </div>
                     <div class="form-group">
                         <label for="checkoutPhone"><i class="fas fa-phone"></i> رقم الهاتف</label>
                         <input type="tel" id="checkoutPhone" required placeholder="05xxxxxxxx">
                     </div>
                     <div class="form-group">
-                        <label for="checkoutAddress"><i class="fas fa-map-marker-alt"></i> عنوان التوصيل</label>
-                        <textarea id="checkoutAddress" required rows="3" placeholder="المدينة - الحي - الشارع - رقم المبنى"></textarea>
+                        <label for="shippingCity"><i class="fas fa-map-marker-alt"></i> المدينة</label>
+                        <select id="shippingCity" required>
+                            <option value="">اختر المدينة</option>
+                            <option value="الرياض">الرياض (شحن مجاني)</option>
+                            <option value="جدة">جدة (30 ر.س)</option>
+                            <option value="الدمام">الدمام (40 ر.س)</option>
+                            <option value="مكة">مكة (25 ر.س)</option>
+                            <option value="المدينة">المدينة (35 ر.س)</option>
+                            <option value="أخرى">مدن أخرى (50 ر.س)</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="checkoutNotes"><i class="fas fa-sticky-note"></i> ملاحظات (اختياري)</label>
-                        <textarea id="checkoutNotes" rows="2" placeholder="أي ملاحظات إضافية للطلب"></textarea>
+                        <label for="checkoutAddress"><i class="fas fa-home"></i> عنوان التوصيل</label>
+                        <textarea id="checkoutAddress" required rows="3" placeholder="الحي - الشارع - رقم المبنى"></textarea>
                     </div>
                     <button type="submit" class="submit-order-btn">
                         <i class="fas fa-check"></i> تأكيد الطلب
@@ -610,6 +700,11 @@
         </div>
     </div>
 
-    <script src="js/script.js" defer></script>
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" data-action="scroll-top" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="js/enhanced-script.js"></script>
 </body>
 </html>
