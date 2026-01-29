@@ -1,4 +1,4 @@
-// متغيرات عامة
+// ==================== Global Variables ====================
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600';
 const BODY_SCROLL_LOCK_CLASS = 'no-scroll';
 const STORAGE_KEYS = {
@@ -6,18 +6,17 @@ const STORAGE_KEYS = {
     wishlist: 'wishlist',
     theme: 'theme',
     compare: 'compare',
-    reviews: 'reviews',
-    priceAlerts: 'priceAlerts'
+    reviews: 'reviews'
 };
 const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
 
+// ==================== Utility Functions ====================
 function debugLog(...args) {
     if (DEBUG_MODE) {
         console.log('[DEBUG]', ...args);
     }
 }
 
-// دوال مساعدة
 function normalizeSearchText(text) {
     return String(text || '')
         .toLowerCase()
@@ -98,7 +97,7 @@ function validatePhone(phone) {
     return /^[\d\s\-+()]{9,}$/.test(phone);
 }
 
-// قائمة المنتجات الموسّعة
+// ==================== Products Data ====================
 const products = [
     // غرف المعيشة
     {
@@ -165,7 +164,6 @@ const products = [
         inStock: true,
         tags: ['كرسي', 'استرخاء', 'مودرن']
     },
-    
     // غرف الطعام
     {
         id: 5,
@@ -213,7 +211,6 @@ const products = [
         inStock: true,
         tags: ['بوفيه', 'تخزين', 'طعام']
     },
-    
     // مقاعد
     {
         id: 8,
@@ -261,7 +258,6 @@ const products = [
         inStock: true,
         tags: ['كرسي', 'مكتب', 'تنفيذي']
     },
-    
     // غرف النوم
     {
         id: 11,
@@ -322,7 +318,6 @@ const products = [
         inStock: true,
         tags: ['كومودينو', 'تخزين', 'جانبي']
     },
-    
     // المكاتب
     {
         id: 15,
@@ -368,7 +363,6 @@ const products = [
         inStock: true,
         tags: ['مكتبة', 'أرفف', 'كتب']
     },
-    
     // إكسسوارات
     {
         id: 18,
@@ -417,6 +411,7 @@ const products = [
     }
 ];
 
+// ==================== State Variables ====================
 let cart = safeParse(STORAGE_KEYS.cart);
 let wishlist = safeParse(STORAGE_KEYS.wishlist);
 let compareList = safeParse(STORAGE_KEYS.compare);
@@ -433,7 +428,7 @@ let activeFilters = {
     sortBy: 'default'
 };
 
-// ========== Toast Notifications ==========
+// ==================== Toast Notifications ====================
 function createToastContainer() {
     let container = document.querySelector('.toast-container');
     if (!container) {
@@ -494,7 +489,7 @@ function showNotification(message, type = 'success') {
     showToast(message, type);
 }
 
-// ========== Accessibility ==========
+// ==================== Accessibility ====================
 function announceToScreenReader(message) {
     let announcer = document.getElementById('sr-announcer');
     if (!announcer) {
@@ -575,7 +570,7 @@ function closeDialog(dialogEl, overlayEl) {
     if (lastFocusedElement) lastFocusedElement.focus();
 }
 
-// ========== Dark Mode ==========
+// ==================== Dark Mode ====================
 function getPreferredTheme() {
     const saved = localStorage.getItem(STORAGE_KEYS.theme);
     if (saved) return saved;
@@ -595,7 +590,44 @@ function toggleTheme() {
     debugLog('toggleTheme', next);
 }
 
-// ========== Advanced Filters ==========
+// ==================== Coupon System ====================
+const COUPONS = {
+    'WELCOME20': { type: 'percent', discount: 20, minAmount: 500 },
+    'SAVE100': { type: 'fixed', discount: 100, minAmount: 1000 },
+    'VIP30': { type: 'percent', discount: 30, minAmount: 2000 }
+};
+
+function applyCoupon() {
+    const input = document.getElementById('couponInput');
+    if (!input) return;
+    
+    const code = input.value.trim().toUpperCase();
+    
+    if (!code) {
+        showNotification('الرجاء إدخال كود الخصم', 'warning');
+        return;
+    }
+    
+    const coupon = COUPONS[code];
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    if (!coupon) {
+        showNotification('كود الخصم غير صحيح', 'error');
+        return;
+    }
+    
+    if (subtotal < coupon.minAmount) {
+        showNotification(`الحد الأدنى للطلب ${formatPrice(coupon.minAmount)}`, 'warning');
+        return;
+    }
+    
+    appliedCoupon = coupon;
+    updateCartTotal();
+    showNotification('تم تطبيق كود الخصم بنجاح!', 'success');
+    input.value = '';
+}
+
+// ==================== Advanced Filters ====================
 function applyFilters() {
     let filtered = [...products];
     
@@ -691,7 +723,7 @@ function resetFilters() {
     showNotification('تم إعادة تعيين الفلاتر', 'info');
 }
 
-// ========== Similar Products ==========
+// ==================== Similar Products ====================
 function getSimilarProducts(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return [];
@@ -746,7 +778,7 @@ function renderSimilarProducts(productId) {
     `).join('');
 }
 
-// ========== Product Details Modal ==========
+// ==================== Product Details Modal ====================
 function openProductDetails(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
@@ -754,11 +786,7 @@ function openProductDetails(productId) {
     const modal = document.getElementById('productDetailsModal');
     const overlay = document.getElementById('productDetailsOverlay');
     
-    if (!modal || !overlay) {
-        // Fallback: open quick view
-        openQuickView(product.name, product.price, product.image, product.category, product.oldPrice, product.badge, product.rating);
-        return;
-    }
+    if (!modal || !overlay) return;
     
     // Fill modal content
     document.getElementById('detailsProductImage').src = product.image;
@@ -813,7 +841,7 @@ function closeProductDetails() {
     closeDialog(modal, overlay);
 }
 
-// ========== Reviews System ==========
+// ==================== Reviews System ====================
 function renderProductReviews(productId) {
     const container = document.getElementById('productReviewsList');
     if (!container) return;
@@ -884,7 +912,7 @@ function submitReview(e) {
     showNotification('تم إضافة تقييمك بنجاح!', 'success');
 }
 
-// ========== Compare System ==========
+// ==================== Compare System ====================
 function addToCompare(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
@@ -1010,7 +1038,7 @@ function closeCompareModal() {
     closeDialog(modal, overlay);
 }
 
-// ========== Shipping Calculator ==========
+// ==================== Shipping Calculator ====================
 const SHIPPING_ZONES = {
     'الرياض': { price: 0, days: '1-2' },
     'جدة': { price: 30, days: '2-3' },
@@ -1043,7 +1071,7 @@ function updateShippingCost() {
     updateCartTotal();
 }
 
-// ========== Cart Functions ==========
+// ==================== Cart Functions ====================
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartCountEl = document.getElementById('cartCount');
@@ -1204,9 +1232,7 @@ function checkout() {
     
     if (modal && overlay) {
         updateCheckoutSummary();
-        overlay.classList.add('active');
-        modal.classList.add('active');
-        setBodyScrollLocked(true);
+        openDialog(modal, overlay);
     } else {
         showNotification('🎉 شكراً لك! سيتم التواصل معك قريباً لتأكيد الطلب.', 'success');
         cart = [];
@@ -1263,9 +1289,7 @@ function updateCheckoutSummary() {
 function closeCheckout() {
     const modal = document.getElementById('checkoutModal');
     const overlay = document.getElementById('checkoutOverlay');
-    if (modal) modal.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-    setBodyScrollLocked(false);
+    closeDialog(modal, overlay);
 }
 
 function submitOrder(e) {
@@ -1311,7 +1335,7 @@ function submitOrder(e) {
     }, 1500);
 }
 
-// ========== Wishlist Functions ==========
+// ==================== Wishlist Functions ====================
 function toggleWishlist() {
     const wishlistOverlay = document.getElementById('wishlistOverlay');
     const wishlistSidebar = document.getElementById('wishlistSidebar');
@@ -1403,7 +1427,7 @@ function removeFromWishlist(index) {
     hydrateHeartsFromWishlist();
 }
 
-// ========== Search Functions ==========
+// ==================== Search Functions ====================
 function toggleSearch() {
     const searchOverlay = document.getElementById('searchOverlay');
     if (!searchOverlay) return;
@@ -1459,19 +1483,7 @@ function performSearch(isSubmit = false) {
     `).join('');
 }
 
-// ========== Quick View ==========
-function openQuickView(name, price, image, category = 'أثاث', oldPrice = null, badge = null, rating = 4.5) {
-    const product = products.find(p => p.name === name);
-    if (product) {
-        openProductDetails(product.id);
-    }
-}
-
-function closeQuickView() {
-    closeProductDetails();
-}
-
-// ========== Other Functions ==========
+// ==================== Other Functions ====================
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -1696,7 +1708,7 @@ function initProductEventDelegation() {
     });
 }
 
-// ========== Global Actions System ==========
+// ==================== Global Actions System ====================
 function initGlobalActions() {
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action]');
@@ -1726,6 +1738,7 @@ function initGlobalActions() {
             case 'cart-decrease': decreaseQty(parseInt(btn.dataset.index)); break;
             case 'cart-remove': removeFromCart(parseInt(btn.dataset.index)); break;
             case 'checkout': checkout(); break;
+            case 'apply-coupon': applyCoupon(); break;
             
             case 'wishlist-remove': removeFromWishlist(parseInt(btn.dataset.index)); break;
             
@@ -1750,7 +1763,7 @@ function initGlobalActions() {
     });
 }
 
-// ========== Filters Modal ==========
+// ==================== Filters Modal ====================
 function toggleFiltersModal() {
     const modal = document.getElementById('filtersModal');
     const overlay = document.getElementById('filtersOverlay');
@@ -1764,7 +1777,7 @@ function toggleFiltersModal() {
     }
 }
 
-// ========== Initialization ==========
+// ==================== Initialization ====================
 function initApp() {
     debugLog('DOMContentLoaded');
     

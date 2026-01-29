@@ -30,6 +30,7 @@
                     <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
                     <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -261,11 +262,73 @@
         </div>
     </section>
 
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header">
+            <h2>آراء عملائنا</h2>
+            <p>شاهد ما يقوله عملاؤنا الراضون عن خدماتنا</p>
+            <div class="line"></div>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">جودة ممتازة وخدمة لا تُضاهى! أثاث بيتي كله من دار الأثاث وأنا راضي جداً عن الاختيار.</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60" class="author-avatar" alt="محمد" loading="lazy" width="60" height="60" decoding="async">
+                    <div class="author-info">
+                        <h4>محمد أحمد</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">توصيل سريع وآمن جداً. المنتجات تطابق الصور بنسبة 100%. متجر موثوق وأنصح به بقوة!</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60" class="author-avatar" alt="فاطمة" loading="lazy" width="60" height="60" decoding="async">
+                    <div class="author-info">
+                        <h4>فاطمة محمود</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">أفضل سعر في السوق مع أفضل جودة! فريق الدعم رد على استفساراتي بسرعة واحترافية.</p>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60" class="author-avatar" alt="علي" loading="lazy" width="60" height="60" decoding="async">
+                    <div class="author-info">
+                        <h4>علي خالد</h4>
+                        <p>مشتري متحقق</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Newsletter -->
     <section class="newsletter">
         <div class="newsletter-content">
             <h2>اشترك في نشرتنا البريدية</h2>
-            <p>احصل على أحدث العروض والمنتجات الجديدة</p>
+            <p>احصل على أحدث العروض والمنتجات الجديدة مباشرة في بريدك الإلكتروني</p>
             <form class="newsletter-form" data-action="subscribe-newsletter">
                 <input type="email" placeholder="أدخل بريدك الإلكتروني" required>
                 <button type="submit">اشترك الآن</button>
@@ -286,6 +349,7 @@
                     <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
                     <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             <div class="footer-column">
@@ -318,6 +382,11 @@
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 دار الأثاث الفاخر. جميع الحقوق محفوظة.</p>
+            <div class="payment-methods">
+                <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" width="48" height="48" loading="lazy" decoding="async">
+                <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MasterCard" width="48" height="48" loading="lazy" decoding="async">
+                <img src="https://img.icons8.com/color/48/000000/apple-pay.png" alt="Apple Pay" width="48" height="48" loading="lazy" decoding="async">
+            </div>
         </div>
     </footer>
     
@@ -388,7 +457,7 @@
         </div>
     </div>
 
-    <!-- Product Details Modal (الجديد) -->
+    <!-- Product Details Modal -->
     <div class="overlay" id="productDetailsOverlay" aria-hidden="true"></div>
     <div class="product-details-modal" id="productDetailsModal" role="dialog" aria-modal="true" aria-hidden="true">
         <button class="modal-close" data-action="close-product-details" aria-label="إغلاق">
