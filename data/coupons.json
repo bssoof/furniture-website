@@ -1,0 +1,24 @@
+﻿[
+  {
+    "code": "WELCOME10",
+    "type": "percent",
+    "value": 10,
+    "minSubtotal": 500,
+    "description": "خصم 10% على أول طلب"
+  },
+  {
+    "code": "ROOM15",
+    "type": "percent",
+    "value": 15,
+    "minSubtotal": 2000,
+    "requiredCategory": "غرف المعيشة",
+    "description": "خصم 15% على منتجات غرف المعيشة"
+  },
+  {
+    "code": "FREESHIP",
+    "type": "shipping",
+    "value": 999,
+    "minSubtotal": 300,
+    "description": "شحن مجاني"
+  }
+]

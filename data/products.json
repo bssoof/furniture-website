@@ -1,0 +1,449 @@
+[
+  {
+    "id": 1,
+    "name": "كنبة مودرن فاخرة",
+    "price": 2799,
+    "oldPrice": 3999,
+    "category": "غرف المعيشة",
+    "badge": "-30%",
+    "image": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500",
+    "rating": 4.5,
+    "reviews": 128,
+    "colors": [
+      "رمادي",
+      "بيج",
+      "أزرق"
+    ],
+    "material": "قماش",
+    "dimensions": "220x90x85 سم",
+    "inStock": true,
+    "tags": [
+      "كنبة",
+      "مودرن",
+      "صالون"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "كنبة زاوية كلاسيكية",
+    "price": 3499,
+    "oldPrice": 4299,
+    "category": "غرف المعيشة",
+    "badge": "-18%",
+    "image": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=500",
+    "rating": 4.7,
+    "reviews": 95,
+    "colors": [
+      "بني",
+      "كريمي"
+    ],
+    "material": "جلد طبيعي",
+    "dimensions": "280x180x90 سم",
+    "inStock": true,
+    "tags": [
+      "كنبة",
+      "زاوية",
+      "كلاسيك"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "طقم كنب 3+2+1",
+    "price": 4999,
+    "oldPrice": 6500,
+    "category": "غرف المعيشة",
+    "badge": "-23%",
+    "image": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500",
+    "rating": 4.8,
+    "reviews": 156,
+    "colors": [
+      "أسود",
+      "رمادي فاتح"
+    ],
+    "material": "قماش وجلد",
+    "dimensions": "طقم كامل",
+    "inStock": true,
+    "tags": [
+      "طقم",
+      "كنب",
+      "مودرن"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "كرسي استرخاء مع مسند قدم",
+    "price": 1299,
+    "oldPrice": 1699,
+    "category": "مقاعد",
+    "badge": "جديد",
+    "image": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500",
+    "rating": 4.6,
+    "reviews": 73,
+    "colors": [
+      "رمادي غامق",
+      "بيج"
+    ],
+    "material": "قماش",
+    "dimensions": "85x90x100 سم",
+    "inStock": true,
+    "tags": [
+      "كرسي",
+      "استرخاء",
+      "مودرن"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "طاولة طعام خشب فاخر",
+    "price": 1899,
+    "oldPrice": 2299,
+    "category": "غرف الطعام",
+    "badge": "جديد",
+    "image": "https://images.unsplash.com/photo-1616362348473-c767bf9eb473?w=500",
+    "rating": 5,
+    "reviews": 95,
+    "colors": [
+      "بني غامق",
+      "عسلي"
+    ],
+    "material": "خشب بلوط",
+    "dimensions": "180x90x75 سم",
+    "inStock": true,
+    "tags": [
+      "طاولة",
+      "طعام",
+      "خشب"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "طاولة طعام رخام مع 6 كراسي",
+    "price": 3299,
+    "oldPrice": 4199,
+    "category": "غرف الطعام",
+    "badge": "-21%",
+    "image": "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=500",
+    "rating": 4.9,
+    "reviews": 142,
+    "colors": [
+      "أبيض",
+      "أسود"
+    ],
+    "material": "رخام وخشب",
+    "dimensions": "200x100x75 سم",
+    "inStock": true,
+    "tags": [
+      "طاولة",
+      "رخام",
+      "فاخر"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "بوفيه طعام عصري",
+    "price": 2199,
+    "category": "غرف الطعام",
+    "image": "https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500",
+    "rating": 4.4,
+    "reviews": 67,
+    "colors": [
+      "بني",
+      "أبيض"
+    ],
+    "material": "خشب MDF",
+    "dimensions": "160x45x85 سم",
+    "inStock": true,
+    "tags": [
+      "بوفيه",
+      "تخزين",
+      "طعام"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "كرسي جلد إيطالي",
+    "price": 1199,
+    "oldPrice": 1499,
+    "category": "مقاعد",
+    "badge": "-20%",
+    "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500",
+    "rating": 4,
+    "reviews": 64,
+    "colors": [
+      "أسود",
+      "بني"
+    ],
+    "material": "جلد طبيعي",
+    "dimensions": "65x70x95 سم",
+    "inStock": true,
+    "tags": [
+      "كرسي",
+      "جلد",
+      "فاخر"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "كرسي هزاز خشبي",
+    "price": 899,
+    "category": "مقاعد",
+    "image": "https://images.unsplash.com/photo-1503602642458-232111445657?w=500",
+    "rating": 4.3,
+    "reviews": 45,
+    "colors": [
+      "خشبي طبيعي"
+    ],
+    "material": "خشب زان",
+    "dimensions": "70x85x105 سم",
+    "inStock": true,
+    "tags": [
+      "كرسي",
+      "هزاز",
+      "كلاسيك"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "كرسي مكتب تنفيذي",
+    "price": 1599,
+    "oldPrice": 1999,
+    "category": "المكاتب",
+    "badge": "-20%",
+    "image": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=500",
+    "rating": 4.7,
+    "reviews": 98,
+    "colors": [
+      "أسود",
+      "رمادي"
+    ],
+    "material": "جلد صناعي",
+    "dimensions": "65x70x120 سم",
+    "inStock": true,
+    "tags": [
+      "كرسي",
+      "مكتب",
+      "تنفيذي"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "سرير فاخر بتصميم عصري",
+    "price": 3999,
+    "oldPrice": 4999,
+    "category": "غرف النوم",
+    "image": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=500",
+    "rating": 4.5,
+    "reviews": 156,
+    "colors": [
+      "رمادي",
+      "بيج"
+    ],
+    "material": "خشب وقماش",
+    "dimensions": "200x180x120 سم",
+    "inStock": true,
+    "tags": [
+      "سرير",
+      "مودرن",
+      "فاخر"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "خزانة ملابس واسعة",
+    "price": 2599,
+    "oldPrice": 2999,
+    "category": "غرف النوم",
+    "image": "https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500",
+    "rating": 4.7,
+    "reviews": 82,
+    "colors": [
+      "أبيض",
+      "بني"
+    ],
+    "material": "خشب MDF",
+    "dimensions": "220x60x200 سم",
+    "inStock": true,
+    "tags": [
+      "خزانة",
+      "ملابس",
+      "تخزين"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "تسريحة مع مرآة",
+    "price": 1499,
+    "category": "غرف النوم",
+    "badge": "جديد",
+    "image": "https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=500",
+    "rating": 4.6,
+    "reviews": 54,
+    "colors": [
+      "أبيض",
+      "وردي فاتح"
+    ],
+    "material": "خشب وزجاج",
+    "dimensions": "120x50x160 سم",
+    "inStock": true,
+    "tags": [
+      "تسريحة",
+      "مرآة",
+      "غرفة نوم"
+    ]
+  },
+  {
+    "id": 14,
+    "name": "كومودينو عصري",
+    "price": 599,
+    "category": "غرف النوم",
+    "image": "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=500",
+    "rating": 4.2,
+    "reviews": 38,
+    "colors": [
+      "أبيض",
+      "رمادي",
+      "خشبي"
+    ],
+    "material": "خشب",
+    "dimensions": "45x40x55 سم",
+    "inStock": true,
+    "tags": [
+      "كومودينو",
+      "تخزين",
+      "جانبي"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "مكتب عمل خشبي",
+    "price": 1499,
+    "category": "المكاتب",
+    "image": "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500",
+    "rating": 4.2,
+    "reviews": 45,
+    "colors": [
+      "بني",
+      "أبيض"
+    ],
+    "material": "خشب",
+    "dimensions": "140x70x75 سم",
+    "inStock": true,
+    "tags": [
+      "مكتب",
+      "عمل",
+      "دراسة"
+    ]
+  },
+  {
+    "id": 16,
+    "name": "مكتب زاوية مع أرفف",
+    "price": 1899,
+    "oldPrice": 2299,
+    "category": "المكاتب",
+    "badge": "-17%",
+    "image": "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=500",
+    "rating": 4.5,
+    "reviews": 71,
+    "colors": [
+      "أبيض",
+      "أسود"
+    ],
+    "material": "خشب وحديد",
+    "dimensions": "150x150x75 سم",
+    "inStock": true,
+    "tags": [
+      "مكتب",
+      "زاوية",
+      "أرفف"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "مكتبة كتب خشبية",
+    "price": 1299,
+    "category": "المكاتب",
+    "image": "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=500",
+    "rating": 4.4,
+    "reviews": 52,
+    "colors": [
+      "بني غامق",
+      "خشبي فاتح"
+    ],
+    "material": "خشب صلب",
+    "dimensions": "180x40x200 سم",
+    "inStock": true,
+    "tags": [
+      "مكتبة",
+      "أرفف",
+      "كتب"
+    ]
+  },
+  {
+    "id": 18,
+    "name": "مرآة حائط ديكور",
+    "price": 499,
+    "category": "إكسسوارات",
+    "badge": "جديد",
+    "image": "https://images.unsplash.com/photo-1618220179428-22790b461013?w=500",
+    "rating": 4.3,
+    "reviews": 67,
+    "colors": [
+      "ذهبي",
+      "فضي",
+      "أسود"
+    ],
+    "material": "زجاج وإطار معدني",
+    "dimensions": "80x80 سم",
+    "inStock": true,
+    "tags": [
+      "مرآة",
+      "ديكور",
+      "حائط"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "طقم طاولات قهوة 3 قطع",
+    "price": 899,
+    "oldPrice": 1199,
+    "category": "غرف المعيشة",
+    "badge": "-25%",
+    "image": "https://images.unsplash.com/photo-1565191999001-551c187427bb?w=500",
+    "rating": 4.6,
+    "reviews": 89,
+    "colors": [
+      "خشبي",
+      "أسود"
+    ],
+    "material": "خشب وحديد",
+    "dimensions": "متدرج الأحجام",
+    "inStock": true,
+    "tags": [
+      "طاولة",
+      "قهوة",
+      "صالون"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "رف حائط عائم",
+    "price": 299,
+    "category": "إكسسوارات",
+    "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500",
+    "rating": 4.1,
+    "reviews": 43,
+    "colors": [
+      "أبيض",
+      "أسود",
+      "خشبي"
+    ],
+    "material": "خشب MDF",
+    "dimensions": "80x25x4 سم",
+    "inStock": true,
+    "tags": [
+      "رف",
+      "حائط",
+      "عائم"
+    ]
+  }
+]
