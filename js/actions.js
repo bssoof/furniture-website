@@ -99,6 +99,105 @@ function updateSearchResults() {
 
 const debouncedSearch = debounce(updateSearchResults, 220);
 
+function getMobileMenuElements() {
+  return {
+    navLinks: document.getElementById("mobileNavLinks") || document.querySelector(".nav-links"),
+    menuButton: document.querySelector(".mobile-menu-btn"),
+    overlay: document.getElementById("mobileMenuOverlay")
+  };
+}
+
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 992px)").matches;
+}
+
+function hasOpenBlockingUi() {
+  return Boolean(
+    document.querySelector(
+      ".cart-sidebar.active, #wishlistSidebar.active, #searchOverlay.active, #filtersModal.active, #compareModal.active, #productDetailsModal.active, #checkoutModal.active"
+    )
+  );
+}
+
+function openMobileMenu() {
+  const { navLinks, menuButton, overlay } = getMobileMenuElements();
+  if (!navLinks || !menuButton || !isMobileViewport()) return;
+
+  navLinks.classList.add("active");
+  navLinks.setAttribute("aria-hidden", "false");
+  menuButton.classList.add("active");
+  menuButton.setAttribute("aria-expanded", "true");
+
+  if (overlay) {
+    overlay.classList.add("active");
+    overlay.setAttribute("aria-hidden", "false");
+  }
+
+  document.body.classList.add("no-scroll");
+}
+
+function closeMobileMenu() {
+  const { navLinks, menuButton, overlay } = getMobileMenuElements();
+  if (!navLinks || !menuButton) return;
+
+  navLinks.classList.remove("active");
+  navLinks.setAttribute("aria-hidden", isMobileViewport() ? "true" : "false");
+  menuButton.classList.remove("active");
+  menuButton.setAttribute("aria-expanded", "false");
+
+  if (overlay) {
+    overlay.classList.remove("active");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  if (!hasOpenBlockingUi()) {
+    document.body.classList.remove("no-scroll");
+  }
+}
+
+function toggleMobileMenu() {
+  const { navLinks } = getMobileMenuElements();
+  if (!navLinks) return;
+
+  if (!isMobileViewport()) {
+    closeMobileMenu();
+    return;
+  }
+
+  if (navLinks.classList.contains("active")) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
+function syncMobileMenuForViewport() {
+  const { navLinks, menuButton, overlay } = getMobileMenuElements();
+  if (!navLinks || !menuButton) return;
+
+  if (isMobileViewport()) {
+    const isOpen = navLinks.classList.contains("active");
+    navLinks.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    menuButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    if (overlay) {
+      overlay.setAttribute("aria-hidden", overlay.classList.contains("active") ? "false" : "true");
+    }
+    return;
+  }
+
+  navLinks.classList.remove("active");
+  navLinks.setAttribute("aria-hidden", "false");
+  menuButton.classList.remove("active");
+  menuButton.setAttribute("aria-expanded", "false");
+  if (overlay) {
+    overlay.classList.remove("active");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+  if (!hasOpenBlockingUi()) {
+    document.body.classList.remove("no-scroll");
+  }
+}
+
 function handleShare(productId) {
   const product = getProductById(productId);
   if (!product) return;
@@ -204,6 +303,10 @@ function submitCheckoutForm(form) {
 }
 
 function handleAction(action, trigger) {
+  if (trigger?.closest("#mobileNavLinks") && action !== "toggle-mobile-menu") {
+    closeMobileMenu();
+  }
+
   switch (action) {
     case "toggle-theme":
       toggleTheme();
@@ -218,8 +321,7 @@ function handleAction(action, trigger) {
       toggleSearch();
       break;
     case "toggle-mobile-menu":
-      document.querySelector(".nav-links")?.classList.toggle("active");
-      document.querySelector(".mobile-menu-btn")?.classList.toggle("active");
+      toggleMobileMenu();
       break;
     case "open-compare":
       if (!state.compare.length) {
@@ -409,6 +511,7 @@ function bindOverlayClicks() {
   const overlayMap = [
     { overlay: "cartOverlay", handler: () => toggleCart() },
     { overlay: "wishlistOverlay", handler: () => toggleWishlist() },
+    { overlay: "mobileMenuOverlay", handler: () => closeMobileMenu() },
     { overlay: "productDetailsOverlay", handler: () => closeProductDetails() },
     { overlay: "searchOverlay", handler: () => toggleSearch() },
     { overlay: "filtersOverlay", handler: () => toggleFiltersModal() },
@@ -440,8 +543,7 @@ function bindKeyboardActions() {
       if (document.querySelector(".cart-sidebar.active")) toggleCart();
       if (document.querySelector("#wishlistSidebar.active")) toggleWishlist();
       if (document.querySelector(".nav-links.active")) {
-        document.querySelector(".nav-links")?.classList.remove("active");
-        document.querySelector(".mobile-menu-btn")?.classList.remove("active");
+        closeMobileMenu();
       }
     }
 
@@ -567,8 +669,9 @@ function bindControlEvents() {
 
       event.preventDefault();
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-      document.querySelector(".nav-links")?.classList.remove("active");
-      document.querySelector(".mobile-menu-btn")?.classList.remove("active");
+      if (isMobileViewport()) {
+        closeMobileMenu();
+      }
     });
   });
 }
@@ -578,6 +681,16 @@ function bindStorageSync() {
     updateAppUi(getCurrentCity());
     refreshProducts();
   });
+}
+
+function bindViewportActions() {
+  const syncOnResize = debounce(() => {
+    syncMobileMenuForViewport();
+  }, 120);
+
+  window.addEventListener("resize", syncOnResize);
+  window.addEventListener("orientationchange", syncOnResize);
+  syncMobileMenuForViewport();
 }
 
 export function initializeInteractions(maxPrice) {
@@ -592,6 +705,7 @@ export function initializeInteractions(maxPrice) {
   bindFormActions();
   bindControlEvents();
   bindStorageSync();
+  bindViewportActions();
   startCountdown();
   debugLog("Interactions bound");
 }

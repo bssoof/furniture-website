@@ -347,6 +347,36 @@ body.no-scroll {
     list-style: none;
 }
 
+.mobile-menu-utility {
+    display: none;
+}
+
+.mobile-utility-btn {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: right;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.mobile-utility-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.mobile-utility-btn i {
+    font-size: 16px;
+}
+
 .nav-links a {
     color: var(--text-primary);
     text-decoration: none;
@@ -379,7 +409,8 @@ body.no-scroll {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
+    flex-shrink: 0;
 }
 
 .nav-btn {
@@ -1413,19 +1444,25 @@ body.no-scroll {
 /* Mobile Menu Button */
 .mobile-menu-btn {
     display: none;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
     gap: 5px;
     background: none;
-    border: none;
+    color: var(--text-primary);
+    border: 1px solid transparent;
+    border-radius: 10px;
     cursor: pointer;
-    padding: 5px;
-    z-index: 1001;
+    padding: 10px;
+    min-width: 44px;
+    min-height: 44px;
+    z-index: 2201;
 }
 
 .mobile-menu-btn span {
-    width: 25px;
+    width: 24px;
     height: 3px;
-    background: white;
+    background: currentColor;
     border-radius: 3px;
     transition: transform 0.3s, opacity 0.3s;
 }
@@ -1440,6 +1477,23 @@ body.no-scroll {
 
 .mobile-menu-btn.active span:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 900;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 /* Wishlist Count */
@@ -1682,27 +1736,82 @@ body.no-scroll {
 }
 
 @media (max-width: 992px) {
+    .nav-main {
+        padding: 12px 16px;
+        gap: 10px;
+    }
+
+    .logo {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .logo-text {
+        font-size: 22px;
+    }
+
     .nav-links {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 80%;
-        max-width: 350px;
+        width: min(86vw, 340px);
         height: 100vh;
         background: var(--dark);
         flex-direction: column;
-        padding: 100px 40px;
-        gap: 25px;
-        transition: right 0.4s;
-        z-index: 1000;
+        align-items: stretch;
+        padding: 96px 20px 28px;
+        gap: 14px;
+        overflow-y: auto;
+        text-align: right;
+        transition: right 0.3s ease;
+        z-index: 2100;
     }
     
     .nav-links.active {
         right: 0;
     }
+
+    .nav-links li {
+        width: 100%;
+    }
     
     .nav-links a {
-        font-size: 20px;
+        display: block;
+        width: 100%;
+        font-size: 18px;
+        padding: 10px 0;
+        text-align: right;
+        color: #fff;
+    }
+
+    .mobile-menu-utility {
+        display: block;
+    }
+
+    .nav-links .mobile-utility-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .nav-actions .desktop-only {
+        display: none;
+    }
+
+    .nav-actions .nav-btn,
+    .nav-actions .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0;
     }
     
     .mobile-menu-btn {
@@ -1716,7 +1825,7 @@ body.no-scroll {
     }
     
     .nav-main {
-        padding: 12px 15px;
+        padding: 12px;
     }
     
     .logo-text {

@@ -84,28 +84,58 @@
                 <div class="logo-icon"><i class="fas fa-couch"></i></div>
                 <div class="logo-text">دار <span>الأثاث</span></div>
             </div>
-            <ul class="nav-links">
+            <ul class="nav-links" id="mobileNavLinks" aria-hidden="false">
                 <li><a href="#home">الرئيسية</a></li>
                 <li><a href="#categories">التصنيفات</a></li>
                 <li><a href="#products">المنتجات</a></li>
                 <li><a href="#offer">العروض</a></li>
                 <li><a href="#contact">اتصل بنا</a></li>
+                <li class="mobile-menu-utility">
+                    <button class="mobile-utility-btn" type="button" data-action="toggle-search" data-mobile-menu="utility" aria-label="فتح البحث">
+                        <span>البحث</span>
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
+                </li>
+                <li class="mobile-menu-utility">
+                    <button class="mobile-utility-btn" type="button" data-action="toggle-wishlist" data-mobile-menu="utility" aria-label="فتح المفضلة">
+                        <span>المفضلة</span>
+                        <i class="fas fa-heart" aria-hidden="true"></i>
+                    </button>
+                </li>
+                <li class="mobile-menu-utility">
+                    <button class="mobile-utility-btn" type="button" data-action="open-filters" data-mobile-menu="utility" aria-label="فتح فلاتر البحث">
+                        <span>الفلاتر</span>
+                        <i class="fas fa-filter" aria-hidden="true"></i>
+                    </button>
+                </li>
+                <li class="mobile-menu-utility">
+                    <button class="mobile-utility-btn" type="button" data-action="open-compare" data-mobile-menu="utility" aria-label="فتح المقارنة">
+                        <span>المقارنة</span>
+                        <i class="fas fa-balance-scale" aria-hidden="true"></i>
+                    </button>
+                </li>
+                <li class="mobile-menu-utility">
+                    <button class="mobile-utility-btn" type="button" data-action="toggle-theme" data-mobile-menu="utility" aria-label="تبديل وضع الألوان">
+                        <span>تبديل الوضع</span>
+                        <i class="fas fa-adjust" aria-hidden="true"></i>
+                    </button>
+                </li>
             </ul>
             <div class="nav-actions">
-                <button class="nav-btn" type="button" data-action="open-filters" title="فلاتر البحث" aria-label="فتح فلاتر البحث">
+                <button class="nav-btn desktop-only" type="button" data-action="open-filters" title="فلاتر البحث" aria-label="فتح فلاتر البحث">
                     <i class="fas fa-filter"></i>
                     <span class="cart-count" id="filterBadge" style="display: none;">0</span>
                 </button>
-                <button class="nav-btn" type="button" data-action="open-compare" title="المقارنة" aria-label="فتح المقارنة">
+                <button class="nav-btn desktop-only" type="button" data-action="open-compare" title="المقارنة" aria-label="فتح المقارنة">
                     <i class="fas fa-balance-scale"></i>
                     <span class="cart-count" id="compareBadge" style="display: none;">0</span>
                 </button>
-                <button class="theme-toggle" type="button" data-action="toggle-theme" title="تبديل الوضع الليلي" aria-label="تبديل وضع الألوان">
+                <button class="theme-toggle desktop-only" type="button" data-action="toggle-theme" title="تبديل الوضع الليلي" aria-label="تبديل وضع الألوان">
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
-                <button class="nav-btn" type="button" data-action="toggle-search" aria-label="فتح البحث"><i class="fas fa-search"></i></button>
-                <button class="nav-btn" type="button" data-action="toggle-wishlist" aria-label="فتح المفضلة">
+                <button class="nav-btn desktop-only" type="button" data-action="toggle-search" aria-label="فتح البحث"><i class="fas fa-search"></i></button>
+                <button class="nav-btn desktop-only" type="button" data-action="toggle-wishlist" aria-label="فتح المفضلة">
                     <i class="fas fa-heart"></i>
                     <span class="cart-count" id="wishlistCount">0</span>
                 </button>
@@ -113,7 +143,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </button>
-                <button class="mobile-menu-btn" type="button" data-action="toggle-mobile-menu" aria-label="فتح القائمة">
+                <button class="mobile-menu-btn" type="button" data-action="toggle-mobile-menu" aria-label="فتح القائمة" aria-controls="mobileNavLinks" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -121,6 +151,7 @@
             </div>
         </div>
     </nav>
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true"></div>
 
     <!-- Main Content -->
     <main id="main-content">
