@@ -516,8 +516,12 @@ function bindControlEvents() {
 
   document.querySelectorAll(".filter-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
-      document.querySelectorAll(".filter-tab").forEach((item) => item.classList.remove("active"));
+      document.querySelectorAll(".filter-tab").forEach((item) => {
+        item.classList.remove("active");
+        item.setAttribute("aria-selected", "false");
+      });
       tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
       state.activeFilters.category = tab.dataset.filter;
       applyFiltersAndRender();
     });

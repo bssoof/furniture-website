@@ -251,6 +251,8 @@ export function renderProducts(products) {
   const grid = byId("productsGrid");
   if (!grid) return;
 
+  announceToScreenReader(`تم عرض ${products.length} منتج`);
+
   if (!products.length) {
     grid.innerHTML = '<p class="ui-empty-state products-empty">لا توجد منتجات مطابقة</p>';
     return;

@@ -1888,6 +1888,22 @@ body.no-scroll {
     .product-image {
         height: 220px;
     }
+    
+    .section-title {
+        font-size: 22px;
+    }
+}
+
+/* Touch-friendly targets */
+@media (pointer: coarse) {
+    button,
+    .filter-tab,
+    .nav-links a,
+    .back-to-top,
+    .social-links a {
+        min-height: 44px;
+        min-width: 44px;
+    }
 }
 
 /* Animations */
