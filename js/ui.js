@@ -5,6 +5,7 @@ import { trackEvent } from "./analytics.js";
 
 const BODY_SCROLL_LOCK_CLASS = "no-scroll";
 const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+const IMAGE_FALLBACK_SRC = "assets/images/hero-sofa-560.webp";
 
 let lastFocusedElement = null;
 
@@ -59,7 +60,7 @@ function buildOptimizedImageUrl(url, width, quality = 72) {
   return parsed.toString();
 }
 
-function buildImageAttributes(url, widths, sizes, quality = 72) {
+function buildImageAttributes(url, widths, sizes, quality = 50) {
   const safeUrl = String(url || "");
   if (!safeUrl) return { src: "", srcset: "", sizes: "" };
 
@@ -83,10 +84,12 @@ function buildImageAttributes(url, widths, sizes, quality = 72) {
 }
 
 function imageAttrsToString(attrs) {
-  if (!attrs?.src) return "";
+  if (!attrs?.src) return `src="${IMAGE_FALLBACK_SRC}"`;
   const parts = [`src="${escapeHTML(attrs.src)}"`];
   if (attrs.srcset) parts.push(`srcset="${escapeHTML(attrs.srcset)}"`);
   if (attrs.sizes) parts.push(`sizes="${escapeHTML(attrs.sizes)}"`);
+  parts.push(`data-fallback-src="${escapeHTML(IMAGE_FALLBACK_SRC)}"`);
+  parts.push('onerror="this.onerror=null;this.src=this.dataset.fallbackSrc||\'assets/images/hero-sofa-560.webp\';this.srcset=\'\';"');
   return parts.join(" ");
 }
 
@@ -532,6 +535,12 @@ export function openProductDetails(productId) {
   image.alt = product.name;
   image.width = 620;
   image.height = 460;
+  image.dataset.fallbackSrc = IMAGE_FALLBACK_SRC;
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = IMAGE_FALLBACK_SRC;
+    image.removeAttribute("srcset");
+  };
 
   byId("detailsProductName").textContent = product.name;
   byId("detailsProductCategory").textContent = product.category;
@@ -818,48 +827,54 @@ export function initFloatingCartButton() {
     `;
     document.body.appendChild(container);
   }
-
-  const fabCart = qs(".fab-cart");
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (window.scrollY > 600) {
-        fabCart?.classList.add("visible");
-      } else {
-        fabCart?.classList.remove("visible");
-      }
-    },
-    { passive: true }
-  );
 }
 
 export function initScrollEnhancements() {
   const progressBar = byId("scrollProgress");
   const backToTop = byId("backToTop");
+  const fabCart = qs(".fab-cart");
+  let ticking = false;
 
   window.addEventListener(
     "scroll",
     () => {
-      const scrollTop = window.scrollY;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-      if (progressBar) progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-      if (backToTop) {
-        if (scrollTop > 500) {
-          backToTop.classList.add("visible");
-        } else {
-          backToTop.classList.remove("visible");
+        if (progressBar) {
+          const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+          progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
         }
-      }
+
+        if (backToTop) {
+          backToTop.classList.toggle("visible", scrollTop > 500);
+        }
+
+        if (fabCart) {
+          fabCart.classList.toggle("visible", scrollTop > 600);
+        }
+
+        ticking = false;
+      });
     },
     { passive: true }
   );
 }
 
 export function startCountdown() {
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 5);
+  const STORAGE_KEY = 'fw_v2:countdown_end';
+  let saved = localStorage.getItem(STORAGE_KEY);
+  let endDate;
+  if (saved && new Date(saved).getTime() > Date.now()) {
+    endDate = new Date(saved);
+  } else {
+    endDate = new Date();
+    endDate.setDate(endDate.getDate() + 5);
+    localStorage.setItem(STORAGE_KEY, endDate.toISOString());
+  }
 
   const render = () => {
     const distance = endDate.getTime() - Date.now();
@@ -923,4 +938,3 @@ export function syncFilterControlStates() {
   const stock = byId("inStockOnly");
   if (stock) stock.checked = Boolean(state.activeFilters.inStock);
 }
-

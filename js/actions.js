@@ -405,6 +405,27 @@ function bindClickActions() {
   });
 }
 
+function bindOverlayClicks() {
+  const overlayMap = [
+    { overlay: "cartOverlay", handler: () => toggleCart() },
+    { overlay: "wishlistOverlay", handler: () => toggleWishlist() },
+    { overlay: "productDetailsOverlay", handler: () => closeProductDetails() },
+    { overlay: "searchOverlay", handler: () => toggleSearch() },
+    { overlay: "filtersOverlay", handler: () => toggleFiltersModal() },
+    { overlay: "compareOverlay", handler: () => closeCompareModal() },
+    { overlay: "checkoutOverlay", handler: () => closeCheckoutModal() },
+  ];
+
+  overlayMap.forEach(({ overlay, handler }) => {
+    const el = document.getElementById(overlay);
+    if (el) {
+      el.addEventListener("click", (event) => {
+        if (event.target === el) handler();
+      });
+    }
+  });
+}
+
 function bindKeyboardActions() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -562,6 +583,7 @@ export function initializeInteractions(maxPrice) {
   refreshProducts();
   updateAppUi(getCurrentCity());
   bindClickActions();
+  bindOverlayClicks();
   bindKeyboardActions();
   bindFormActions();
   bindControlEvents();

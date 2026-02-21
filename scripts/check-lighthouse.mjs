@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import net from "node:net";
 
 const root = process.cwd();
 const artifactsDir = path.join(root, "artifacts");
 const reportPath = path.join(artifactsDir, "lighthouse-report.json");
-const serverUrl = "http://127.0.0.1:4173/";
 
 const thresholds = {
   performance: 0.85,
@@ -104,6 +104,25 @@ function formatScore(value) {
   return value.toFixed(2);
 }
 
+function getAvailablePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : null;
+      server.close(() => {
+        if (!port) {
+          reject(new Error("Failed to allocate local port for Lighthouse server."));
+          return;
+        }
+        resolve(port);
+      });
+    });
+  });
+}
+
 async function main() {
   fs.mkdirSync(artifactsDir, { recursive: true });
 
@@ -111,9 +130,12 @@ async function main() {
     fs.rmSync(reportPath);
   }
 
-  const serverProcess = spawn("npx http-server -p 4173 .", {
+  const port = Number(process.env.LH_PORT) || await getAvailablePort();
+  const serverUrl = `http://127.0.0.1:${port}/`;
+  const httpServerBin = path.join(root, "node_modules", "http-server", "bin", "http-server");
+
+  const serverProcess = spawn(process.execPath, [httpServerBin, "-p", String(port), "."], {
     cwd: root,
-    shell: true,
     stdio: ["ignore", "pipe", "pipe"]
   });
 
