@@ -1,7 +1,0 @@
-index.html
-css/
-js/
-data/
-scripts/
-tests/
-docs/
