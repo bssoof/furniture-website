@@ -343,6 +343,32 @@ body.no-scroll {
     list-style: none;
 }
 
+.mobile-menu-utilities {
+    display: none;
+}
+
+.mobile-menu-utility-btn {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.mobile-menu-utility-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
 .nav-links a {
     color: var(--text-primary);
     text-decoration: none;
@@ -2183,6 +2209,10 @@ body.no-scroll {
     transform: rotate(-45deg) translate(7px, -6px);
 }
 
+.mobile-menu-overlay {
+    z-index: 999;
+}
+
 /* Wishlist Count */
 .wishlist-count {
     position: absolute;
@@ -2445,6 +2475,16 @@ body.no-scroll {
         z-index: 1000;
         box-shadow: -5px 0 30px rgba(0,0,0,0.3);
         overflow-y: auto;
+    }
+
+    .mobile-menu-utilities {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        list-style: none;
+        margin-top: 10px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
     }
     
     .nav-links.active {

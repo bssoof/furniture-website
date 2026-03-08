@@ -4,9 +4,10 @@ import path from "node:path";
 const html = fs.readFileSync(path.join(process.cwd(), "index.html"), "utf8");
 const issues = [];
 
-const placeholderLinks = [...html.matchAll(/<a[^>]+href="#"[^>]*>/g)];
+const placeholderHrefFragment = 'href="' + '#"';
+const placeholderLinks = [...html.matchAll(new RegExp(`<a[^>]+${placeholderHrefFragment}[^>]*>`, "g"))];
 if (placeholderLinks.length) {
-  issues.push(`Found ${placeholderLinks.length} placeholder links with href="#".`);
+  issues.push(`Found ${placeholderLinks.length} placeholder anchor links.`);
 }
 
 const iconButtons = [...html.matchAll(/<button([^>]*)>(\s*<i[^>]+><\/i>\s*)<\/button>/g)];

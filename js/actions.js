@@ -287,7 +287,7 @@ function submitCheckoutForm(form) {
     return;
   }
 
-  showToast("تم تحويلك إلى واتساب لإكمال الطلب", "success");
+  showToast("تم فتح واتساب لإرسال طلبك", "success");
   form.reset();
   closeCheckoutModal();
   if (document.querySelector(".cart-sidebar.active")) {

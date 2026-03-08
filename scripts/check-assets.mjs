@@ -11,8 +11,16 @@ function isLocal(value) {
   return !/^(https?:|#|mailto:|tel:|javascript:)/i.test(value);
 }
 
+function normalizeAssetPath(relativePath) {
+  return String(relativePath || "")
+    .split(/[?#]/)[0]
+    .replace(/\\/g, "/")
+    .replace(/^\//, "");
+}
+
 function ensureExists(relativePath) {
-  const normalized = relativePath.replace(/\\/g, "/");
+  const normalized = normalizeAssetPath(relativePath);
+  if (!normalized) return path.resolve(root);
   const absolutePath = path.resolve(root, normalized);
   if (!fs.existsSync(absolutePath)) {
     missing.add(normalized);
@@ -22,11 +30,11 @@ function ensureExists(relativePath) {
 
 function collectHtmlAssets() {
   const refs = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map((m) => m[1]);
-  return refs.filter(isLocal);
+  return refs.filter(isLocal).map((value) => normalizeAssetPath(value)).filter(Boolean);
 }
 
 function collectJsDependencies(entryRelativePath, visited = new Set()) {
-  const normalized = entryRelativePath.replace(/\\/g, "/");
+  const normalized = normalizeAssetPath(entryRelativePath);
   if (visited.has(normalized)) return [];
   visited.add(normalized);
 
@@ -40,7 +48,7 @@ function collectJsDependencies(entryRelativePath, visited = new Set()) {
   importMatches
     .filter((value) => isLocal(value) && !value.startsWith("/"))
     .forEach((relative) => {
-      const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(normalized), relative));
+      const resolved = normalizeAssetPath(path.posix.normalize(path.posix.join(path.posix.dirname(normalized), relative)));
       deps.push(resolved);
     });
 
@@ -48,9 +56,9 @@ function collectJsDependencies(entryRelativePath, visited = new Set()) {
   fetchMatches
     .filter((value) => isLocal(value))
     .forEach((relative) => {
-      const resolved = relative.startsWith("/")
+      const resolved = normalizeAssetPath(relative.startsWith("/")
         ? relative.slice(1)
-        : path.posix.normalize(path.posix.join(path.posix.dirname(normalized), relative));
+        : path.posix.normalize(path.posix.join(path.posix.dirname(normalized), relative)));
       deps.push(resolved);
     });
 

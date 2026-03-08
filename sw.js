@@ -1,22 +1,30 @@
-const CACHE_NAME = "dar-furniture-v1";
+const CACHE_NAME = "dar-furniture-v4";
+const SCOPE_URL = new URL(self.registration.scope);
+
+function scopedPath(relativePath) {
+  return new URL(relativePath, SCOPE_URL).pathname;
+}
+
+const INDEX_FALLBACK = scopedPath("./index.html");
 const STATIC_ASSETS = [
-  "/",
-  "/index.html",
-  "/css/style.css",
-  "/js/script.js",
-  "/js/state.js",
-  "/js/catalog.js",
-  "/js/cart.js",
-  "/js/commerce.js",
-  "/js/checkout.js",
-  "/js/ui.js",
-  "/js/actions.js",
-  "/js/analytics.js",
-  "/data/products.json",
-  "/manifest.json",
-  "/assets/images/hero-sofa-360.webp",
-  "/assets/images/hero-sofa-560.webp",
-  "/assets/images/hero-sofa-900.webp"
+  scopedPath("./"),
+  INDEX_FALLBACK,
+  scopedPath("./css/style.css"),
+  scopedPath("./js/main.js"),
+  scopedPath("./js/state.js"),
+  scopedPath("./js/catalog.js"),
+  scopedPath("./js/cart.js"),
+  scopedPath("./js/commerce.js"),
+  scopedPath("./js/checkout.js"),
+  scopedPath("./js/ui.js"),
+  scopedPath("./js/actions.js"),
+  scopedPath("./js/analytics.js"),
+  scopedPath("./data/products.json"),
+  scopedPath("./data/coupons.json"),
+  scopedPath("./manifest.json"),
+  scopedPath("./assets/images/hero-sofa-360.webp"),
+  scopedPath("./assets/images/hero-sofa-560.webp"),
+  scopedPath("./assets/images/hero-sofa-900.webp")
 ];
 
 self.addEventListener("install", (event) => {
@@ -47,13 +55,23 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Network-first for navigation with cached homepage fallback
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(() => caches.match(INDEX_FALLBACK))
+    );
+    return;
+  }
+
   // Network-first for API/data requests
   if (request.url.includes("/data/")) {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(request))
@@ -66,8 +84,10 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       caches.match(request).then((cached) => {
         const networkFetch = fetch(request).then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
           return response;
         });
         return cached || networkFetch;

@@ -17,8 +17,8 @@ test("computeSubtotal sums line totals", () => {
   assert.equal(subtotal, 250);
 });
 
-test("calculateShipping returns free zone for Riyadh", () => {
-  const shipping = calculateShipping("الرياض", 2);
+test("calculateShipping returns free zone for القدس", () => {
+  const shipping = calculateShipping("القدس", 2);
   assert.equal(shipping.price, 0);
   assert.equal(shipping.days, "1-2");
 });
@@ -45,22 +45,23 @@ test("calculateCouponDiscount applies shipping coupon", () => {
   assert.equal(discount, 40);
 });
 
-test("computeCartTotals returns consistent total", () => {
+test("computeCartTotals returns consistent total for رام الله shipping", () => {
   const totals = computeCartTotals(
     [
       { price: 200, quantity: 2, category: "غرف المعيشة" },
       { price: 100, quantity: 1, category: "غرف الطعام" }
     ],
-    "جدة",
+    "رام الله",
     { code: "ROOM15", type: "percent", value: 15, requiredCategory: "غرف المعيشة", minSubtotal: 200 },
     {
-      "جدة": { price: 30, days: "2-3" },
-      "أخرى": { price: 50, days: "3-5" }
+      "رام الله": { price: 15, days: "1-2" },
+      "أخرى": { price: 35, days: "3-5" }
     }
   );
 
   assert.equal(totals.subtotal, 500);
   assert.equal(totals.discount, 75);
-  assert.equal(totals.shipping.price, 30);
-  assert.equal(totals.total, 455);
+  assert.equal(totals.shipping.price, 15);
+  assert.equal(totals.shipping.days, "1-2");
+  assert.equal(totals.total, 440);
 });

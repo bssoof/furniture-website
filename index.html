@@ -5,11 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="دار الأثاث الفاخر - أفضل متجر أثاث في فلسطين. تشكيلة واسعة من الأثاث العصري والكلاسيكي بأسعار منافسة وجودة عالية.">
     <title>دار الأثاث الفاخر | أفضل أثاث في فلسطين</title>
+    <link rel="canonical" href="https://bssoof.github.io/furniture-website/">
+    <meta property="og:title" content="دار الأثاث الفاخر | أثاث منزلي ومكتبي في فلسطين">
+    <meta property="og:description" content="تصفح منتجات دار الأثاث الفاخر واطلب الأثاث المنزلي والمكتبي داخل فلسطين عبر واتساب بخطوات واضحة ومباشرة.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bssoof.github.io/furniture-website/">
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "دار الأثاث الفاخر",
+      "url": "https://bssoof.github.io/furniture-website/",
+      "logo": "https://bssoof.github.io/furniture-website/assets/icons/icon-512.svg",
+      "description": "متجر أثاث منزلي ومكتبي في فلسطين مع طلب مباشر عبر واتساب.",
+      "email": "info@darfurniture.com",
+      "telephone": "+972569906492",
+      "areaServed": "PS",
+      "availableLanguage": ["ar"],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+972569906492",
+        "contactType": "customer service",
+        "areaServed": "PS",
+        "availableLanguage": "ar"
+      }
+    }
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
@@ -21,15 +49,9 @@
         <div class="nav-top">
             <div class="nav-top-content">
                 <div class="nav-contact-info">
-                    <i class="fas fa-phone"></i> +970 59 123 4567
+                    <i class="fas fa-phone"></i> +972 56 990 6492
                     <span style="margin: 0 15px;">|</span>
                     <i class="fas fa-envelope"></i> info@darfurniture.com
-                </div>
-                <div class="nav-social-links">
-                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -38,12 +60,34 @@
                 <div class="logo-icon"><i class="fas fa-couch"></i></div>
                 <div class="logo-text">دار <span>الأثاث</span></div>
             </div>
-            <ul class="nav-links">
+            <ul class="nav-links" id="mobileNavLinks" aria-hidden="false">
                 <li><a href="#home">الرئيسية</a></li>
                 <li><a href="#categories">التصنيفات</a></li>
                 <li><a href="#products">المنتجات</a></li>
                 <li><a href="#offer">العروض</a></li>
-                <li><a href="#contact">اتصل بنا</a></li>
+                <li><a href="https://wa.me/972569906492" target="_blank" rel="noopener noreferrer">اتصل بنا</a></li>
+                <li class="mobile-menu-utilities" aria-label="اختصارات القائمة">
+                    <button type="button" class="mobile-menu-utility-btn" data-mobile-menu="utility" data-action="toggle-search">
+                        <i class="fas fa-search"></i>
+                        <span>البحث</span>
+                    </button>
+                    <button type="button" class="mobile-menu-utility-btn" data-mobile-menu="utility" data-action="toggle-wishlist">
+                        <i class="fas fa-heart"></i>
+                        <span>المفضلة</span>
+                    </button>
+                    <button type="button" class="mobile-menu-utility-btn" data-mobile-menu="utility" data-action="open-filters">
+                        <i class="fas fa-filter"></i>
+                        <span>الفلاتر</span>
+                    </button>
+                    <button type="button" class="mobile-menu-utility-btn" data-mobile-menu="utility" data-action="open-compare">
+                        <i class="fas fa-balance-scale"></i>
+                        <span>المقارنة</span>
+                    </button>
+                    <button type="button" class="mobile-menu-utility-btn" data-mobile-menu="utility" data-action="toggle-theme">
+                        <i class="fas fa-adjust"></i>
+                        <span>المظهر</span>
+                    </button>
+                </li>
             </ul>
             <div class="nav-actions">
                 <button class="nav-btn" data-action="open-filters" title="فلاتر البحث">
@@ -58,7 +102,9 @@
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
-                <button class="nav-btn" data-action="toggle-search"><i class="fas fa-search"></i></button>
+                <button class="nav-btn" type="button" data-action="toggle-search" aria-label="فتح البحث">
+                    <i class="fas fa-search"></i>
+                </button>
                 <button class="nav-btn" data-action="toggle-wishlist">
                     <i class="fas fa-heart"></i>
                     <span class="cart-count" id="wishlistCount">0</span>
@@ -67,7 +113,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </button>
-                <button class="mobile-menu-btn" data-action="toggle-mobile-menu">
+                <button class="mobile-menu-btn" type="button" data-action="toggle-mobile-menu" aria-label="فتح القائمة" aria-controls="mobileNavLinks" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -75,6 +121,7 @@
             </div>
         </div>
     </nav>
+    <div class="overlay mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true"></div>
 
     <!-- Main Content -->
     <main id="main-content">
@@ -91,20 +138,6 @@
                         تسوق الآن
                     </a>
                     <a href="#categories" class="btn-secondary">شاهد المجموعات</a>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <div class="stat-number" data-count="15000">0</div>
-                        <div class="stat-label">عميل سعيد</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-count="500">0</div>
-                        <div class="stat-label">منتج فريد</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-count="50">0</div>
-                        <div class="stat-label">فرع</div>
-                    </div>
                 </div>
             </div>
             <div class="hero-image">
@@ -137,18 +170,18 @@
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                <h3>ضمان الجودة</h3>
-                <p>ضمان شامل لمدة 5 سنوات على جميع المنتجات</p>
+                <h3>تفاصيل واضحة</h3>
+                <p>يعرض كل منتج السعر والخامات والتفاصيل الأساسية قبل إرسال الطلب.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-undo"></i></div>
-                <h3>إرجاع سهل</h3>
-                <p>سياسة إرجاع مرنة خلال 30 يوم</p>
+                <h3>طلب مباشر</h3>
+                <p>يمكنك إرسال طلب الشراء عبر واتساب ومراجعة التفاصيل قبل التأكيد.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-headset"></i></div>
-                <h3>دعم 24/7</h3>
-                <p>فريق دعم متاح على مدار الساعة</p>
+                <h3>تواصل مباشر</h3>
+                <p>للاستفسار والمتابعة عبر الهاتف وواتساب.</p>
             </div>
         </div>
     </section>
@@ -335,6 +368,28 @@
         </div>
     </section>
 
+    <section class="contact-section" id="contact">
+        <div class="section-header">
+            <h2>تواصل معنا</h2>
+            <p>لطلب الأثاث أو الاستفسار عن التوصيل داخل فلسطين، تواصل معنا مباشرة عبر واتساب أو الهاتف.</p>
+            <div class="line"></div>
+        </div>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>الهاتف وواتساب</h4>
+                <p><a href="https://wa.me/972569906492" target="_blank" rel="noopener noreferrer">+972 56 990 6492</a></p>
+            </div>
+            <div class="footer-column">
+                <h4>البريد الإلكتروني</h4>
+                <p><a href="mailto:info@darfurniture.com">info@darfurniture.com</a></p>
+            </div>
+            <div class="footer-column">
+                <h4>طريقة الطلب</h4>
+                <p>تصفح المنتجات، أضف ما يناسبك إلى السلة، ثم أرسل طلبك عبر واتساب.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -343,35 +398,21 @@
                     <div class="logo-icon"><i class="fas fa-couch"></i></div>
                     <div class="logo-text">دار <span>الأثاث</span></div>
                 </div>
-                <p>متجر الأثاث الفاخر الأول في فلسطين</p>
-                <div class="social-links">
-                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
-                </div>
+                <p>أثاث منزلي ومكتبي بطلب مباشر عبر واتساب داخل فلسطين</p>
             </div>
             <div class="footer-column">
                 <h4>المتجر</h4>
                 <ul>
-                    <li><a href="#">الرئيسية</a></li>
-                    <li><a href="#">المنتجات</a></li>
-                    <li><a href="#">العروض</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4>خدمات</h4>
-                <ul>
-                    <li><a href="#">الشحن والتوصيل</a></li>
-                    <li><a href="#">الضمان</a></li>
-                    <li><a href="#">سياسة الإرجاع</a></li>
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#products">المنتجات</a></li>
+                    <li><a href="#offer">العروض</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h4>تواصل معنا</h4>
                 <div class="contact-item">
                     <i class="fas fa-phone"></i>
-                    <p>+970 59 123 4567</p>
+                    <p>+972 56 990 6492</p>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-envelope"></i>
@@ -381,11 +422,6 @@
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 دار الأثاث الفاخر. جميع الحقوق محفوظة.</p>
-            <div class="payment-methods">
-                <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" width="48" height="48" loading="lazy" decoding="async">
-                <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MasterCard" width="48" height="48" loading="lazy" decoding="async">
-                <img src="https://img.icons8.com/color/48/000000/apple-pay.png" alt="Apple Pay" width="48" height="48" loading="lazy" decoding="async">
-            </div>
         </div>
     </footer>
     
@@ -426,7 +462,7 @@
             </div>
             <button class="checkout-btn" data-action="checkout">
                 <i class="fas fa-lock"></i>
-                الدفع الآن
+                إرسال الطلب
             </button>
         </div>
     </aside>
@@ -450,7 +486,9 @@
             <h2>ابحث عن منتجاتك</h2>
             <div class="search-input-wrapper">
                 <input type="search" id="searchInput" placeholder="اكتب اسم المنتج...">
-                <button data-action="perform-search"><i class="fas fa-search"></i></button>
+                <button type="button" data-action="perform-search" aria-label="تنفيذ البحث">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
             <div class="search-results" id="searchResults"></div>
         </div>
@@ -479,13 +517,13 @@
                 </div>
                 <div class="details-specs" id="detailsProductSpecs"></div>
                 <div class="details-actions">
-                    <button class="details-add-to-cart" onclick="if(currentQuickViewProduct) addToCart(currentQuickViewProduct.name, currentQuickViewProduct.price, currentQuickViewProduct.image)">
+                    <button class="details-add-to-cart" type="button" data-action="details-add-to-cart">
                         <i class="fas fa-cart-plus"></i> أضف للسلة
                     </button>
-                    <button class="details-add-to-wishlist" onclick="if(currentQuickViewProduct) addToWishlist(currentQuickViewProduct.name, currentQuickViewProduct.price, this, currentQuickViewProduct.image)">
+                    <button class="details-add-to-wishlist" type="button" data-action="details-add-to-wishlist">
                         <i class="fas fa-heart"></i> المفضلة
                     </button>
-                    <button class="details-compare" onclick="if(currentQuickViewProduct) addToCompare(currentQuickViewProduct.id)">
+                    <button class="details-compare" type="button" data-action="details-add-to-compare">
                         <i class="fas fa-balance-scale"></i> مقارنة
                     </button>
                 </div>
@@ -634,9 +672,9 @@
 
     <!-- Checkout Modal -->
     <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true"></div>
-    <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إتمام الطلب" aria-modal="true">
+    <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إرسال طلب الشراء" aria-modal="true">
         <div class="checkout-header">
-            <h3><i class="fas fa-shopping-bag"></i> إتمام الطلب</h3>
+            <h3><i class="fas fa-shopping-bag"></i> إرسال طلب الشراء</h3>
             <button class="close-checkout" data-action="close-checkout" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
@@ -698,8 +736,11 @@
                         <label for="checkoutAddress"><i class="fas fa-home"></i> عنوان التوصيل</label>
                         <textarea id="checkoutAddress" required rows="3" placeholder="الحي - الشارع - رقم المبنى"></textarea>
                     </div>
+                    <p class="checkout-note" style="margin: 12px 0 16px; color: var(--text-secondary); font-size: 0.95rem;">
+                        لن يتم الدفع إلكترونيًا. سيتم فتح واتساب لإرسال طلبك.
+                    </p>
                     <button type="submit" class="submit-order-btn">
-                        <i class="fas fa-check"></i> تأكيد الطلب
+                        <i class="fab fa-whatsapp"></i> إرسال الطلب عبر واتساب
                     </button>
                 </form>
             </div>
@@ -739,6 +780,6 @@
         </div>
     </nav>
 
-    <script src="js/script.js?v=2"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

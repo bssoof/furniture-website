@@ -1,8 +1,9 @@
 {
   "name": "دار الأثاث الفاخر",
   "short_name": "دار الأثاث",
-  "description": "أفضل متجر أثاث في المملكة العربية السعودية - تشكيلة واسعة من الأثاث العصري والكلاسيكي",
-  "start_url": "/",
+  "description": "أفضل متجر أثاث في فلسطين - تشكيلة واسعة من الأثاث العصري والكلاسيكي",
+  "start_url": "/furniture-website/",
+  "scope": "/furniture-website/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2D6A4F",

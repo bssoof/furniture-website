@@ -5,6 +5,8 @@ const root = process.cwd();
 const htmlPath = path.join(root, "index.html");
 const robotsPath = path.join(root, "robots.txt");
 const sitemapPath = path.join(root, "sitemap.xml");
+const siteUrl = "https://bssoof.github.io/furniture-website/";
+const sitemapUrl = `${siteUrl}sitemap.xml`;
 
 const html = fs.readFileSync(htmlPath, "utf8");
 
@@ -22,7 +24,7 @@ const missing = requiredPatterns
   .map((item) => item.label);
 
 const canonicalMatch = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i);
-if (!canonicalMatch || !/^https:\/\/darfurniture\.com\/?$/i.test(canonicalMatch[1])) {
+if (!canonicalMatch || canonicalMatch[1].trim() !== siteUrl) {
   missing.push("canonical-domain");
 }
 
@@ -30,7 +32,7 @@ if (!fs.existsSync(robotsPath)) {
   missing.push("robots.txt");
 } else {
   const robots = fs.readFileSync(robotsPath, "utf8");
-  if (!/Sitemap:\s*https:\/\/darfurniture\.com\/sitemap\.xml/i.test(robots)) {
+  if (!robots.includes(`Sitemap: ${sitemapUrl}`)) {
     missing.push("robots-sitemap-reference");
   }
 }
@@ -45,7 +47,7 @@ if (!fs.existsSync(sitemapPath)) {
   }
 
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gi)].map((m) => m[1].trim());
-  if (!locations.includes("https://darfurniture.com/")) {
+  if (!locations.includes(siteUrl)) {
     missing.push("sitemap-root-url");
   }
   if (locations.some((loc) => loc.includes("#"))) {

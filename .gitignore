@@ -17,3 +17,8 @@ Desktop.ini
 # Temp files
 *.tmp
 *.bak
+
+# Dependencies and generated output
+node_modules/
+dist/
+test-results/
