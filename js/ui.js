@@ -39,7 +39,7 @@ export function escapeHTML(text) {
 }
 
 export function formatPrice(value) {
-  return `${Number(value || 0).toLocaleString()} ر.س`;
+  return `${Number(value || 0).toLocaleString()} ₪`;
 }
 
 function isUnsplashImage(url) {

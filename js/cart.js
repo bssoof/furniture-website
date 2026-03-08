@@ -85,7 +85,7 @@ export function applyCouponCode(code, city) {
     clearAppliedCoupon();
     return {
       ok: false,
-      message: `الحد الأدنى لتفعيل الكود هو ${toNumber(coupon.minSubtotal).toLocaleString()} ر.س`
+      message: `الحد الأدنى لتفعيل الكود هو ${toNumber(coupon.minSubtotal).toLocaleString()} ₪`
     };
   }
 

@@ -1,10 +1,17 @@
 ﻿export const DEFAULT_SHIPPING_ZONES = {
-  "الرياض": { price: 0, days: "1-2" },
-  "جدة": { price: 30, days: "2-3" },
-  "الدمام": { price: 40, days: "2-3" },
-  "مكة": { price: 25, days: "2-3" },
-  "المدينة": { price: 35, days: "3-4" },
-  "أخرى": { price: 50, days: "3-5" }
+  "القدس": { price: 0, days: "1-2" },
+  "رام الله": { price: 15, days: "1-2" },
+  "بيت لحم": { price: 15, days: "1-2" },
+  "نابلس": { price: 20, days: "2-3" },
+  "الخليل": { price: 20, days: "2-3" },
+  "أريحا": { price: 20, days: "2-3" },
+  "جنين": { price: 25, days: "2-3" },
+  "طولكرم": { price: 25, days: "2-3" },
+  "قلقيلية": { price: 25, days: "2-3" },
+  "سلفيت": { price: 25, days: "2-3" },
+  "طوباس": { price: 30, days: "3-4" },
+  "غزة": { price: 40, days: "4-6" },
+  "أخرى": { price: 35, days: "3-5" }
 };
 
 function toNumber(value, fallback = 0) {
@@ -23,8 +30,8 @@ export function computeSubtotal(items = []) {
 
 export function calculateShipping(city, itemCount, zones = DEFAULT_SHIPPING_ZONES) {
   if (!itemCount) return { price: 0, days: "1-2" };
-  if (!city) return { ...(zones["أخرى"] || { price: 50, days: "3-5" }) };
-  return { ...(zones[city] || zones["أخرى"] || { price: 50, days: "3-5" }) };
+  if (!city) return { ...(zones["أخرى"] || { price: 35, days: "3-5" }) };
+  return { ...(zones[city] || zones["أخرى"] || { price: 35, days: "3-5" }) };
 }
 
 export function isCouponExpired(coupon, now = Date.now()) {

@@ -4,4 +4,4 @@ Disallow: /node_modules/
 Disallow: /tests/
 Disallow: /scripts/
 
-Sitemap: https://darfurniture.com/sitemap.xml
+Sitemap: https://bssoof.github.io/furniture-website/sitemap.xml
