@@ -48,6 +48,12 @@ import { trackEvent } from "./analytics.js";
 
 let maxCatalogPrice = 10000;
 
+function setElementAccessibilityState(element, hidden) {
+  if (!element) return;
+  element.setAttribute("aria-hidden", hidden ? "true" : "false");
+  element.hidden = hidden;
+}
+
 function getCurrentCity() {
   return document.getElementById("shippingCity")?.value || "";
 }
@@ -68,7 +74,9 @@ function resetFilters() {
   };
 
   document.querySelectorAll(".filter-tab").forEach((tab) => {
-    tab.classList.toggle("active", tab.dataset.filter === "all");
+    const isActive = tab.dataset.filter === "all";
+    tab.classList.toggle("active", isActive);
+    tab.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
   const sortDropdown = document.getElementById("sortProducts");
@@ -114,9 +122,67 @@ function isMobileViewport() {
 function hasOpenBlockingUi() {
   return Boolean(
     document.querySelector(
-      ".cart-sidebar.active, #wishlistSidebar.active, #searchOverlay.active, #filtersModal.active, #compareModal.active, #productDetailsModal.active, #checkoutModal.active"
+      ".cart-sidebar.active, #wishlistSidebar.active, #searchOverlay.active, #filtersModal.active, #compareModal.active, #productDetailsModal.active, #checkoutModal.active, .nav-links.active"
     )
   );
+}
+
+function syncBlockingUiStates() {
+  const dialogStateMap = [
+    { elementId: "cartSidebar", overlayId: "cartOverlay" },
+    { elementId: "wishlistSidebar", overlayId: "wishlistOverlay" },
+    { elementId: "searchOverlay" },
+    { elementId: "filtersModal", overlayId: "filtersOverlay" },
+    { elementId: "compareModal", overlayId: "compareOverlay" },
+    { elementId: "productDetailsModal", overlayId: "productDetailsOverlay" },
+    { elementId: "checkoutModal", overlayId: "checkoutOverlay" }
+  ];
+
+  dialogStateMap.forEach(({ elementId, overlayId }) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      setElementAccessibilityState(element, !element.classList.contains("active"));
+    }
+
+    if (overlayId) {
+      const overlay = document.getElementById(overlayId);
+      if (overlay) {
+        setElementAccessibilityState(overlay, !overlay.classList.contains("active"));
+      }
+    }
+  });
+
+  const activeDialog = document.querySelector(
+    ".cart-sidebar.active, #wishlistSidebar.active, #searchOverlay.active, #filtersModal.active, #compareModal.active, #productDetailsModal.active, #checkoutModal.active"
+  );
+
+  if (activeDialog?.id === "searchOverlay") {
+    requestAnimationFrame(() => {
+      document.getElementById("searchInput")?.focus();
+    });
+  } else if (activeDialog && !activeDialog.contains(document.activeElement)) {
+    const firstFocusable = activeDialog.querySelector(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    requestAnimationFrame(() => {
+      firstFocusable?.focus();
+    });
+  }
+
+  document.body.classList.toggle("no-scroll", hasOpenBlockingUi());
+}
+
+function scrollToSection(sectionId) {
+  const target = document.getElementById(sectionId);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function setActiveMobileNav(action) {
+  document.querySelectorAll(".mobile-nav-item").forEach((item) => {
+    item.classList.toggle("active", item.dataset.action === action);
+  });
 }
 
 function openMobileMenu() {
@@ -124,13 +190,13 @@ function openMobileMenu() {
   if (!navLinks || !menuButton || !isMobileViewport()) return;
 
   navLinks.classList.add("active");
-  navLinks.setAttribute("aria-hidden", "false");
+  setElementAccessibilityState(navLinks, false);
   menuButton.classList.add("active");
   menuButton.setAttribute("aria-expanded", "true");
 
   if (overlay) {
     overlay.classList.add("active");
-    overlay.setAttribute("aria-hidden", "false");
+    setElementAccessibilityState(overlay, false);
   }
 
   document.body.classList.add("no-scroll");
@@ -141,13 +207,13 @@ function closeMobileMenu() {
   if (!navLinks || !menuButton) return;
 
   navLinks.classList.remove("active");
-  navLinks.setAttribute("aria-hidden", isMobileViewport() ? "true" : "false");
+  setElementAccessibilityState(navLinks, isMobileViewport());
   menuButton.classList.remove("active");
   menuButton.setAttribute("aria-expanded", "false");
 
   if (overlay) {
     overlay.classList.remove("active");
-    overlay.setAttribute("aria-hidden", "true");
+    setElementAccessibilityState(overlay, true);
   }
 
   if (!hasOpenBlockingUi()) {
@@ -177,21 +243,21 @@ function syncMobileMenuForViewport() {
 
   if (isMobileViewport()) {
     const isOpen = navLinks.classList.contains("active");
-    navLinks.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    setElementAccessibilityState(navLinks, !isOpen);
     menuButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
     if (overlay) {
-      overlay.setAttribute("aria-hidden", overlay.classList.contains("active") ? "false" : "true");
+      setElementAccessibilityState(overlay, !overlay.classList.contains("active"));
     }
     return;
   }
 
   navLinks.classList.remove("active");
-  navLinks.setAttribute("aria-hidden", "false");
+  setElementAccessibilityState(navLinks, false);
   menuButton.classList.remove("active");
   menuButton.setAttribute("aria-expanded", "false");
   if (overlay) {
     overlay.classList.remove("active");
-    overlay.setAttribute("aria-hidden", "true");
+    setElementAccessibilityState(overlay, true);
   }
   if (!hasOpenBlockingUi()) {
     document.body.classList.remove("no-scroll");
@@ -307,6 +373,10 @@ function handleAction(action, trigger) {
     closeMobileMenu();
   }
 
+  if (trigger?.classList.contains("mobile-nav-item")) {
+    setActiveMobileNav(action);
+  }
+
   switch (action) {
     case "toggle-theme":
       toggleTheme();
@@ -388,6 +458,7 @@ function handleAction(action, trigger) {
       const id = Number(state.currentProductId);
       const added = toggleWishlistItem(id);
       const product = getProductById(id);
+      trigger.setAttribute("aria-pressed", added ? "true" : "false");
       showToast(added ? `تمت إضافة ${product?.name || "المنتج"} إلى المفضلة` : `تمت إزالة ${product?.name || "المنتج"} من المفضلة`, added ? "success" : "info");
       updateAppUi(getCurrentCity());
       refreshProducts();
@@ -396,6 +467,7 @@ function handleAction(action, trigger) {
     case "details-add-to-compare": {
       const id = Number(state.currentProductId);
       const result = toggleCompareItem(id);
+      trigger.setAttribute("aria-pressed", result.added ? "true" : "false");
       showToast(result.message, result.ok ? "success" : "warning");
       updateAppUi(getCurrentCity());
       renderCompare();
@@ -405,6 +477,7 @@ function handleAction(action, trigger) {
       const id = Number(trigger.dataset.productId);
       const added = toggleWishlistItem(id);
       const product = getProductById(id);
+      trigger.setAttribute("aria-pressed", added ? "true" : "false");
       showToast(added ? `تمت إضافة ${product?.name || "المنتج"} إلى المفضلة` : `تمت إزالة ${product?.name || "المنتج"} من المفضلة`, added ? "success" : "info");
       updateAppUi(getCurrentCity());
       refreshProducts();
@@ -413,6 +486,7 @@ function handleAction(action, trigger) {
     case "toggle-compare-item": {
       const id = Number(trigger.dataset.productId);
       const result = toggleCompareItem(id);
+      trigger.setAttribute("aria-pressed", result.added ? "true" : "false");
       showToast(result.message, result.ok ? "success" : "warning");
       updateAppUi(getCurrentCity());
       renderCompare();
@@ -487,9 +561,19 @@ function handleAction(action, trigger) {
     case "scroll-top":
       scrollToTop();
       break;
+    case "scroll-home":
+      scrollToSection("home");
+      break;
+    case "scroll-categories":
+      scrollToSection("categories");
+      break;
     default:
       break;
   }
+
+  requestAnimationFrame(() => {
+    syncBlockingUiStates();
+  });
 }
 
 function bindClickActions() {
@@ -523,7 +607,12 @@ function bindOverlayClicks() {
     const el = document.getElementById(overlay);
     if (el) {
       el.addEventListener("click", (event) => {
-        if (event.target === el) handler();
+        if (event.target === el) {
+          handler();
+          requestAnimationFrame(() => {
+            syncBlockingUiStates();
+          });
+        }
       });
     }
   });
@@ -545,10 +634,16 @@ function bindKeyboardActions() {
       if (document.querySelector(".nav-links.active")) {
         closeMobileMenu();
       }
+
+      requestAnimationFrame(() => {
+        syncBlockingUiStates();
+      });
     }
 
     if (event.key === "Enter" || event.key === " ") {
-      const trigger = event.target.closest('[data-action="open-product-details"], [data-action="open-search-result"]');
+      const trigger = event.target.closest(
+        '[data-action="open-product-details"], [data-action="open-search-result"], [data-action="scroll-home"], [data-action="scroll-categories"]'
+      );
       if (trigger) {
         event.preventDefault();
         handleAction(trigger.dataset.action, trigger);
@@ -620,10 +715,10 @@ function bindControlEvents() {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".filter-tab").forEach((item) => {
         item.classList.remove("active");
-        item.setAttribute("aria-selected", "false");
+        item.setAttribute("aria-pressed", "false");
       });
       tab.classList.add("active");
-      tab.setAttribute("aria-selected", "true");
+      tab.setAttribute("aria-pressed", "true");
       state.activeFilters.category = tab.dataset.filter;
       applyFiltersAndRender();
     });
@@ -631,9 +726,8 @@ function bindControlEvents() {
 
   document.querySelectorAll(".rating-filter-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".rating-filter-btn").forEach((item) => item.classList.remove("active"));
-      btn.classList.add("active");
       state.activeFilters.rating = Number(btn.dataset.rating || 0);
+      syncFilterControlStates();
     });
   });
 
@@ -650,6 +744,8 @@ function bindControlEvents() {
       } else {
         state.activeFilters.colors = state.activeFilters.colors.filter((item) => item !== color);
       }
+
+      syncFilterControlStates();
     });
   });
 
@@ -686,6 +782,7 @@ function bindStorageSync() {
 function bindViewportActions() {
   const syncOnResize = debounce(() => {
     syncMobileMenuForViewport();
+    syncBlockingUiStates();
   }, 120);
 
   window.addEventListener("resize", syncOnResize);
@@ -699,6 +796,7 @@ export function initializeInteractions(maxPrice) {
   updatePriceSlider(maxPrice);
   refreshProducts();
   updateAppUi(getCurrentCity());
+  syncFilterControlStates();
   bindClickActions();
   bindOverlayClicks();
   bindKeyboardActions();
@@ -706,6 +804,7 @@ export function initializeInteractions(maxPrice) {
   bindControlEvents();
   bindStorageSync();
   bindViewportActions();
+  syncBlockingUiStates();
   startCountdown();
   debugLog("Interactions bound");
 }

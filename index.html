@@ -10,7 +10,13 @@
     <meta property="og:description" content="تصفح منتجات دار الأثاث الفاخر واطلب الأثاث المنزلي والمكتبي داخل فلسطين عبر واتساب بخطوات واضحة ومباشرة.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bssoof.github.io/furniture-website/">
+    <meta property="og:image" content="https://bssoof.github.io/furniture-website/assets/images/hero-sofa-900.webp">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="دار الأثاث الفاخر | أثاث منزلي ومكتبي في فلسطين">
+    <meta name="twitter:description" content="تصفح منتجات دار الأثاث الفاخر واطلب الأثاث المنزلي والمكتبي داخل فلسطين عبر واتساب بخطوات واضحة ومباشرة.">
+    <meta name="twitter:image" content="https://bssoof.github.io/furniture-website/assets/images/hero-sofa-900.webp">
+    <meta name="theme-color" content="#8B3D1A" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f0a08" media="(prefers-color-scheme: dark)">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -37,20 +43,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="icon" href="assets/icons/icon-192.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="assets/icons/icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="css/tokens-base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/utilities-state.css">
+    <link rel="stylesheet" href="css/theme-dark.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">تخطي إلى المحتوى الرئيسي</a>
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
-    
+
+    <header class="site-header">
     <!-- Navigation -->
-    <nav class="navbar" role="navigation" aria-label="القائمة الرئيسية">
+    <nav class="navbar" aria-label="القائمة الرئيسية">
         <div class="nav-top">
             <div class="nav-top-content">
                 <div class="nav-contact-info">
                     <i class="fas fa-phone"></i> +972 56 990 6492
-                    <span style="margin: 0 15px;">|</span>
+                    <span class="nav-contact-divider" aria-hidden="true">|</span>
                     <i class="fas fa-envelope"></i> info@darfurniture.com
                 </div>
             </div>
@@ -90,26 +106,26 @@
                 </li>
             </ul>
             <div class="nav-actions">
-                <button class="nav-btn" data-action="open-filters" title="فلاتر البحث">
+                <button class="nav-btn" type="button" data-action="open-filters" title="فلاتر البحث" aria-label="فتح فلاتر البحث">
                     <i class="fas fa-filter"></i>
-                    <span class="cart-count" id="filterBadge" style="display: none;">0</span>
+                    <span class="cart-count is-hidden" id="filterBadge">0</span>
                 </button>
-                <button class="nav-btn" data-action="open-compare" title="المقارنة">
+                <button class="nav-btn" type="button" data-action="open-compare" title="المقارنة" aria-label="فتح مقارنة المنتجات">
                     <i class="fas fa-balance-scale"></i>
-                    <span class="cart-count" id="compareBadge" style="display: none;">0</span>
+                    <span class="cart-count is-hidden" id="compareBadge">0</span>
                 </button>
-                <button class="theme-toggle" data-action="toggle-theme" title="تبديل الوضع الليلي">
+                <button class="theme-toggle" type="button" data-action="toggle-theme" title="تبديل الوضع الليلي" aria-label="تبديل الوضع الليلي">
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
                 <button class="nav-btn" type="button" data-action="toggle-search" aria-label="فتح البحث">
                     <i class="fas fa-search"></i>
                 </button>
-                <button class="nav-btn" data-action="toggle-wishlist">
+                <button class="nav-btn" type="button" data-action="toggle-wishlist" aria-label="فتح المفضلة">
                     <i class="fas fa-heart"></i>
                     <span class="cart-count" id="wishlistCount">0</span>
                 </button>
-                <button class="nav-btn" data-action="toggle-cart">
+                <button class="nav-btn" type="button" data-action="toggle-cart" aria-label="فتح سلة التسوق">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </button>
@@ -121,11 +137,8 @@
             </div>
         </div>
     </nav>
-    <div class="overlay mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true"></div>
+    <div class="overlay mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true" hidden></div>
 
-    <!-- Main Content -->
-    <main id="main-content">
-    
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
@@ -141,7 +154,16 @@
                 </div>
             </div>
             <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800" alt="أثاث فاخر">
+                <img
+                    src="assets/images/hero-sofa-560.webp"
+                    srcset="assets/images/hero-sofa-360.webp 360w, assets/images/hero-sofa-560.webp 560w, assets/images/hero-sofa-900.webp 900w"
+                    sizes="(max-width: 768px) 92vw, (max-width: 1200px) 70vw, 560px"
+                    width="900"
+                    height="675"
+                    alt="كنبة فاخرة في غرفة معيشة عصرية"
+                    fetchpriority="high"
+                    decoding="async"
+                >
                 <div class="floating-card discount">
                     <i class="fas fa-percent"></i>
                     <div>
@@ -159,8 +181,10 @@
             </div>
         </div>
     </section>
+    </header>
 
     <!-- Features -->
+    <main id="main-content" tabindex="-1">
     <section class="features">
         <div class="features-grid">
             <div class="feature-card">
@@ -195,7 +219,16 @@
         </div>
         <div class="categories-grid">
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600" alt="غرف المعيشة" loading="lazy">
+                <img
+                    src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=640&q=70&auto=format&fit=crop"
+                    srcset="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=320&q=60&auto=format&fit=crop 320w, https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=480&q=65&auto=format&fit=crop 480w, https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=640&q=70&auto=format&fit=crop 640w"
+                    sizes="(max-width: 768px) 46vw, (max-width: 1200px) 42vw, 320px"
+                    alt="غرف المعيشة"
+                    loading="lazy"
+                    width="640"
+                    height="480"
+                    decoding="async"
+                >
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف المعيشة</h3>
@@ -203,7 +236,16 @@
                 </div>
             </div>
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600" alt="غرف النوم" loading="lazy">
+                <img
+                    src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=640&q=70&auto=format&fit=crop"
+                    srcset="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=320&q=60&auto=format&fit=crop 320w, https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=480&q=65&auto=format&fit=crop 480w, https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=640&q=70&auto=format&fit=crop 640w"
+                    sizes="(max-width: 768px) 46vw, (max-width: 1200px) 42vw, 320px"
+                    alt="غرف النوم"
+                    loading="lazy"
+                    width="640"
+                    height="480"
+                    decoding="async"
+                >
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف النوم</h3>
@@ -211,7 +253,16 @@
                 </div>
             </div>
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600" alt="غرف الطعام" loading="lazy">
+                <img
+                    src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=640&q=70&auto=format&fit=crop"
+                    srcset="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=320&q=60&auto=format&fit=crop 320w, https://images.unsplash.com/photo-1617806118233-18e1de247200?w=480&q=65&auto=format&fit=crop 480w, https://images.unsplash.com/photo-1617806118233-18e1de247200?w=640&q=70&auto=format&fit=crop 640w"
+                    sizes="(max-width: 768px) 46vw, (max-width: 1200px) 42vw, 320px"
+                    alt="غرف الطعام"
+                    loading="lazy"
+                    width="640"
+                    height="480"
+                    decoding="async"
+                >
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>غرف الطعام</h3>
@@ -219,7 +270,16 @@
                 </div>
             </div>
             <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600" alt="المكاتب" loading="lazy">
+                <img
+                    src="https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=640&q=70&auto=format&fit=crop"
+                    srcset="https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=320&q=60&auto=format&fit=crop 320w, https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=480&q=65&auto=format&fit=crop 480w, https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=640&q=70&auto=format&fit=crop 640w"
+                    sizes="(max-width: 768px) 46vw, (max-width: 1200px) 42vw, 320px"
+                    alt="المكاتب"
+                    loading="lazy"
+                    width="640"
+                    height="480"
+                    decoding="async"
+                >
                 <div class="category-overlay">
                     <div class="arrow"><i class="fas fa-arrow-left"></i></div>
                     <h3>المكاتب</h3>
@@ -232,21 +292,64 @@
     <!-- Products -->
     <section class="products" id="products">
         <div class="products-header">
-            <div class="section-header" style="text-align: right; margin: 0;">
+            <div class="section-header section-header--inline">
                 <h2>مجموعتنا الحصرية</h2>
                 <p>تشكيلة مميزة من أرقى قطع الأثاث</p>
             </div>
             <div class="products-controls">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="all">الكل</button>
-                    <button class="filter-tab" data-filter="غرف المعيشة">غرف المعيشة</button>
-                    <button class="filter-tab" data-filter="غرف النوم">غرف النوم</button>
-                    <button class="filter-tab" data-filter="غرف الطعام">غرف الطعام</button>
-                    <button class="filter-tab" data-filter="المكاتب">المكاتب</button>
-                    <button class="filter-tab" data-filter="مقاعد">مقاعد</button>
-                    <button class="filter-tab" data-filter="إكسسوارات">إكسسوارات</button>
+                <div class="filter-tabs" role="group" aria-label="تصفية المنتجات حسب القسم">
+                    <button class="filter-tab filter-tab--all active" type="button" data-filter="all" aria-pressed="true" aria-label="عرض جميع المنتجات">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">الكل</span>
+                            <span class="filter-tab__hint">عرض شامل للمجموعة</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--living" type="button" data-filter="غرف المعيشة" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">غرف المعيشة</span>
+                            <span class="filter-tab__hint">كنب وصالونات</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--bedroom" type="button" data-filter="غرف النوم" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">غرف النوم</span>
+                            <span class="filter-tab__hint">أسرّة وخزائن</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--dining" type="button" data-filter="غرف الطعام" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">غرف الطعام</span>
+                            <span class="filter-tab__hint">طاولات وضيافة</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--office" type="button" data-filter="المكاتب" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">المكاتب</span>
+                            <span class="filter-tab__hint">حلول عمل يومية</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--chairs" type="button" data-filter="مقاعد" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">مقاعد</span>
+                            <span class="filter-tab__hint">كراسي مريحة</span>
+                        </span>
+                    </button>
+                    <button class="filter-tab filter-tab--accessories" type="button" data-filter="إكسسوارات" aria-pressed="false">
+                        <span class="filter-tab__media" aria-hidden="true"></span>
+                        <span class="filter-tab__content">
+                            <span class="filter-tab__label">إكسسوارات</span>
+                            <span class="filter-tab__hint">ديكور ولمسات</span>
+                        </span>
+                    </button>
                 </div>
                 <div class="sort-dropdown">
+                    <label class="sort-dropdown__label" for="sortProducts">ترتيب العرض</label>
                     <select id="sortProducts" aria-label="ترتيب المنتجات">
                         <option value="default">الترتيب الافتراضي</option>
                         <option value="price-low">السعر: من الأقل للأعلى</option>
@@ -289,7 +392,16 @@
                 <a href="#products" class="btn-primary">اغتنم العرض الآن</a>
             </div>
             <div class="offer-image">
-                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600" alt="عرض خاص" loading="lazy">
+                <img
+                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=640&q=70&auto=format&fit=crop"
+                    srcset="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=320&q=60&auto=format&fit=crop 320w, https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=480&q=65&auto=format&fit=crop 480w, https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=640&q=70&auto=format&fit=crop 640w"
+                    sizes="(max-width: 768px) 92vw, (max-width: 1200px) 70vw, 600px"
+                    alt="عرض خاص على كنبة فاخرة"
+                    loading="lazy"
+                    width="640"
+                    height="480"
+                    decoding="async"
+                >
             </div>
         </div>
     </section>
@@ -312,7 +424,17 @@
                 </div>
                 <p class="testimonial-text">جودة ممتازة وخدمة لا تُضاهى! أثاث بيتي كله من دار الأثاث وأنا راضي جداً عن الاختيار.</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60" class="author-avatar" alt="محمد" loading="lazy" width="60" height="60" decoding="async">
+                    <img
+                        src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=60&q=60&auto=format&fit=crop"
+                        srcset="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=60&q=60&auto=format&fit=crop 60w, https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=65&auto=format&fit=crop 120w"
+                        sizes="60px"
+                        class="author-avatar"
+                        alt="محمد أحمد"
+                        loading="lazy"
+                        width="60"
+                        height="60"
+                        decoding="async"
+                    >
                     <div class="author-info">
                         <h4>محمد أحمد</h4>
                         <p>مشتري متحقق</p>
@@ -329,7 +451,17 @@
                 </div>
                 <p class="testimonial-text">توصيل سريع وآمن جداً. المنتجات تطابق الصور بنسبة 100%. متجر موثوق وأنصح به بقوة!</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60" class="author-avatar" alt="فاطمة" loading="lazy" width="60" height="60" decoding="async">
+                    <img
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=60&auto=format&fit=crop"
+                        srcset="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=60&auto=format&fit=crop 60w, https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=65&auto=format&fit=crop 120w"
+                        sizes="60px"
+                        class="author-avatar"
+                        alt="فاطمة محمود"
+                        loading="lazy"
+                        width="60"
+                        height="60"
+                        decoding="async"
+                    >
                     <div class="author-info">
                         <h4>فاطمة محمود</h4>
                         <p>مشتري متحقق</p>
@@ -346,7 +478,17 @@
                 </div>
                 <p class="testimonial-text">أفضل سعر في السوق مع أفضل جودة! فريق الدعم رد على استفساراتي بسرعة واحترافية.</p>
                 <div class="testimonial-author">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60" class="author-avatar" alt="علي" loading="lazy" width="60" height="60" decoding="async">
+                    <img
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&q=60&auto=format&fit=crop"
+                        srcset="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&q=60&auto=format&fit=crop 60w, https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=65&auto=format&fit=crop 120w"
+                        sizes="60px"
+                        class="author-avatar"
+                        alt="علي خالد"
+                        loading="lazy"
+                        width="60"
+                        height="60"
+                        decoding="async"
+                    >
                     <div class="author-info">
                         <h4>علي خالد</h4>
                         <p>مشتري متحقق</p>
@@ -362,7 +504,8 @@
             <h2>اشترك في نشرتنا البريدية</h2>
             <p>احصل على أحدث العروض والمنتجات الجديدة مباشرة في بريدك الإلكتروني</p>
             <form class="newsletter-form" data-action="subscribe-newsletter">
-                <input type="email" placeholder="أدخل بريدك الإلكتروني" required>
+                <label class="sr-only" for="newsletterEmail">البريد الإلكتروني للاشتراك في النشرة</label>
+                <input type="email" id="newsletterEmail" placeholder="أدخل بريدك الإلكتروني" required autocomplete="email" inputmode="email">
                 <button type="submit">اشترك الآن</button>
             </form>
         </div>
@@ -389,6 +532,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
@@ -424,30 +568,29 @@
             <p>&copy; 2026 دار الأثاث الفاخر. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
-    
-    </main>
 
     <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay" aria-hidden="true"></div>
-    <aside class="cart-sidebar" role="dialog" aria-label="سلة التسوق" aria-modal="true">
+    <div class="cart-overlay" id="cartOverlay" aria-hidden="true" hidden></div>
+    <aside class="cart-sidebar" id="cartSidebar" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="cartTitle" hidden>
         <div class="cart-header">
-            <h3>سلة التسوق</h3>
-            <button class="close-cart" data-action="toggle-cart" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <h3 id="cartTitle">سلة التسوق</h3>
+            <button class="close-cart" type="button" data-action="toggle-cart" aria-label="إغلاق"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items" id="cartItems" role="list">
-            <p style="text-align: center; color: #999; padding: 40px 20px;">السلة فارغة حالياً</p>
+            <p class="panel-empty-message">السلة فارغة حالياً</p>
         </div>
         <div class="cart-footer">
             <div class="coupon-section">
+                <label class="sr-only" for="couponInput">كود الخصم</label>
                 <input type="text" id="couponInput" placeholder="كود الخصم">
-                <button data-action="apply-coupon" class="coupon-btn">تطبيق</button>
+                <button type="button" data-action="apply-coupon" class="coupon-btn">تطبيق</button>
             </div>
             <div class="cart-summary">
                 <div class="summary-row">
                     <span>المجموع:</span>
                     <span id="cartSubtotal">0 ₪</span>
                 </div>
-                <div class="summary-row discount-row" id="discountRow" style="display: none;">
+                <div class="summary-row discount-row is-hidden" id="discountRow">
                     <span>الخصم:</span>
                     <span id="discountAmount">-0 ₪</span>
                 </div>
@@ -460,7 +603,7 @@
                     <span id="cartTotal">0 ₪</span>
                 </div>
             </div>
-            <button class="checkout-btn" data-action="checkout">
+            <button class="checkout-btn" type="button" data-action="checkout">
                 <i class="fas fa-lock"></i>
                 إرسال الطلب
             </button>
@@ -468,23 +611,24 @@
     </aside>
 
     <!-- Wishlist Sidebar -->
-    <div class="wishlist-overlay" id="wishlistOverlay" aria-hidden="true"></div>
-    <aside class="wishlist-sidebar" id="wishlistSidebar" role="dialog" aria-label="المفضلة" aria-modal="true">
+    <div class="wishlist-overlay" id="wishlistOverlay" aria-hidden="true" hidden></div>
+    <aside class="wishlist-sidebar" id="wishlistSidebar" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="wishlistTitle" hidden>
         <div class="cart-header">
-            <h3>المفضلة <i class="fas fa-heart"></i></h3>
-            <button class="close-cart" data-action="toggle-wishlist" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <h3 id="wishlistTitle">المفضلة <i class="fas fa-heart" aria-hidden="true"></i></h3>
+            <button class="close-cart" type="button" data-action="toggle-wishlist" aria-label="إغلاق"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items" id="wishlistItems" role="list">
-            <p style="text-align: center; color: var(--text-secondary); padding: 40px 20px;">المفضلة فارغة</p>
+            <p class="panel-empty-message panel-empty-message--secondary">المفضلة فارغة</p>
         </div>
     </aside>
 
     <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="البحث" aria-modal="true">
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="searchTitle" hidden>
         <div class="search-container">
-            <button class="close-search" data-action="toggle-search" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-            <h2>ابحث عن منتجاتك</h2>
+            <button class="close-search" type="button" data-action="toggle-search" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <h2 id="searchTitle">ابحث عن منتجاتك</h2>
             <div class="search-input-wrapper">
+                <label class="sr-only" for="searchInput">ابحث عن اسم المنتج أو تصنيفه</label>
                 <input type="search" id="searchInput" placeholder="اكتب اسم المنتج...">
                 <button type="button" data-action="perform-search" aria-label="تنفيذ البحث">
                     <i class="fas fa-search"></i>
@@ -495,15 +639,15 @@
     </div>
 
     <!-- Product Details Modal -->
-    <div class="overlay" id="productDetailsOverlay" aria-hidden="true"></div>
-    <div class="product-details-modal" id="productDetailsModal" role="dialog" aria-modal="true" aria-hidden="true">
-        <button class="modal-close" data-action="close-product-details" aria-label="إغلاق">
+    <div class="overlay" id="productDetailsOverlay" aria-hidden="true" hidden></div>
+    <div class="product-details-modal" id="productDetailsModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="detailsProductName" hidden>
+        <button class="modal-close" type="button" data-action="close-product-details" aria-label="إغلاق">
             <i class="fas fa-times"></i>
         </button>
         <div class="product-details-container">
             <div class="product-details-gallery">
                 <img id="detailsProductImage" src="" alt="" class="details-main-image">
-                <div id="detailsProductBadge" class="details-badge"></div>
+                <div id="detailsProductBadge" class="details-badge is-hidden"></div>
             </div>
             <div class="product-details-content">
                 <div class="details-header">
@@ -512,7 +656,7 @@
                     <div class="details-rating" id="detailsProductRating"></div>
                     <div class="details-price-section">
                         <span class="details-price" id="detailsProductPrice"></span>
-                        <span class="details-old-price" id="detailsProductOldPrice"></span>
+                        <span class="details-old-price is-hidden" id="detailsProductOldPrice"></span>
                     </div>
                 </div>
                 <div class="details-specs" id="detailsProductSpecs"></div>
@@ -530,12 +674,12 @@
                 
                 <!-- Reviews -->
                 <div class="details-reviews-section">
-                    <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--text-primary);">
-                        <i class="fas fa-star" style="color: #F59E0B;"></i> التقييمات والمراجعات
+                    <h3 class="details-section-title">
+                        <i class="fas fa-star details-section-title-icon details-section-title-icon--accent" aria-hidden="true"></i> التقييمات والمراجعات
                     </h3>
                     <div id="productReviewsList" class="reviews-list"></div>
                     <div class="add-review-section">
-                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">أضف تقييمك</h4>
+                        <h4 class="details-subsection-title">أضف تقييمك</h4>
                         <form data-action="submit-review" class="review-form">
                             <div class="form-group">
                                 <label for="reviewName">الاسم</label>
@@ -568,9 +712,9 @@
                 </div>
                 
                 <!-- Similar Products -->
-                <div id="similarProducts" class="similar-products-section" style="display: none;">
-                    <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--text-primary);">
-                        <i class="fas fa-layer-group"></i> منتجات مشابهة
+                <div id="similarProducts" class="similar-products-section is-hidden">
+                    <h3 class="details-section-title">
+                        <i class="fas fa-layer-group details-section-title-icon" aria-hidden="true"></i> منتجات مشابهة
                     </h3>
                     <div class="similar-products-grid"></div>
                 </div>
@@ -579,13 +723,13 @@
     </div>
 
     <!-- Compare Modal -->
-    <div class="overlay" id="compareOverlay" aria-hidden="true"></div>
-    <div class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="overlay" id="compareOverlay" aria-hidden="true" hidden></div>
+    <div class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="compareTitle" hidden>
         <div class="modal-header">
             <h2 id="compareTitle">
                 <i class="fas fa-balance-scale"></i> مقارنة المنتجات
             </h2>
-            <button class="modal-close" data-action="close-compare" aria-label="إغلاق">
+            <button class="modal-close" type="button" data-action="close-compare" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -595,13 +739,13 @@
     </div>
 
     <!-- Filters Modal -->
-    <div class="overlay" id="filtersOverlay" aria-hidden="true"></div>
-    <div class="filters-modal" id="filtersModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="overlay" id="filtersOverlay" aria-hidden="true" hidden></div>
+    <div class="filters-modal" id="filtersModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="filtersTitle" hidden>
         <div class="modal-header">
             <h2 id="filtersTitle">
                 <i class="fas fa-filter"></i> تصفية المنتجات
             </h2>
-            <button class="modal-close" data-action="close-filters" aria-label="إغلاق">
+            <button class="modal-close" type="button" data-action="close-filters" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -612,7 +756,7 @@
                         <i class="fas fa-dollar-sign"></i> نطاق السعر
                     </h3>
                     <div class="price-range-container">
-                        <input type="range" id="priceSlider" min="0" max="10000" value="10000" step="100">
+                        <input type="range" id="priceSlider" min="0" max="10000" value="10000" step="100" aria-label="تصفية المنتجات حسب السعر">
                         <div class="price-range-labels">
                             <span>0 ₪</span>
                             <span id="priceValue">10,000 ₪</span>
@@ -641,12 +785,12 @@
                         <i class="fas fa-palette"></i> الألوان المتاحة
                     </h3>
                     <div class="color-filters">
-                        <button class="color-filter-btn" data-color="أبيض" style="background: #fff; border: 1px solid #ddd;"></button>
-                        <button class="color-filter-btn" data-color="أسود" style="background: #000;"></button>
-                        <button class="color-filter-btn" data-color="رمادي" style="background: #888;"></button>
-                        <button class="color-filter-btn" data-color="بني" style="background: #8B4513;"></button>
-                        <button class="color-filter-btn" data-color="بيج" style="background: #F5F5DC;"></button>
-                        <button class="color-filter-btn" data-color="أزرق" style="background: #4A90E2;"></button>
+                        <button class="color-filter-btn color-filter-btn--white" type="button" data-color="أبيض" aria-label="تصفية حسب اللون الأبيض"></button>
+                        <button class="color-filter-btn color-filter-btn--black" type="button" data-color="أسود" aria-label="تصفية حسب اللون الأسود"></button>
+                        <button class="color-filter-btn color-filter-btn--gray" type="button" data-color="رمادي" aria-label="تصفية حسب اللون الرمادي"></button>
+                        <button class="color-filter-btn color-filter-btn--brown" type="button" data-color="بني" aria-label="تصفية حسب اللون البني"></button>
+                        <button class="color-filter-btn color-filter-btn--beige" type="button" data-color="بيج" aria-label="تصفية حسب اللون البيج"></button>
+                        <button class="color-filter-btn color-filter-btn--blue" type="button" data-color="أزرق" aria-label="تصفية حسب اللون الأزرق"></button>
                     </div>
                 </div>
                 <div class="filter-group">
@@ -659,10 +803,10 @@
                     </label>
                 </div>
                 <div class="filter-actions">
-                    <button class="apply-filters-btn" data-action="apply-filters">
+                    <button class="apply-filters-btn" type="button" data-action="apply-filters">
                         <i class="fas fa-check"></i> تطبيق الفلاتر
                     </button>
-                    <button class="reset-filters-btn" data-action="reset-filters">
+                    <button class="reset-filters-btn" type="button" data-action="reset-filters">
                         <i class="fas fa-redo"></i> إعادة تعيين
                     </button>
                 </div>
@@ -671,11 +815,11 @@
     </div>
 
     <!-- Checkout Modal -->
-    <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true"></div>
-    <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="إرسال طلب الشراء" aria-modal="true">
+    <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true" hidden></div>
+    <div class="checkout-modal" id="checkoutModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="checkoutTitle" hidden>
         <div class="checkout-header">
-            <h3><i class="fas fa-shopping-bag"></i> إرسال طلب الشراء</h3>
-            <button class="close-checkout" data-action="close-checkout" aria-label="إغلاق">
+            <h3 id="checkoutTitle"><i class="fas fa-shopping-bag"></i> إرسال طلب الشراء</h3>
+            <button class="close-checkout" type="button" data-action="close-checkout" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -711,7 +855,7 @@
                     </div>
                     <div class="form-group">
                         <label for="checkoutPhone"><i class="fas fa-phone"></i> رقم الهاتف</label>
-                        <input type="tel" id="checkoutPhone" required placeholder="059xxxxxxx">
+                        <input type="tel" id="checkoutPhone" required placeholder="059xxxxxxx" autocomplete="tel">
                     </div>
                     <div class="form-group">
                         <label for="shippingCity"><i class="fas fa-map-marker-alt"></i> المدينة</label>
@@ -736,7 +880,7 @@
                         <label for="checkoutAddress"><i class="fas fa-home"></i> عنوان التوصيل</label>
                         <textarea id="checkoutAddress" required rows="3" placeholder="الحي - الشارع - رقم المبنى"></textarea>
                     </div>
-                    <p class="checkout-note" style="margin: 12px 0 16px; color: var(--text-secondary); font-size: 0.95rem;">
+                    <p class="checkout-note">
                         لن يتم الدفع إلكترونيًا. سيتم فتح واتساب لإرسال طلبك.
                     </p>
                     <button type="submit" class="submit-order-btn">
@@ -766,12 +910,12 @@
             <button class="mobile-nav-item" data-action="toggle-cart" aria-label="السلة">
                 <i class="fas fa-shopping-cart"></i>
                 <span>السلة</span>
-                <span class="mobile-badge" id="mobileCartBadge" style="display:none;">0</span>
+                <span class="mobile-badge is-hidden" id="mobileCartBadge">0</span>
             </button>
             <button class="mobile-nav-item" data-action="toggle-wishlist" aria-label="المفضلة">
                 <i class="fas fa-heart"></i>
                 <span>المفضلة</span>
-                <span class="mobile-badge" id="mobileWishlistBadge" style="display:none;">0</span>
+                <span class="mobile-badge is-hidden" id="mobileWishlistBadge">0</span>
             </button>
             <button class="mobile-nav-item" data-action="toggle-search" aria-label="البحث">
                 <i class="fas fa-search"></i>

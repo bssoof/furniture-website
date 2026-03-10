@@ -6,6 +6,17 @@ import { trackEvent } from "./analytics.js";
 const BODY_SCROLL_LOCK_CLASS = "no-scroll";
 const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 const IMAGE_FALLBACK_SRC = "assets/images/hero-sofa-560.webp";
+const HIDDEN_CLASS = "is-hidden";
+const blockingUiSelectors = [
+  ".cart-sidebar.active",
+  "#wishlistSidebar.active",
+  "#searchOverlay.active",
+  "#filtersModal.active",
+  "#compareModal.active",
+  "#productDetailsModal.active",
+  "#checkoutModal.active",
+  ".nav-links.active"
+].join(", ");
 
 let lastFocusedElement = null;
 
@@ -97,6 +108,44 @@ function setBodyScrollLocked(locked) {
   document.body.classList.toggle(BODY_SCROLL_LOCK_CLASS, locked);
 }
 
+function setElementAccessibilityState(element, hidden) {
+  if (!element) return;
+  element.setAttribute("aria-hidden", hidden ? "true" : "false");
+  element.hidden = hidden;
+}
+
+function setHiddenState(element, hidden) {
+  if (!element) return;
+  element.classList.toggle(HIDDEN_CLASS, hidden);
+}
+
+function hasActiveBlockingUi() {
+  return Boolean(document.querySelector(blockingUiSelectors));
+}
+
+function syncDialogOpenState(element) {
+  if (!element) return;
+  element.classList.add("active");
+  element.setAttribute("aria-hidden", "false");
+  element.hidden = false;
+}
+
+function syncDialogClosedState(element) {
+  if (!element) return;
+  element.classList.remove("active");
+  element.setAttribute("aria-hidden", "true");
+  element.hidden = true;
+}
+
+export function syncDecorativeIcons(root = document) {
+  if (!root?.querySelectorAll) return;
+
+  root.querySelectorAll('i[class*="fa"]').forEach((icon) => {
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("focusable", "false");
+  });
+}
+
 function createToastContainer() {
   let container = qs(".toast-container");
   if (!container) {
@@ -157,6 +206,7 @@ export function showToast(message, type = "success", title = "") {
 
   const container = createToastContainer();
   container.appendChild(toast);
+  syncDecorativeIcons(toast);
   announceToScreenReader(message);
 
   window.setTimeout(() => toast.classList.add("show"), 10);
@@ -202,33 +252,49 @@ export function openDialog(dialogEl, overlayEl = null) {
 
   lastFocusedElement = document.activeElement;
   dialogEl.classList.add("active");
-  dialogEl.setAttribute("aria-hidden", "false");
+  setElementAccessibilityState(dialogEl, false);
 
   if (overlayEl) {
     overlayEl.classList.add("active");
-    overlayEl.setAttribute("aria-hidden", "false");
+    setElementAccessibilityState(overlayEl, false);
   }
 
   setBodyScrollLocked(true);
   dialogEl._cleanupFocusTrap = trapFocus(dialogEl);
+
+  requestAnimationFrame(() => {
+    syncDialogOpenState(dialogEl);
+    if (overlayEl) {
+      syncDialogOpenState(overlayEl);
+    }
+  });
 }
 
 export function closeDialog(dialogEl, overlayEl = null) {
   if (!dialogEl) return;
 
   dialogEl.classList.remove("active");
-  dialogEl.setAttribute("aria-hidden", "true");
+  setElementAccessibilityState(dialogEl, true);
 
   if (overlayEl) {
     overlayEl.classList.remove("active");
-    overlayEl.setAttribute("aria-hidden", "true");
+    setElementAccessibilityState(overlayEl, true);
   }
 
   if (dialogEl._cleanupFocusTrap) {
     dialogEl._cleanupFocusTrap();
   }
 
-  setBodyScrollLocked(false);
+  if (!hasActiveBlockingUi()) {
+    setBodyScrollLocked(false);
+  }
+
+  requestAnimationFrame(() => {
+    syncDialogClosedState(dialogEl);
+    if (overlayEl) {
+      syncDialogClosedState(overlayEl);
+    }
+  });
 
   if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
     lastFocusedElement.focus();
@@ -255,6 +321,7 @@ export function renderProducts(products) {
 
   if (!products.length) {
     grid.innerHTML = '<p class="ui-empty-state products-empty">لا توجد منتجات مطابقة</p>';
+    syncDecorativeIcons(grid);
     return;
   }
 
@@ -275,10 +342,10 @@ export function renderProducts(products) {
             <img ${imageAttrsToString(imageAttrs)} alt="${escapeHTML(product.name)}" loading="lazy" width="500" height="360" decoding="async">
             ${product.badge ? `<span class="product-badge ${badgeClass}">${escapeHTML(product.badge)}</span>` : ""}
             <div class="product-actions">
-              <button class="action-btn wishlist-btn ${isWished ? "active" : ""}" type="button" data-action="toggle-wishlist-item" data-product-id="${product.id}" aria-label="إضافة إلى المفضلة">
+              <button class="action-btn wishlist-btn ${isWished ? "active" : ""}" type="button" data-action="toggle-wishlist-item" data-product-id="${product.id}" aria-label="إضافة إلى المفضلة" aria-pressed="${isWished ? "true" : "false"}">
                 <i class="fas fa-heart"></i>
               </button>
-              <button class="action-btn compare-btn ${isItemCompared ? "active" : ""}" type="button" data-action="toggle-compare-item" data-product-id="${product.id}" aria-label="إضافة للمقارنة">
+              <button class="action-btn compare-btn ${isItemCompared ? "active" : ""}" type="button" data-action="toggle-compare-item" data-product-id="${product.id}" aria-label="إضافة للمقارنة" aria-pressed="${isItemCompared ? "true" : "false"}">
                 <i class="fas fa-balance-scale"></i>
               </button>
               <button class="action-btn share-btn" type="button" data-action="share-product" data-product-id="${product.id}" aria-label="مشاركة المنتج">
@@ -306,6 +373,7 @@ export function renderProducts(products) {
       `;
     })
     .join("");
+  syncDecorativeIcons(grid);
 }
 
 export function renderCart() {
@@ -320,6 +388,7 @@ export function renderCart() {
         <button type="button" data-action="toggle-cart" class="ui-empty-action">تابع التسوق</button>
       </div>
     `;
+    syncDecorativeIcons(container);
     return;
   }
 
@@ -345,6 +414,7 @@ export function renderCart() {
       `
     })
     .join("");
+  syncDecorativeIcons(container);
 }
 
 export function renderWishlist() {
@@ -355,6 +425,7 @@ export function renderWishlist() {
 
   if (!products.length) {
     container.innerHTML = '<p class="ui-empty-state wishlist-empty-state">المفضلة فارغة</p>';
+    syncDecorativeIcons(container);
     return;
   }
 
@@ -376,6 +447,7 @@ export function renderWishlist() {
       `
     })
     .join("");
+  syncDecorativeIcons(container);
 }
 
 export function renderCompare() {
@@ -386,6 +458,7 @@ export function renderCompare() {
 
   if (!products.length) {
     container.innerHTML = '<p class="ui-empty-state compare-empty-state">لا توجد منتجات للمقارنة</p>';
+    syncDecorativeIcons(container);
     return;
   }
 
@@ -437,6 +510,7 @@ export function renderCompare() {
       </table>
     </div>
   `;
+  syncDecorativeIcons(container);
 }
 
 function renderReviewStars(rating) {
@@ -452,6 +526,7 @@ export function renderReviews(productId) {
 
   if (!reviews.length) {
     container.innerHTML = '<p class="ui-empty-state reviews-empty-state">لا توجد تقييمات بعد. كن أول من يقيّم!</p>';
+    syncDecorativeIcons(container);
     return;
   }
 
@@ -469,6 +544,7 @@ export function renderReviews(productId) {
       `
     )
     .join("");
+  syncDecorativeIcons(container);
 }
 
 export function renderSimilarProducts(productId) {
@@ -478,11 +554,11 @@ export function renderSimilarProducts(productId) {
 
   const similar = getSimilarProducts(productId);
   if (!similar.length) {
-    section.style.display = "none";
+    setHiddenState(section, true);
     return;
   }
 
-  section.style.display = "block";
+  setHiddenState(section, false);
   grid.innerHTML = similar
     .map((product) => {
       const imageAttrs = buildImageAttributes(
@@ -502,6 +578,7 @@ export function renderSimilarProducts(productId) {
       `
     })
     .join("");
+  syncDecorativeIcons(grid);
 }
 
 export function openProductDetails(productId) {
@@ -552,9 +629,9 @@ export function openProductDetails(productId) {
   if (oldPrice) {
     if (product.oldPrice) {
       oldPrice.textContent = formatPrice(product.oldPrice);
-      oldPrice.style.display = "inline";
+      setHiddenState(oldPrice, false);
     } else {
-      oldPrice.style.display = "none";
+      setHiddenState(oldPrice, true);
     }
   }
 
@@ -576,15 +653,26 @@ export function openProductDetails(productId) {
   if (badge) {
     if (product.badge) {
       badge.textContent = product.badge;
-      badge.style.display = "inline-flex";
+      setHiddenState(badge, false);
     } else {
-      badge.style.display = "none";
+      setHiddenState(badge, true);
     }
+  }
+
+  const detailsWishlistBtn = qs('[data-action="details-add-to-wishlist"]');
+  if (detailsWishlistBtn) {
+    detailsWishlistBtn.setAttribute("aria-pressed", isWishlisted(product.id) ? "true" : "false");
+  }
+
+  const detailsCompareBtn = qs('[data-action="details-add-to-compare"]');
+  if (detailsCompareBtn) {
+    detailsCompareBtn.setAttribute("aria-pressed", isCompared(product.id) ? "true" : "false");
   }
 
   renderReviews(product.id);
   renderSimilarProducts(product.id);
   openDialog(modal, overlay);
+  syncDecorativeIcons(modal);
 
   trackEvent("view_product", {
     product_id: product.id,
@@ -603,6 +691,7 @@ export function renderSearchResults(products) {
 
   if (!products.length) {
     container.innerHTML = '<p class="search-empty">لا توجد نتائج</p>';
+    syncDecorativeIcons(container);
     return;
   }
 
@@ -621,6 +710,7 @@ export function renderSearchResults(products) {
       `
     })
     .join("");
+  syncDecorativeIcons(container);
 }
 
 export function updateCounts() {
@@ -632,16 +722,26 @@ export function updateCounts() {
   const wishlistCountEl = byId("wishlistCount");
   const compareBadge = byId("compareBadge");
   const fabBadge = byId("fabCartBadge");
+  const mobileCartBadge = byId("mobileCartBadge");
+  const mobileWishlistBadge = byId("mobileWishlistBadge");
 
   if (cartCountEl) cartCountEl.textContent = String(cartCount);
   if (wishlistCountEl) wishlistCountEl.textContent = String(wishlistCount);
   if (compareBadge) {
     compareBadge.textContent = String(compareCount);
-    compareBadge.style.display = compareCount ? "flex" : "none";
+    setHiddenState(compareBadge, !compareCount);
   }
   if (fabBadge) {
     fabBadge.textContent = String(cartCount);
-    fabBadge.style.display = cartCount ? "flex" : "none";
+    setHiddenState(fabBadge, !cartCount);
+  }
+  if (mobileCartBadge) {
+    mobileCartBadge.textContent = String(cartCount);
+    setHiddenState(mobileCartBadge, !cartCount);
+  }
+  if (mobileWishlistBadge) {
+    mobileWishlistBadge.textContent = String(wishlistCount);
+    setHiddenState(mobileWishlistBadge, !wishlistCount);
   }
 }
 
@@ -655,7 +755,7 @@ export function updateFilterBadge() {
   if (state.activeFilters.inStock) count += 1;
 
   badge.textContent = String(count);
-  badge.style.display = count ? "flex" : "none";
+  setHiddenState(badge, !count);
 }
 
 export function updatePriceSlider(maxPrice) {
@@ -680,10 +780,10 @@ export function updateCartTotals(city) {
   if (subtotalEl) subtotalEl.textContent = formatPrice(totals.subtotal);
   if (discountRow && discountAmount) {
     if (totals.discount > 0) {
-      discountRow.style.display = "flex";
+      setHiddenState(discountRow, false);
       discountAmount.textContent = `-${formatPrice(totals.discount)}`;
     } else {
-      discountRow.style.display = "none";
+      setHiddenState(discountRow, true);
     }
   }
   if (shippingCost) shippingCost.textContent = totals.shipping.price === 0 ? "مجاني" : formatPrice(totals.shipping.price);
@@ -756,7 +856,9 @@ export function toggleSearch() {
     closeDialog(overlay);
   } else {
     openDialog(overlay);
-    byId("searchInput")?.focus();
+    requestAnimationFrame(() => {
+      byId("searchInput")?.focus();
+    });
   }
 }
 
@@ -829,6 +931,7 @@ export function initFloatingCartButton() {
     `;
     document.body.appendChild(container);
   }
+  syncDecorativeIcons(container);
 }
 
 export function initScrollEnhancements() {
@@ -930,11 +1033,15 @@ export function updateAppUi(city) {
 
 export function syncFilterControlStates() {
   qsa(".rating-filter-btn").forEach((btn) => {
-    btn.classList.toggle("active", Number(btn.dataset.rating) === Number(state.activeFilters.rating));
+    const isActive = Number(btn.dataset.rating) === Number(state.activeFilters.rating);
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
   qsa(".color-filter-btn").forEach((btn) => {
-    btn.classList.toggle("active", state.activeFilters.colors.includes(btn.dataset.color));
+    const isActive = state.activeFilters.colors.includes(btn.dataset.color);
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
   const stock = byId("inStockOnly");

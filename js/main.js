@@ -8,7 +8,8 @@ import {
   renderProducts,
   initTheme,
   initFloatingCartButton,
-  initScrollEnhancements
+  initScrollEnhancements,
+  syncDecorativeIcons
 } from "./ui.js";
 import { initializeInteractions } from "./actions.js";
 
@@ -46,6 +47,7 @@ async function bootstrap() {
   renderProducts(filterProducts());
 
   initializeInteractions(maxPrice);
+  syncDecorativeIcons();
 }
 
 bootstrap()

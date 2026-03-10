@@ -11,7 +11,7 @@ export function normalizeSearchText(text) {
 }
 
 async function readJson(path) {
-  const response = await fetch(path, { cache: "no-store" });
+  const response = await fetch(path);
   if (!response.ok) {
     throw new Error(`Failed to load ${path}: ${response.status}`);
   }

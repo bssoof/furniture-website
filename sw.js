@@ -1,4 +1,4 @@
-const CACHE_NAME = "dar-furniture-v4";
+const CACHE_NAME = "dar-furniture-v7";
 const SCOPE_URL = new URL(self.registration.scope);
 
 function scopedPath(relativePath) {
@@ -10,6 +10,12 @@ const STATIC_ASSETS = [
   scopedPath("./"),
   INDEX_FALLBACK,
   scopedPath("./css/style.css"),
+  scopedPath("./css/tokens-base.css"),
+  scopedPath("./css/layout.css"),
+  scopedPath("./css/components.css"),
+  scopedPath("./css/utilities-state.css"),
+  scopedPath("./css/theme-dark.css"),
+  scopedPath("./css/responsive.css"),
   scopedPath("./js/main.js"),
   scopedPath("./js/state.js"),
   scopedPath("./js/catalog.js"),
@@ -22,6 +28,8 @@ const STATIC_ASSETS = [
   scopedPath("./data/products.json"),
   scopedPath("./data/coupons.json"),
   scopedPath("./manifest.json"),
+  scopedPath("./assets/icons/icon-192.svg"),
+  scopedPath("./assets/icons/icon-512.svg"),
   scopedPath("./assets/images/hero-sofa-360.webp"),
   scopedPath("./assets/images/hero-sofa-560.webp"),
   scopedPath("./assets/images/hero-sofa-900.webp")
