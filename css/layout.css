@@ -212,14 +212,20 @@
     margin-top: 110px;
     min-height: calc(100vh - 110px);
     padding: 40px 0 60px;
-    background: linear-gradient(120deg, rgba(255,248,241,0.95) 0%, rgba(255,248,241,0.85) 45%, rgba(217,160,102,0.15) 100%);
+    background:
+        radial-gradient(circle at 72% 28%, rgba(217,160,102,0.22), transparent 22%),
+        radial-gradient(circle at 18% 80%, rgba(245,230,213,0.9), transparent 28%),
+        linear-gradient(120deg, rgba(255,248,241,0.98) 0%, rgba(255,248,241,0.9) 46%, rgba(217,160,102,0.16) 100%);
     display: flex;
     align-items: center;
     position: relative;
 }
 
 [data-theme="dark"] .hero {
-    background: linear-gradient(120deg, rgba(15,10,8,0.92) 0%, rgba(26,19,16,0.88) 45%, rgba(217,160,102,0.12) 100%);
+    background:
+        radial-gradient(circle at 74% 26%, rgba(227,177,119,0.16), transparent 20%),
+        radial-gradient(circle at 20% 78%, rgba(59,42,34,0.46), transparent 28%),
+        linear-gradient(120deg, rgba(15,10,8,0.94) 0%, rgba(26,19,16,0.9) 46%, rgba(217,160,102,0.12) 100%);
 }
 
 .hero::before {
@@ -229,9 +235,21 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A574' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A574' fill-opacity='0.085'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
+    opacity: 0.88;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(255,248,241,0.08), transparent 24%, transparent 76%, rgba(255,248,241,0.08)),
+        radial-gradient(circle at 66% 42%, rgba(255,255,255,0.28), transparent 24%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .hero-content {
@@ -368,6 +386,8 @@
 
 .hero-image img {
     width: 100%;
+    height: auto;
+    display: block;
     border-radius: 30px;
     box-shadow: 0 30px 60px rgba(0,0,0,0.4);
 }

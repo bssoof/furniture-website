@@ -60,7 +60,7 @@ section {
 }
 
 main {
-    overflow: hidden;
+    overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {

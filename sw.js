@@ -1,4 +1,4 @@
-const CACHE_NAME = "dar-furniture-v7";
+const CACHE_NAME = "dar-furniture-v9";
 const SCOPE_URL = new URL(self.registration.scope);
 
 function scopedPath(relativePath) {
