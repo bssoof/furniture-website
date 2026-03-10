@@ -188,18 +188,22 @@
         min-height: auto;
         padding: 30px 16px 50px;
         background:
-            radial-gradient(circle at 82% 16%, rgba(217,160,102,0.14), transparent 20%),
-            radial-gradient(circle at 18% 82%, rgba(245,230,213,0.38), transparent 24%),
-            linear-gradient(160deg, rgba(255,248,241,0.56) 0%, rgba(255,248,241,0.48) 52%, rgba(217,160,102,0.12) 100%),
-            url("../assets/images/hero-room-bg.jpg") 68% center/cover no-repeat;
+            radial-gradient(circle at 80% 18%, rgba(217,160,102,0.12), transparent 18%),
+            radial-gradient(circle at 18% 82%, rgba(245,230,213,0.26), transparent 22%),
+            linear-gradient(160deg, rgba(255,248,241,0.34) 0%, rgba(255,248,241,0.28) 52%, rgba(217,160,102,0.08) 100%),
+            url("../assets/images/hero-room-bg-mobile.jpg") center/cover no-repeat;
     }
 
     [data-theme="dark"] .hero {
         background:
-            radial-gradient(circle at 82% 16%, rgba(227,177,119,0.12), transparent 20%),
-            radial-gradient(circle at 18% 82%, rgba(59,42,34,0.28), transparent 24%),
-            linear-gradient(160deg, rgba(15,10,8,0.62) 0%, rgba(26,19,16,0.58) 52%, rgba(217,160,102,0.1) 100%),
-            url("../assets/images/hero-room-bg.jpg") 68% center/cover no-repeat;
+            radial-gradient(circle at 80% 18%, rgba(227,177,119,0.1), transparent 18%),
+            radial-gradient(circle at 18% 82%, rgba(59,42,34,0.22), transparent 22%),
+            linear-gradient(160deg, rgba(15,10,8,0.52) 0%, rgba(26,19,16,0.46) 52%, rgba(217,160,102,0.08) 100%),
+            url("../assets/images/hero-room-bg-mobile.jpg") center/cover no-repeat;
+    }
+
+    .hero::before {
+        opacity: 0.42;
     }
     
     .hero-content {
