@@ -187,6 +187,19 @@
         margin-top: 70px;
         min-height: auto;
         padding: 30px 16px 50px;
+        background:
+            radial-gradient(circle at 82% 16%, rgba(217,160,102,0.14), transparent 20%),
+            radial-gradient(circle at 18% 82%, rgba(245,230,213,0.38), transparent 24%),
+            linear-gradient(160deg, rgba(255,248,241,0.56) 0%, rgba(255,248,241,0.48) 52%, rgba(217,160,102,0.12) 100%),
+            url("../assets/images/hero-room-bg.jpg") 68% center/cover no-repeat;
+    }
+
+    [data-theme="dark"] .hero {
+        background:
+            radial-gradient(circle at 82% 16%, rgba(227,177,119,0.12), transparent 20%),
+            radial-gradient(circle at 18% 82%, rgba(59,42,34,0.28), transparent 24%),
+            linear-gradient(160deg, rgba(15,10,8,0.62) 0%, rgba(26,19,16,0.58) 52%, rgba(217,160,102,0.1) 100%),
+            url("../assets/images/hero-room-bg.jpg") 68% center/cover no-repeat;
     }
     
     .hero-content {
