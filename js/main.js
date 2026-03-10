@@ -21,6 +21,17 @@ async function registerServiceWorker() {
   if (!isSupportedProtocol) return;
 
   try {
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let isRefreshing = false;
+
+    if (hadController) {
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (isRefreshing) return;
+        isRefreshing = true;
+        window.location.reload();
+      });
+    }
+
     const swUrl = new URL("sw.js", window.location.href);
     const scopeUrl = new URL("./", window.location.href);
     const registration = await navigator.serviceWorker.register(swUrl, {

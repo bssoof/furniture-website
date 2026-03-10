@@ -1,4 +1,4 @@
-const CACHE_NAME = "dar-furniture-v9";
+const CACHE_NAME = "dar-furniture-v11";
 const SCOPE_URL = new URL(self.registration.scope);
 
 function scopedPath(relativePath) {
@@ -30,6 +30,7 @@ const STATIC_ASSETS = [
   scopedPath("./manifest.json"),
   scopedPath("./assets/icons/icon-192.svg"),
   scopedPath("./assets/icons/icon-512.svg"),
+  scopedPath("./assets/images/hero-room-bg.jpg"),
   scopedPath("./assets/images/hero-sofa-360.webp"),
   scopedPath("./assets/images/hero-sofa-560.webp"),
   scopedPath("./assets/images/hero-sofa-900.webp")
